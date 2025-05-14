@@ -18,20 +18,28 @@ export default function CheckoutLayout({
           >
             <ChevronDown className="rotate-90" size={16} />
             <span className="mt-px hidden small:block txt-compact-plus text-ui-fg-subtle hover:text-ui-fg-base ">
-              Back to shopping cart
+              Tagasi ostukorvi
             </span>
             <span className="mt-px block small:hidden txt-compact-plus text-ui-fg-subtle hover:text-ui-fg-base">
-              Back
+              Tagasi
             </span>
           </LocalizedClientLink>
-          <LocalizedClientLink
-            href="/"
-            className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
-            data-testid="store-link"
+          <span
+            className="txt-compact-xlarge-plus text-ui-fg-subtle"
+            data-testid="checkout-header-title"
           >
-            Medusa Store
-          </LocalizedClientLink>
-          <div className="flex-1 basis-0" />
+            Lõpeta tellimus
+          </span>
+          <div className="flex-1 basis-0 flex justify-end items-center">
+            <LocalizedClientLink
+              href="/"
+              className="text-small-semi text-ui-fg-base flex items-center gap-x-2 hover:text-ui-fg-interactive"
+              data-testid="homepage-link"
+            >
+              Avalehele
+              {/* Add Home icon here if available - e.g., <HomeIcon className="h-5 w-5" /> */}
+            </LocalizedClientLink>
+          </div>
         </nav>
       </div>
       <div className="relative" data-testid="checkout-container">{children}</div>

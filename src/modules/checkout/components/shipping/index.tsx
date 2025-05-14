@@ -4,11 +4,10 @@ import { RadioGroup, Radio } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
-import { CheckCircleSolid, Loader } from "@medusajs/icons"
+import { Loader, Clock } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Button, Heading, Text, clx } from "@medusajs/ui"
+import { Button, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import Divider from "@modules/common/components/divider"
 import MedusaRadio from "@modules/common/components/radio"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -21,7 +20,7 @@ type ShippingProps = {
   availableShippingMethods: HttpTypes.StoreCartShippingOption[] | null
 }
 
-function formatAddress(address) {
+function formatAddress(address: any) {
   if (!address) {
     return ""
   }
@@ -70,12 +69,14 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const isOpen = searchParams.get("step") === "delivery"
 
+  // Note: these properties are custom extensions to the Medusa types
+  // When service_zone doesn't exist, fallback to standard filtering
   const _shippingMethods = availableShippingMethods?.filter(
-    (sm) => sm.service_zone?.fulfillment_set?.type !== "pickup"
+    (sm) => !((sm as any).service_zone?.fulfillment_set?.type === "pickup")
   )
 
   const _pickupMethods = availableShippingMethods?.filter(
-    (sm) => sm.service_zone?.fulfillment_set?.type === "pickup"
+    (sm) => (sm as any).service_zone?.fulfillment_set?.type === "pickup"
   )
 
   const hasPickupOptions = !!_pickupMethods?.length
@@ -104,7 +105,7 @@ const Shipping: React.FC<ShippingProps> = ({
     if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
       setShowPickupOptions(PICKUP_OPTION_ON)
     }
-  }, [availableShippingMethods])
+  }, [availableShippingMethods, _shippingMethods, _pickupMethods, shippingMethodId, cart.id])
 
   const handleEdit = () => {
     router.push(pathname + "?step=delivery", { scroll: false })
@@ -149,250 +150,155 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [isOpen])
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
-            {
-              "opacity-50 pointer-events-none select-none":
-                !isOpen && cart.shipping_methods?.length === 0,
-            }
-          )}
-        >
-          Kohaletoimetamine
-          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
-            <CheckCircleSolid />
-          )}
-        </Heading>
+    <div className={`${isOpen ? '' : 'opacity-75'} space-y-6`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isOpen ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
+            <Clock className="h-4 w-4" />
+          </div>
+          <h3 className="font-medium text-lg text-gray-900">Tarnimine</h3>
+        </div>
+        
         {!isOpen &&
           cart?.shipping_address &&
           cart?.billing_address &&
           cart?.email && (
-            <Text>
-              <button
-                onClick={handleEdit}
-                className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-                data-testid="edit-delivery-button"
-              >
-                Muuda
-              </button>
-            </Text>
+            <button
+              onClick={handleEdit}
+              className="text-sm text-yellow-600 hover:text-yellow-700 font-medium transition-colors"
+              data-testid="edit-delivery-button"
+            >
+              Muuda
+            </button>
           )}
       </div>
+      
       {isOpen ? (
-        <>
-          <div className="grid">
-            <div className="flex flex-col">
-              <span className="font-medium txt-medium text-ui-fg-base">
-                Transpordi meetod
-              </span>
-              <span className="mb-4 text-ui-fg-muted txt-medium">
-                Kuidas soovid oma tellimuse kätte saada
-              </span>
-            </div>
-            <div data-testid="delivery-options-container">
-              <div className="pb-8 md:pt-0 pt-2">
-                {hasPickupOptions && (
-                  <RadioGroup
-                    value={showPickupOptions}
-                    onChange={(value) => {
-                      const id = _pickupMethods.find(
-                        (option) => !option.insufficient_inventory
-                      )?.id
+        <div className="bg-gray-50 p-6 rounded-lg mb-6 space-y-6">
+          <span className="text-sm text-gray-700">Valige oma tellimuse tarneviis</span>
+          <div data-testid="delivery-options-container">
+            <div className="space-y-3">
+              {hasPickupOptions && (
+                <RadioGroup
+                  value={showPickupOptions}
+                  onChange={(value) => {
+                    const id = _pickupMethods?.find(
+                      (option) => !option.insufficient_inventory
+                    )?.id
 
-                      if (id) {
-                        handleSetShippingMethod(id, "pickup")
+                    if (id) {
+                      handleSetShippingMethod(id, "pickup")
+                    }
+                  }}
+                >
+                  <Radio
+                    value={PICKUP_OPTION_ON}
+                    data-testid="delivery-option-radio"
+                    className={clx(
+                      "flex items-center justify-between cursor-pointer py-4 px-5 rounded-lg border transition-colors",
+                      {
+                        "border-yellow-500 bg-yellow-50": showPickupOptions === PICKUP_OPTION_ON,
+                        "border-gray-200 hover:border-gray-300": showPickupOptions !== PICKUP_OPTION_ON,
                       }
-                    }}
+                    )}
                   >
+                    <div className="flex items-center gap-x-3">
+                      <MedusaRadio
+                        checked={showPickupOptions === PICKUP_OPTION_ON}
+                      />
+                      <span className="text-sm font-medium text-gray-900">
+                        Poe püüdmine
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-700">
+                      Tasuta
+                    </span>
+                  </Radio>
+                </RadioGroup>
+              )}
+              <RadioGroup
+                value={shippingMethodId || ""}
+                onChange={(v) => handleSetShippingMethod(v, "shipping")}
+              >
+                {_shippingMethods?.map((option) => {
+                  const isDisabled =
+                    option.price_type === "calculated" &&
+                    !isLoadingPrices &&
+                    typeof calculatedPricesMap[option.id] !== "number"
+
+                  return (
                     <Radio
-                      value={PICKUP_OPTION_ON}
+                      key={option.id}
+                      value={option.id}
                       data-testid="delivery-option-radio"
+                      disabled={isDisabled}
                       className={clx(
-                        "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
+                        "flex items-center justify-between cursor-pointer py-4 px-5 rounded-lg border transition-colors",
                         {
-                          "border-ui-border-interactive":
-                            showPickupOptions === PICKUP_OPTION_ON,
+                          "border-yellow-500 bg-yellow-50": shippingMethodId === option.id,
+                          "border-gray-200 hover:border-gray-300": shippingMethodId !== option.id,
+                          "opacity-50 cursor-not-allowed": isDisabled
                         }
                       )}
                     >
-                      <div className="flex items-center gap-x-4">
-                        <MedusaRadio
-                          checked={showPickupOptions === PICKUP_OPTION_ON}
-                        />
-                        <span className="text-base-regular">
-                          Tule ise kaubale järele
+                      <div className="flex items-center gap-x-3">
+                        <MedusaRadio checked={shippingMethodId === option.id} />
+                        <span className="text-sm font-medium text-gray-900">
+                          {option.name}
                         </span>
                       </div>
-                      <span className="justify-self-end text-ui-fg-base">
-                        -
+                      <span className="text-sm text-gray-700">
+                        {option.amount !== undefined &&
+                        option.price_type !== "calculated"
+                          ? convertToLocale({
+                              amount: option.amount,
+                              currency_code: cart.region?.currency_code || "",
+                            })
+                          : isLoadingPrices
+                          ? "Calculating..."
+                          : typeof calculatedPricesMap[option.id] === "number"
+                          ? convertToLocale({
+                              amount: calculatedPricesMap[option.id],
+                              currency_code: cart.region?.currency_code || "",
+                            })
+                          : "N/A"}
                       </span>
                     </Radio>
-                  </RadioGroup>
-                )}
-                <RadioGroup
-                  value={shippingMethodId}
-                  onChange={(v) => handleSetShippingMethod(v, "shipping")}
-                >
-                  {_shippingMethods?.map((option) => {
-                    const isDisabled =
-                      option.price_type === "calculated" &&
-                      !isLoadingPrices &&
-                      typeof calculatedPricesMap[option.id] !== "number"
-
-                    return (
-                      <Radio
-                        key={option.id}
-                        value={option.id}
-                        data-testid="delivery-option-radio"
-                        disabled={isDisabled}
-                        className={clx(
-                          "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
-                          {
-                            "border-ui-border-interactive":
-                              option.id === shippingMethodId,
-                            "hover:shadow-brders-none cursor-not-allowed":
-                              isDisabled,
-                          }
-                        )}
-                      >
-                        <div className="flex items-center gap-x-4">
-                          <MedusaRadio
-                            checked={option.id === shippingMethodId}
-                          />
-                          <span className="text-base-regular">
-                            {option.name}
-                          </span>
-                        </div>
-                        <span className="justify-self-end text-ui-fg-base">
-                          {option.price_type === "flat" ? (
-                            convertToLocale({
-                              amount: option.amount!,
-                              currency_code: cart?.currency_code,
-                            })
-                          ) : calculatedPricesMap[option.id] ? (
-                            convertToLocale({
-                              amount: calculatedPricesMap[option.id],
-                              currency_code: cart?.currency_code,
-                            })
-                          ) : isLoadingPrices ? (
-                            <Loader />
-                          ) : (
-                            "-"
-                          )}
-                        </span>
-                      </Radio>
-                    )
-                  })}
-                </RadioGroup>
-              </div>
+                  )
+                })}
+              </RadioGroup>
             </div>
-          </div>
-
-          {showPickupOptions === PICKUP_OPTION_ON && (
-            <div className="grid">
-              <div className="flex flex-col">
-                <span className="font-medium txt-medium text-ui-fg-base">
-                  Pood
-                </span>
-                <span className="mb-4 text-ui-fg-muted txt-medium">
-                  Vali endale lähim pood
-                </span>
-              </div>
-              <div data-testid="delivery-options-container">
-                <div className="pb-8 md:pt-0 pt-2">
-                  <RadioGroup
-                    value={shippingMethodId}
-                    onChange={(v) => handleSetShippingMethod(v, "pickup")}
-                  >
-                    {_pickupMethods?.map((option) => {
-                      return (
-                        <Radio
-                          key={option.id}
-                          value={option.id}
-                          disabled={option.insufficient_inventory}
-                          data-testid="delivery-option-radio"
-                          className={clx(
-                            "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
-                            {
-                              "border-ui-border-interactive":
-                                option.id === shippingMethodId,
-                              "hover:shadow-brders-none cursor-not-allowed":
-                                option.insufficient_inventory,
-                            }
-                          )}
-                        >
-                          <div className="flex items-start gap-x-4">
-                            <MedusaRadio
-                              checked={option.id === shippingMethodId}
-                            />
-                            <div className="flex flex-col">
-                              <span className="text-base-regular">
-                                {option.name}
-                              </span>
-                              <span className="text-base-regular text-ui-fg-muted">
-                                {formatAddress(
-                                  option.service_zone?.fulfillment_set?.location
-                                    ?.address
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                          <span className="justify-self-end text-ui-fg-base">
-                            {convertToLocale({
-                              amount: option.amount!,
-                              currency_code: cart?.currency_code,
-                            })}
-                          </span>
-                        </Radio>
-                      )
-                    })}
-                  </RadioGroup>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <ErrorMessage
-              error={error}
-              data-testid="delivery-option-error-message"
-            />
-            <Button
-              size="large"
-              className="mt"
-              onClick={handleSubmit}
-              isLoading={isLoading}
-              disabled={!cart.shipping_methods?.[0]}
-              data-testid="submit-delivery-option-button"
-            >
-              Jätka maksega
-            </Button>
-          </div>
-        </>
-      ) : (
-        <div>
-          <div className="text-small-regular">
-            {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Meetod
-                </Text>
-                <Text className="txt-medium text-ui-fg-subtle">
-                  {cart.shipping_methods?.at(-1)?.name}{" "}
-                  {convertToLocale({
-                    amount: cart.shipping_methods.at(-1)?.amount!,
-                    currency_code: cart?.currency_code,
-                  })}
-                </Text>
-              </div>
-            )}
+            <ErrorMessage error={error} />
           </div>
         </div>
+      ) : (
+        <div className="space-y-2">
+          {!isLoading && cart?.shipping_methods?.[0]?.shipping_option_id && (
+            <>
+              <p className="text-sm font-medium text-gray-500">Valitud tarneviis</p>
+              <p className="text-sm text-gray-900">
+                {cart.shipping_methods[0].shipping_option_id} (
+                {convertToLocale({
+                  amount: cart.shipping_methods[0].amount || 0,
+                  currency_code: cart.region?.currency_code || "",
+                })}
+                )
+              </p>
+              {cart.shipping_address && (
+                <p className="text-sm text-gray-700">
+                  {formatAddress(cart.shipping_address)}
+                </p>
+              )}
+            </>
+          )}
+          {!cart?.shipping_methods?.length && (
+            <div className="flex items-center justify-center gap-x-2">
+              <Loader className="animate-spin" />
+              <p className="text-sm text-gray-700">Laeb tarnimismeetodeid...</p>
+            </div>
+          )}
+        </div>
       )}
-      <Divider className="mt-8" />
     </div>
   )
 }

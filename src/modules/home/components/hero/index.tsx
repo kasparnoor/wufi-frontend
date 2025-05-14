@@ -8,6 +8,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Sparkles } from "@medusajs/icons"
 import ProductPreview from "@modules/products/components/product-preview"
 import WufiButton from "@modules/common/components/wufi-button"
+import { BentoDemo } from "@modules/common/components/bento-grid/demo"
 
 const Hero = async ({ region }: { region: HttpTypes.StoreRegion }) => {
   // Fetch collections, categories and featured products
@@ -46,7 +47,7 @@ const Hero = async ({ region }: { region: HttpTypes.StoreRegion }) => {
         {/* Main content */}
         <div className="relative z-10 h-full flex flex-col">
           {/* Hero content */}
-          <div className="flex-1 container mx-auto px-6 lg:px-12 pt-32 pb-20">
+          <div className="flex-1 content-container pt-32 pb-20">
             <div className="max-w-[720px] relative">
               <div className="inline-flex items-center gap-2 mb-8 bg-white/5 backdrop-blur-sm px-6 py-2.5 rounded-full border border-white/10">
                 <Sparkles className="h-5 w-5 text-yellow-400" />
@@ -86,7 +87,7 @@ const Hero = async ({ region }: { region: HttpTypes.StoreRegion }) => {
           </div>
 
           {/* Feature cards */}
-          <div className="container mx-auto px-4 sm:px-6 lg:px-12 pb-8 sm:pb-12">
+          <div className="content-container py-8 sm:py-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white/5 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors group">
                 <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -122,85 +123,97 @@ const Hero = async ({ region }: { region: HttpTypes.StoreRegion }) => {
       </div>
 
       {/* How it Works Section */}
-      <div className="py-16 sm:py-24 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-yellow-50/50 to-transparent"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
+      <div className="py-16 sm:py-24 bg-gradient-to-b from-white to-yellow-50 relative overflow-hidden">
+        <div className="content-container relative">
           <div className="flex flex-col items-center mb-12 sm:mb-16">
-            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-4 sm:px-6 py-2.5 rounded-full border border-yellow-400/30">
+            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-4 sm:px-6 py-2.5 rounded-full border border-yellow-500/40">
               <Sparkles className="h-5 w-5 text-yellow-600" />
               <span className="text-yellow-700 font-semibold">Kuidas see töötab</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Lihtne ja mugav tellimine</h2>
-            <p className="text-gray-600 text-center max-w-2xl px-4">Nelja lihtsa sammuga alustage oma lemmiklooma toidu tellimist</p>
+            <h2 className="text-2xl sm:text-3xl text-gray-900 font-bold mb-4">Lihtne ja mugav tellimine</h2>
+            <p className="text-gray-700 text-center max-w-2xl px-4">Nelja lihtsa sammuga alustage oma lemmiklooma toidu tellimist</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {/* Step 1 */}
-            <div className="group relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg z-10">
-                1
-              </div>
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-yellow-200 group-hover:-translate-y-1">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ShoppingBag className="h-6 w-6 text-yellow-400" />
+          {/* Journey Steps with connecting track */}
+          <div className="relative">
+            {/* Connection track - horizontal line */}
+            <div className="absolute hidden lg:block top-12 left-[calc(12.5%+2rem)] right-[calc(12.5%+2rem)] h-2 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 rounded-full z-0"></div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 relative">
+              {/* Step 1 */}
+              <div className="group relative">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg z-10 shadow-md shadow-yellow-300/50 border-2 border-white">
+                  1
                 </div>
-                <h3 className="text-lg font-medium mb-3 group-hover:text-yellow-600 transition-colors">Valige toit</h3>
-                <p className="text-gray-600">Valige sobiv toit oma lemmiklooma jaoks. Meie eksperdid aitavad teil teha õige valiku.</p>
+                <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-yellow-100 hover:border-yellow-400 group-hover:-translate-y-2 relative z-[1]">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <ShoppingBag className="h-7 w-7 text-yellow-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-yellow-600 transition-colors">Valige toit</h3>
+                  <p className="text-gray-700">Valige sobiv toit oma lemmiklooma jaoks. Meie eksperdid aitavad teil teha õige valiku.</p>
+                </div>
               </div>
-            </div>
 
-            {/* Step 2 */}
-            <div className="group relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg z-10">
-                2
-              </div>
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-yellow-200 group-hover:-translate-y-1">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ArrrowRight className="h-6 w-6 text-yellow-400" />
+              {/* Step 2 */}
+              <div className="group relative">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg z-10 shadow-md shadow-yellow-300/50 border-2 border-white">
+                  2
                 </div>
-                <h3 className="text-lg font-medium mb-3 group-hover:text-yellow-600 transition-colors">Määrake kogus</h3>
-                <p className="text-gray-600">Valige igakuine toidu kogus vastavalt oma lemmiklooma vajadustele.</p>
+                {/* Mobile step connector (visible only on small screens) */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-yellow-400 -mt-8 sm:hidden"></div>
+                <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-yellow-100 hover:border-yellow-400 group-hover:-translate-y-2 relative z-[1]">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <ArrrowRight className="h-7 w-7 text-yellow-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-yellow-600 transition-colors">Määrake kogus</h3>
+                  <p className="text-gray-700">Valige igakuine toidu kogus vastavalt oma lemmiklooma vajadustele.</p>
+                </div>
               </div>
-            </div>
 
-            {/* Step 3 */}
-            <div className="group relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg z-10">
-                3
-              </div>
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-yellow-200 group-hover:-translate-y-1">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-6 w-6 text-yellow-400" />
+              {/* Step 3 */}
+              <div className="group relative">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg z-10 shadow-md shadow-yellow-300/50 border-2 border-white">
+                  3
                 </div>
-                <h3 className="text-lg font-medium mb-3 group-hover:text-yellow-600 transition-colors">Valige tarne</h3>
-                <p className="text-gray-600">Valige sobiv tarnekuupäev ja me toome toidu otse ukse taha.</p>
+                {/* Mobile step connector (visible only on small screens) */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-yellow-400 -mt-8 sm:hidden"></div>
+                <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-yellow-100 hover:border-yellow-400 group-hover:-translate-y-2 relative z-[1]">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Sparkles className="h-7 w-7 text-yellow-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-yellow-600 transition-colors">Valige tarne</h3>
+                  <p className="text-gray-700">Valige sobiv tarnekuupäev ja me toome toidu otse ukse taha.</p>
+                </div>
               </div>
-            </div>
 
-            {/* Step 4 */}
-            <div className="group relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg z-10">
-                4
-              </div>
-              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-yellow-200 group-hover:-translate-y-1">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ArrrowRight className="h-6 w-6 text-yellow-400" />
+              {/* Step 4 */}
+              <div className="group relative">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg z-10 shadow-md shadow-yellow-300/50 border-2 border-white">
+                  4
                 </div>
-                <h3 className="text-lg font-medium mb-3 group-hover:text-yellow-600 transition-colors">Nautige</h3>
-                <p className="text-gray-600">Nautige igakuist mugavust ja näke, kuidas teie lemmikloom õitseb.</p>
+                {/* Mobile step connector (visible only on small screens) */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-yellow-400 -mt-8 sm:hidden"></div>
+                <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-yellow-100 hover:border-yellow-400 group-hover:-translate-y-2 relative z-[1]">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <ArrrowRight className="h-7 w-7 text-yellow-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-yellow-600 transition-colors">Nautige</h3>
+                  <p className="text-gray-700">Nautige igakuist mugavust ja näke, kuidas teie lemmikloom õitseb.</p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* CTA Button */}
-          <div className="mt-12 text-center">
+          <div className="mt-16 text-center">
             <Link href="/products">
               <WufiButton 
                 variant="primary"
                 size="large"
+                className="shadow-lg shadow-yellow-400/20"
               >
                 Alusta tellimist
-                <ShoppingBag className="h-5 w-5" />
+                <ShoppingBag className="h-5 w-5 ml-2 group-hover:rotate-12 transition-transform" />
               </WufiButton>
             </Link>
           </div>
@@ -209,47 +222,82 @@ const Hero = async ({ region }: { region: HttpTypes.StoreRegion }) => {
 
       {/* Categories Section */}
       <div className="py-16 sm:py-24 bg-yellow-50/30 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
+        <div className="content-container relative">
           <div className="flex flex-col items-center mb-8 sm:mb-12">
-            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-4 sm:px-6 py-2.5 rounded-full border border-yellow-400/30">
+            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/10 px-4 sm:px-6 py-2.5 rounded-full border border-yellow-400/30">
               <Sparkles className="h-5 w-5 text-yellow-600" />
               <span className="text-yellow-700 font-semibold">Kategooriad</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Milline on teie lemmikloom?</h2>
+            <h2 className="text-2xl sm:text-3xl text-gray-800 font-bold mb-4">Milline on teie lemmikloom?</h2>
             <p className="text-gray-600 text-center max-w-2xl px-4">Valige oma lemmiklooma tüüp ja leidke talle sobivad tooted</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {categories?.filter(category => !category.parent_category).slice(0, 4).map((category) => (
-              <Link 
-                key={category.id} 
-                href={`/${region.countries?.[0]?.iso_2 || 'ee'}/categories/${category.handle}`}
-                className="group relative bg-white p-8 rounded-2xl hover:shadow-xl transition-all duration-300 border border-yellow-200 hover:border-yellow-300 hover:-translate-y-1"
-              >
-                <div className="w-12 h-12 bg-yellow-400/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-6 w-6 text-yellow-600" />
-                </div>
-                <h3 className="text-lg font-medium mb-1 text-yellow-800 group-hover:text-yellow-600 transition-colors">{category.name}</h3>
-                <p className="text-sm text-yellow-700 group-hover:text-yellow-600">
-                  Vaata tooteid 
-                  <ArrrowRight className="inline-block ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </p>
-              </Link>
-            ))}
+            {categories?.filter(category => {
+              const isTopLevel = !category.parent_category;
+              return isTopLevel;
+            }).slice(0, 4).map((category) => {
+              const thumbnailUrl = (category.metadata as { thumbnail?: string })?.thumbnail;
+              return (
+                <Link 
+                  key={category.id} 
+                  href={`/${region.countries?.[0]?.iso_2 || 'ee'}/categories/${category.handle}`}
+                  className="group relative block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-yellow-300 hover:-translate-y-1"
+                >
+                  <div className="relative w-full aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+                    {thumbnailUrl ? (
+                      <Image
+                        src={thumbnailUrl}
+                        alt={category.name || 'Category image'}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
+                    ) : (
+                      <span className="text-3xl font-semibold text-yellow-500">
+                        {category.name?.[0]}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4 text-center">
+                    <h3 className="text-lg font-semibold mb-1 text-gray-800 group-hover:text-yellow-600 transition-colors">{category.name}</h3>
+                    <p className="text-sm text-gray-600 group-hover:text-yellow-600 flex items-center justify-center">
+                      Vaata tooteid 
+                      <ArrrowRight className="inline-block ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
+        </div>
+      </div>
+
+      {/* Bento Features Section */}
+      <div className="py-16 bg-white">
+        <div className="content-container">
+          <div className="flex flex-col items-center mb-8 sm:mb-12">
+            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/10 px-4 sm:px-6 py-2.5 rounded-full border border-yellow-400/30">
+              <Sparkles className="h-5 w-5 text-yellow-600" />
+              <span className="text-yellow-700 font-semibold">Meie teenused</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl text-gray-800 font-bold mb-4">Meie lubadused teie lemmikule</h2>
+            <p className="text-gray-600 text-center max-w-2xl px-4">Toidu tarnimine ja toitumisabi kohandatud teie lemmiklooma vajadustele</p>
+          </div>
+          <BentoDemo />
         </div>
       </div>
 
       {/* Products Section */}
       <div className="py-24 bg-white relative overflow-hidden">
-        <div className="container mx-auto px-6 lg:px-12 relative">
+        <div className="content-container relative">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-6 py-2.5 rounded-full border border-yellow-400/30">
+              <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/10 px-6 py-2.5 rounded-full border border-yellow-400/30">
                 <Sparkles className="h-5 w-5 text-yellow-600" />
                 <span className="text-yellow-700 font-semibold">Populaarsed tooted</span>
               </div>
-              <h2 className="text-3xl font-bold mb-4">Meie kliendid armastavad neid tooteid</h2>
-              <p className="text-yellow-700">Kvaliteetsed tooted teie lemmikutele</p>
+              <h2 className="text-3xl text-gray-800 font-bold mb-4">Meie kliendid armastavad neid tooteid</h2>
+              <p className="text-gray-600">Kvaliteetsed tooted teie lemmikutele</p>
             </div>
             <Link href="/products">
               <WufiButton 
@@ -275,14 +323,14 @@ const Hero = async ({ region }: { region: HttpTypes.StoreRegion }) => {
 
       {/* Newsletter Section */}
       <div className="py-24 bg-yellow-50/30 relative overflow-hidden">
-        <div className="container mx-auto px-6 lg:px-12 relative">
+        <div className="content-container relative">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-6 py-2.5 rounded-full border border-yellow-400/30">
+            <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/10 px-6 py-2.5 rounded-full border border-yellow-400/30">
               <Sparkles className="h-5 w-5 text-yellow-600" />
               <span className="text-yellow-700 font-semibold">Uudiskiri</span>
             </div>
-            <h2 className="text-3xl font-bold mb-4">Liitu uudiskirjaga</h2>
-            <p className="text-yellow-700 mb-8">
+            <h2 className="text-3xl text-gray-800 font-bold mb-4">Liitu uudiskirjaga</h2>
+            <p className="text-gray-600 mb-8">
               Saage teada esimesena uutest toodetest ja eripakkumistest. Liitujatele kingitus!
             </p>
             <div className="flex gap-3 p-2 bg-white rounded-full shadow-sm border border-yellow-200">

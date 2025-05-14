@@ -10,6 +10,7 @@ interface WufiButtonProps {
   onClick?: () => void
   type?: "button" | "submit" | "reset"
   disabled?: boolean
+  form?: string
 }
 
 const WufiButton = ({
@@ -20,6 +21,7 @@ const WufiButton = ({
   onClick,
   type = "button",
   disabled = false,
+  form,
 }: WufiButtonProps) => {
   const baseStyles = "inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-200"
   
@@ -45,6 +47,7 @@ const WufiButton = ({
       )}
       type={type}
       disabled={disabled}
+      form={form}
     >
       {children}
     </Button>

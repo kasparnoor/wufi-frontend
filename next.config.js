@@ -40,6 +40,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "www.petcity.ee",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "source.unsplash.com",
+      },
     ],
   },
 }

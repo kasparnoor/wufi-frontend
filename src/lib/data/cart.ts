@@ -115,10 +115,12 @@ export async function addToCart({
   variantId,
   quantity,
   countryCode,
+  metadata,
 }: {
   variantId: string
   quantity: number
   countryCode: string
+  metadata?: Record<string, any>
 }) {
   if (!variantId) {
     throw new Error("Missing variant ID when adding to cart")
@@ -140,6 +142,7 @@ export async function addToCart({
       {
         variant_id: variantId,
         quantity,
+        metadata,
       },
       {},
       headers
@@ -157,9 +160,11 @@ export async function addToCart({
 export async function updateLineItem({
   lineId,
   quantity,
+  metadata,
 }: {
   lineId: string
-  quantity: number
+  quantity?: number
+  metadata?: Record<string, any>
 }) {
   if (!lineId) {
     throw new Error("Missing lineItem ID when updating line item")
@@ -175,8 +180,16 @@ export async function updateLineItem({
     ...(await getAuthHeaders()),
   }
 
+  const body: any = {}
+  if (typeof quantity === "number") {
+    body.quantity = quantity
+  }
+  if (metadata) {
+    body.metadata = metadata
+  }
+
   await sdk.store.cart
-    .updateLineItem(cartId, lineId, { quantity }, {}, headers)
+    .updateLineItem(cartId, lineId, body, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
@@ -185,6 +198,18 @@ export async function updateLineItem({
       revalidateTag(fulfillmentCacheTag)
     })
     .catch(medusaError)
+}
+
+export async function updateLineItemMetadata({
+  lineId,
+  metadata,
+  quantity,
+}: {
+  lineId: string
+  metadata: Record<string, any>
+  quantity: number
+}) {
+  return updateLineItem({ lineId, metadata, quantity })
 }
 
 export async function deleteLineItem(lineId: string) {

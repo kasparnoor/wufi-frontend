@@ -1,125 +1,98 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
+# Wufi Storefront
 
-<h1 align="center">
-  Medusa Next.js Starter Template
-</h1>
+Wufi is a modern, subscription-based pet e-commerce platform inspired by Chewy.com, tailored for the Estonian market. This is the customer-facing storefront, built for performance, accessibility, and a seamless shopping experience.
 
-<p align="center">
-Combine Medusa's modules for your commerce backend with the newest Next.js 15 features for a performant storefront.</p>
+## Project Overview
 
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+- **Localized for Estonia**: All flows and content are tailored for the Estonian market.
+- **Subscription-first**: Built to support recurring pet product subscriptions as well as one-time purchases.
+- **Modern UX**: Fast, responsive, and accessible UI with a custom design system.
+- **Full-featured e-commerce**: Product catalog, collections, categories, cart, checkout, user accounts, order history, and more.
+- **Secure payments**: Stripe integration for safe and reliable checkout.
 
-### Prerequisites
+## Tech Stack
 
-To use the [Next.js Starter Template](https://medusajs.com/nextjs-commerce/), you should have a Medusa server running locally on port 9000.
-For a quick setup, run:
-
-```shell
-npx create-medusa-app@latest
-```
-
-Check out [create-medusa-app docs](https://docs.medusajs.com/learn/installation) for more details and troubleshooting.
-
-# Overview
-
-The Medusa Next.js Starter is built with:
-
-- [Next.js](https://nextjs.org/)
+- [Next.js 15](https://nextjs.org/) (App Router, Server Components)
+- [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Typescript](https://www.typescriptlang.org/)
-- [Medusa](https://medusajs.com/)
+- [Medusa JS SDK](https://docs.medusajs.com/js-client/overview/)
+- [Stripe](https://stripe.com/) (checkout)
+- [i18next](https://www.i18next.com/) (internationalization)
 
-Features include:
+## Folder Structure
 
-- Full ecommerce support:
-  - Product Detail Page
-  - Product Overview Page
-  - Product Collections
-  - Cart
-  - Checkout with Stripe
-  - User Accounts
-  - Order Details
-- Full Next.js 15 support:
-  - App Router
-  - Next fetching/caching
-  - Server Components
-  - Server Actions
-  - Streaming
-  - Static Pre-Rendering
-
-# Quickstart
-
-### Setting up the environment variables
-
-Navigate into your projects directory and get your environment variables ready:
-
-```shell
-cd nextjs-starter-medusa/
-mv .env.template .env.local
+```
+wufi-pood-storefront/
+├── src/
+│   ├── app/                # Next.js app directory (routes, layouts, pages)
+│   ├── modules/            # UI and business logic modules (cart, products, account, etc.)
+│   ├── lib/                # Data fetching, utilities, helpers
+│   ├── styles/             # Tailwind and global styles
+│   └── types/              # TypeScript types
+├── public/                 # Static assets
+├── tailwind.config.js      # Tailwind CSS config
+├── next.config.js          # Next.js config
+└── ...
 ```
 
-### Install dependencies
+## Main Features
 
-Use Yarn to install all dependencies.
+- **Product Catalog**: Browse products, categories, and collections
+- **Cart**: Add, remove, and update items
+- **Checkout**: Secure checkout with Stripe
+- **User Accounts**: Sign up, sign in, view and manage orders
+- **Order History**: See past orders and their status
+- **Subscriptions**: (Planned/ongoing) Manage recurring deliveries
+- **Localization**: Estonian market focus, i18n-ready
+- **Responsive Design**: Mobile-first, works on all devices
+- **Performance**: Optimized images, code splitting, and caching
+- **Accessibility**: Semantic HTML, proper contrast, ARIA labels
 
-```shell
+## Getting Started
+
+### 1. Prerequisites
+- Node.js 20+
+- Yarn (recommended)
+- A running [Wufi Medusa backend](../wufi-pood/README.md) (default: http://localhost:9000)
+
+### 2. Setup
+
+Copy the environment template and fill in required values:
+
+```sh
+cp .env.template .env.local
+```
+
+Install dependencies:
+
+```sh
 yarn
 ```
 
-### Start developing
+### 3. Run the Development Server
 
-You are now ready to start up your project.
-
-```shell
+```sh
 yarn dev
 ```
 
-### Open the code and start customizing
+The site will be running at [http://localhost:8000](http://localhost:8000)
 
-Your site is now running at http://localhost:8000!
+### 4. Payment Integrations
 
-# Payment integrations
+By default, Stripe is supported. Add your Stripe public key to `.env.local`:
 
-By default this starter supports the following payment integrations
-
-- [Stripe](https://stripe.com/)
-
-To enable the integrations you need to add the following to your `.env.local` file:
-
-```shell
+```
 NEXT_PUBLIC_STRIPE_KEY=<your-stripe-public-key>
 ```
 
-You'll also need to setup the integrations in your Medusa server. See the [Medusa documentation](https://docs.medusajs.com) for more information on how to configure [Stripe](https://docs.medusajs.com/resources/commerce-modules/payment/payment-provider/stripe#main).
+You must also configure Stripe in your Medusa backend. See the [Medusa docs](https://docs.medusajs.com/resources/commerce-modules/payment/payment-provider/stripe#main) for details.
 
-# Resources
+## Resources
+- [Wufi Backend (Medusa)](../wufi-pood/README.md)
+- [Medusa Documentation](https://docs.medusajs.com/)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Stripe Documentation](https://stripe.com/docs)
 
-## Learn more about Medusa
+---
 
-- [Website](https://www.medusajs.com/)
-- [GitHub](https://github.com/medusajs)
-- [Documentation](https://docs.medusajs.com/)
-
-## Learn more about Next.js
-
-- [Website](https://nextjs.org/)
-- [GitHub](https://github.com/vercel/next.js)
-- [Documentation](https://nextjs.org/docs)
+For questions or contributions, please open an issue or pull request!

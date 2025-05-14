@@ -1,0 +1,25 @@
+---
+description: Explains how Medusa integrates with this frontend
+globs: 
+alwaysApply: false
+---
+# Medusa Integration
+
+The Wufi Storefront integrates with Medusa, an open-source headless commerce engine.
+
+## Key Integration Points
+- Uses the Medusa JS SDK for all commerce operations
+- Data fetching is primarily done via server components
+- Product, cart, and checkout flows are built on Medusa APIs
+
+## Commerce Modules
+These modules handle specific commerce functionality:
+- [src/modules/products](mdc:src/modules/products) - Product display and search
+- [src/modules/cart](mdc:src/modules/cart) - Shopping cart management
+- [src/modules/checkout](mdc:src/modules/checkout) - Checkout process
+- [src/modules/account](mdc:src/modules/account) - User accounts and orders
+
+## Data Flow
+- Server components fetch data directly from Medusa API
+- Client components use React Server Actions for mutations
+- Cart state is managed with cookies and server-side storage

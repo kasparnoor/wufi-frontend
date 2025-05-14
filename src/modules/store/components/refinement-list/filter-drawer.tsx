@@ -17,9 +17,16 @@ const FilterDrawer = ({ isOpen, onClose, setQueryParams }: FilterDrawerProps) =>
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
       {/* Backdrop */}
-      <div 
+      <div
+        role="button"
+        tabIndex={0}
         className="fixed inset-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            onClose()
+          }
+        }}
       />
 
       {/* Drawer */}

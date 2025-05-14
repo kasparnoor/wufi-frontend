@@ -7,7 +7,7 @@ import { Button, clx } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
@@ -16,19 +16,21 @@ import WufiButton from "@modules/common/components/wufi-button"
 import { RadioGroup, Radio } from "@headlessui/react"
 import MedusaRadio from "@modules/common/components/radio"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { useToast } from "@modules/common/components/toast"
+import { useCartState } from "@modules/common/components/cart-state"
 
 type PurchaseType = "one_time" | "subscription"
-type DeliveryFrequency = "2_weeks" | "1_month" | "2_months" | "3_months"
-
-const DELIVERY_OPTIONS = [
-  { value: "2_weeks", label: "Iga 2 nädala tagant" },
-  { value: "1_month", label: "Iga kuu" },
-  { value: "2_months", label: "Iga 2 kuu tagant" },
-  { value: "3_months", label: "Iga 3 kuu tagant" },
-]
 
 const FIRST_ORDER_DISCOUNT = 30 // 30% off first order
 const RECURRING_DISCOUNT = 5 // 5% off recurring orders
+
+// Define available autoship intervals
+const AUTOSHIP_INTERVALS = [
+  { value: "2w", label: "Iga 2 nädala tagant" },
+  { value: "4w", label: "Iga 4 nädala tagant" },
+  { value: "6w", label: "Iga 6 nädala tagant" },
+  { value: "8w", label: "Iga 8 nädala tagant" },
+];
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -51,9 +53,11 @@ export default function ProductActions({
 }: ProductActionsProps) {
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
-  const [purchaseType, setPurchaseType] = useState<PurchaseType>("one_time")
-  const [deliveryFrequency, setDeliveryFrequency] = useState<DeliveryFrequency>("1_month")
+  const [purchaseType, setPurchaseType] = useState<PurchaseType>("subscription")
   const countryCode = useParams().countryCode as string
+  const router = useRouter()
+  const { showToast } = useToast()
+  const { forceUpdate } = useCartState()
 
   // If there is only 1 variant, preselect the options
   useEffect(() => {
@@ -137,35 +141,68 @@ export default function ProductActions({
     }
   }, [variantPrice])
 
-  // Format price for display
+  // Format a numeric price value (already in major currency units) to a localized currency string
   const formatPrice = (amount: number) => {
     if (!variantPrice?.currency_code) return "-"
+
     return new Intl.NumberFormat("et-EE", {
       style: "currency",
       currency: variantPrice.currency_code,
-    }).format(amount / 100)
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)
   }
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
+    if (!selectedVariant?.id) return;
 
-    setIsAdding(true)
+    setIsAdding(true);
 
-    await addToCart({
-      variantId: selectedVariant.id,
-      quantity: 1,
-      countryCode,
-      metadata: {
+    try {
+      const metadata: Record<string, any> = {
         purchase_type: purchaseType,
-        delivery_frequency: purchaseType === "subscription" ? deliveryFrequency : null,
-        subscription_discount: purchaseType === "subscription" ? String(FIRST_ORDER_DISCOUNT) : "0",
-        is_first_order: "true"
-      }
-    } as any)
+      };
 
-    setIsAdding(false)
-  }
+      if (purchaseType === "subscription") {
+        metadata.is_first_order = "true";
+        metadata.subscription_discount = String(FIRST_ORDER_DISCOUNT);
+        metadata.autoship = "true";
+      } else {
+        metadata.autoship = "false";
+      }
+
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity: 1,
+        countryCode,
+        metadata: metadata
+      });
+      
+      // Use same toast message for both purchase types
+      showToast(
+        "Toode lisatud ostukorvi!",
+        "success",
+        5000,
+        {
+          label: "Vaata ostukorvi",
+          href: `/${countryCode}/cart`
+        }
+      );
+      
+      // Update cart state immediately
+      forceUpdate();
+      
+      // This is no longer needed for cart count but kept for other UI refreshes
+      router.refresh();
+      
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+      showToast("Toote lisamisel ostukorvi tekkis viga.", "error", 5000);
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   return (
     <>
@@ -193,93 +230,104 @@ export default function ProductActions({
           )}
         </div>
 
-        {/* Purchase Type Selection */}
-        <div className="flex flex-col gap-y-4">
+        {/* Purchase Type Selection - Revamped */}
+        <div className="flex flex-col gap-y-3">
           <RadioGroup value={purchaseType} onChange={setPurchaseType}>
-            <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col gap-y-4">
+              {/* Subscription Option */}
               <Radio
                 value="subscription"
-                className={clx(
-                  "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 hover:shadow-borders-interactive-with-active",
-                  {
-                    "border-ui-border-interactive": purchaseType === "subscription"
-                  }
-                )}
+                className={({ checked }) =>
+                  clx(
+                    "p-6 border rounded-xl cursor-pointer transition-colors duration-200 ease-in-out",
+                    {
+                      "border-2 border-blue-500 bg-blue-50/70 shadow-lg": checked,
+                      "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300": !checked,
+                    }
+                  )
+                }
               >
-                <div className="flex items-center gap-x-4">
-                  <MedusaRadio checked={purchaseType === "subscription"} />
-                  <div className="flex flex-col">
-                    <span className="text-base-regular">Automaattellimus</span>
-                    <span className="text-small-regular text-ui-fg-subtle">
-                      Säästa {FIRST_ORDER_DISCOUNT}% esimesel tellimusel, seejärel {RECURRING_DISCOUNT}% järgnevatel
-                    </span>
+                {({ checked }) => (
+                  <div className="flex flex-col md:flex-row justify-between w-full gap-6">
+                    <div className="flex items-start gap-x-4">
+                      <div className="mt-0.5 transform scale-110">
+                        <MedusaRadio checked={checked} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-gray-800 mb-2">Püsitellimus</span>
+                        <div className="px-3 py-1.5 bg-green-50 border border-green-100 rounded-lg inline-block mb-3">
+                          <span className="text-base text-green-700 font-medium">
+                            Säästa {FIRST_ORDER_DISCOUNT}% esimesel tellimusel, seejärel {RECURRING_DISCOUNT}%!
+                          </span>
+                        </div>
+                        <ul className="text-base text-gray-700 list-disc list-outside ml-5 space-y-2.5">
+                          <li>Regulaarsed tarned sinu graafiku alusel</li>
+                          <li>Jäta vahele, muuda või tühista igal ajal</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end flex-shrink-0 text-right pt-2">
+                      {prices?.firstOrder && (
+                        <>
+                          <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2 mb-2">
+                            <span className="text-2xl font-bold text-blue-600">
+                              {formatPrice(prices.firstOrder)}
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-500 line-through mb-1">
+                            {formatPrice(prices.regular)}
+                          </span>
+                          <div className="flex items-center gap-x-1.5 text-sm text-gray-700">
+                            <span>seejärel</span>
+                            <span className="font-medium">{formatPrice(prices.recurring)}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-end">
-                  {prices?.firstOrder && (
-                    <>
-                      <span className="text-ui-fg-base font-semibold">
-                        {formatPrice(prices.firstOrder)}
-                      </span>
-                      <span className="text-small-regular text-ui-fg-subtle">
-                        seejärel {formatPrice(prices.recurring)}
-                      </span>
-                    </>
-                  )}
-                </div>
+                )}
               </Radio>
 
+              {/* One-Time Purchase Option */}
               <Radio
                 value="one_time"
-                className={clx(
-                  "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 hover:shadow-borders-interactive-with-active",
-                  {
-                    "border-ui-border-interactive": purchaseType === "one_time"
-                  }
-                )}
+                 className={({ checked }) =>
+                  clx(
+                    "p-6 border rounded-xl cursor-pointer transition-colors duration-200 ease-in-out",
+                    {
+                      "border-2 border-blue-500 bg-blue-50/70 shadow-lg": checked,
+                      "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300": !checked,
+                    }
+                  )
+                }
               >
-                <div className="flex items-center gap-x-4">
-                  <MedusaRadio checked={purchaseType === "one_time"} />
-                  <span className="text-base-regular">Ühekordne ost</span>
-                </div>
-                <span className="text-ui-fg-base font-semibold">
-                  {prices?.regular ? formatPrice(prices.regular) : "-"}
-                </span>
+                {({ checked }) => (
+                  <div className="flex justify-between items-center w-full gap-x-4">
+                    <div className="flex items-center gap-x-4">
+                       <div className="transform scale-110">
+                         <MedusaRadio checked={checked} />
+                       </div>
+                      <span className="text-lg font-semibold text-gray-800">Ühekordne ost</span>
+                    </div>
+                    <div className="bg-gray-50 border border-gray-100 rounded-lg px-4 py-2">
+                      <span className="text-2xl font-bold text-gray-800">
+                        {prices?.regular ? formatPrice(prices.regular) : "-"}
+                      </span>
+                    </div>
+                  </div>
+                 )}
               </Radio>
             </div>
           </RadioGroup>
-
-          {/* Delivery Frequency Selection */}
-          {purchaseType === "subscription" && (
-            <div className="mt-4">
-              <label className="text-base-regular mb-2 block">Tarne sagedus:</label>
-              <select 
-                value={deliveryFrequency}
-                onChange={(e) => setDeliveryFrequency(e.target.value as DeliveryFrequency)}
-                className="w-full p-2 border rounded-rounded"
-              >
-                {DELIVERY_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
         </div>
 
-        {/* Price */}
-        <div className="flex flex-col gap-y-2">
-          <div className="text-xl font-semibold">
-            {purchaseType === "subscription" 
-              ? formatPrice(prices?.firstOrder || 0)
-              : formatPrice(prices?.regular || 0)
-            }
-          </div>
-          <p className="text-sm text-gray-500">Tasuta tagastus 30 päeva jooksul</p>
-        </div>
+        {/* Price Display (Consider removing if prices are clear in options) */}
+        {/* <div className="flex flex-col gap-y-2"> ... </div> */}
 
-        {/* Add to Cart Button */}
+        {/* Return Policy */}
+        {/* <p className="text-sm text-gray-500 text-center">Tasuta tagastus 30 päeva jooksul</p> */}
+
+        {/* Add to Cart / Setup Autoship Button */}
         <div className="flex flex-col gap-y-3">
           <WufiButton
             onClick={handleAddToCart}
@@ -294,7 +342,7 @@ export default function ProductActions({
             size="large"
             className="w-full"
           >
-            {isAdding ? (
+             {isAdding ? (
               <>
                 <Spinner className="h-5 w-5 animate-spin" />
                 Lisame...
@@ -306,7 +354,7 @@ export default function ProductActions({
             ) : (
               <>
                 Lisa ostukorvi
-                <ShoppingBag className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                <ShoppingBag className="h-5 w-5 ml-2 group-hover:rotate-12 transition-transform" />
               </>
             )}
           </WufiButton>

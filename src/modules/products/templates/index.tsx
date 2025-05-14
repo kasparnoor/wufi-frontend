@@ -3,7 +3,6 @@ import React, { Suspense } from "react"
 import ImageGallery from "@modules/products/components/image-gallery"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
-import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
@@ -11,6 +10,8 @@ import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
 import { Sparkles } from "@medusajs/icons"
+import { listProducts } from "@lib/data/products"
+import { getRegion } from "@lib/data/regions"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -18,7 +19,7 @@ type ProductTemplateProps = {
   countryCode: string
 }
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({
+const ProductTemplate: React.FC<ProductTemplateProps> = async ({
   product,
   region,
   countryCode,
@@ -26,39 +27,48 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   if (!product || !product.id) {
     return notFound()
   }
+  if (!region) {
+    return notFound()
+  }
+
+  const queryParams: any = {
+    region_id: region.id,
+  }
+
+  if (product.collection_id) {
+    queryParams.collection_id = [product.collection_id]
+  }
+
+  if (product.tags && product.tags.length > 0) {
+    queryParams.tags = product.tags.map((t) => t.id).filter(Boolean)
+  }
+  
+  queryParams.is_giftcard = false
+
+  const relatedProductsList = await listProducts({
+    queryParams: queryParams,
+    countryCode,
+  }).then(({ response }) => {
+    return response.products.filter(
+      (responseProduct) => responseProduct.id !== product.id
+    )
+  })
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-0 sm:px-6 lg:px-12">
-        <div className="py-6 sm:py-16 lg:py-32">
-          {/* Main Product Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 sm:gap-8 lg:gap-16">
-            {/* Left Column - Product Images */}
-            <div className="lg:sticky lg:top-32 h-fit">
-              <div className="rounded-none sm:rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-10 lg:py-12 mt-6 sm:mt-8 lg:mt-12">
+        {/* Main Product Section: Images + Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Product Images + Actions */}
+          <div className="lg:col-span-7 lg:sticky lg:top-24" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+            <div className="space-y-2 max-h-full">
+              {/* Gallery */}
+              <div className="rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 bg-white p-2">
                 <ImageGallery images={product?.images || []} />
               </div>
-            </div>
-
-            {/* Right Column - Product Info & Actions */}
-            <div className="flex flex-col gap-3 sm:gap-8 lg:gap-16">
-              {/* Product Info Section */}
-              <div>
-                <div className="mb-2 sm:mb-8">
-                  <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
-                    <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
-                    <span className="text-xs sm:text-base text-yellow-700 font-semibold">Toote info</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 sm:space-y-8">
-                  <ProductInfo product={product} />
-                  <ProductOnboardingCta />
-                </div>
-              </div>
-
-              {/* Sticky Actions */}
-              <div className="lg:sticky lg:top-32 bg-white rounded-none sm:rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 p-2 sm:p-6 lg:p-8">
+              
+              {/* Product Actions */}
+              <div className="rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 bg-white p-3">
                 <Suspense
                   fallback={
                     <ProductActions
@@ -74,20 +84,43 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
             </div>
           </div>
 
-          {/* Product Details Section */}
-          <div className="mt-6 sm:mt-24 lg:mt-32 border-t border-gray-100 pt-3 sm:pt-12 lg:pt-16">
-            <div className="mb-2 sm:mb-10">
-              <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
-                <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
-                <span className="text-xs sm:text-base text-yellow-700 font-semibold">Toote detailid</span>
+          {/* Right Column: Product Info */}
+          <div className="lg:col-span-5">
+            {/* Product Title & Info */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+              <div className="mb-4 sm:mb-8">
+                <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
+                  <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
+                  <span className="text-xs sm:text-base text-yellow-700 font-semibold">Toote info</span>
+                </div>
+              </div>
+              <ProductInfo product={product} />
+              
+              {/* Product Onboarding */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <ProductOnboardingCta />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Product Details Section - REMOVED */}
+        {/* <div className="mt-8 border-t border-gray-100 pt-6">
+          <div className="mb-4 sm:mb-8">
+            <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
+              <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
+              <span className="text-xs sm:text-base text-yellow-700 font-semibold">Toote detailid</span>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
             <ProductTabs product={product} />
           </div>
+        </div> */}
 
-          {/* Related Products Section */}
-          <div className="mt-6 sm:mt-24 lg:mt-32">
-            <div className="mb-2 sm:mb-10">
+        {/* Related Products Section - Conditionally Rendered */}
+        {relatedProductsList && relatedProductsList.length > 0 && (
+          <div className="mt-8 border-t border-gray-100 pt-6">
+            <div className="mb-4 sm:mb-8">
               <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
                 <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
                 <span className="text-xs sm:text-base text-yellow-700 font-semibold">Sarnased tooted</span>
@@ -97,7 +130,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               <RelatedProducts product={product} countryCode={countryCode} />
             </Suspense>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -13,6 +13,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
+import { convertToLocale } from "@lib/util/money"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -31,6 +32,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
     await updateLineItem({
       lineId: item.id,
       quantity,
+      metadata: item.metadata || undefined,
     })
       .catch((err) => {
         setError(err.message)
@@ -44,8 +46,17 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
+  const isSubscriptionItem =
+    item.metadata?.purchase_type === "subscription" &&
+    item.metadata?.is_first_order === "true"
+  const subscriptionPct = isSubscriptionItem
+    ? parseFloat(String(item.metadata?.subscription_discount ?? 0))
+    : 0
+  const originalLineTotal = item.unit_price * item.quantity
+  const discountedTotal = originalLineTotal * (1 - subscriptionPct / 100)
+
   return (
-    <Table.Row className="w-full" data-testid="product-row">
+    <Table.Row className="w-full group transition-colors hover:bg-yellow-50/40" data-testid="product-row">
       <Table.Cell className="!pl-0 p-4 w-24">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
@@ -58,28 +69,35 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             thumbnail={item.thumbnail}
             images={item.variant?.product?.images}
             size="square"
+            className="rounded-lg overflow-hidden border border-gray-100 group-hover:border-yellow-300 transition-colors shadow-sm"
           />
         </LocalizedClientLink>
       </Table.Cell>
 
-      <Table.Cell className="text-left">
-        <Text
-          className="txt-medium-plus text-ui-fg-base"
-          data-testid="product-title"
-        >
-          {item.product_title}
-        </Text>
-        <LineItemOptions variant={item.variant} data-testid="product-variant" />
+      <Table.Cell className={clx("text-left", { "p-4": type === "preview" })}>
+        <LocalizedClientLink href={`/products/${item.product_handle}`}>
+          <Text
+            className={clx(
+              "font-medium text-gray-900 group-hover:text-yellow-700 transition-colors",
+              type === "preview" ? "text-base" : "text-base sm:text-lg"
+            )}
+            data-testid="product-title"
+          >
+            {item.product_title}
+          </Text>
+        </LocalizedClientLink>
+        <div className="text-gray-600">
+          <LineItemOptions variant={item.variant} data-testid="product-variant" />
+        </div>
       </Table.Cell>
 
       {type === "full" && (
         <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
-            <DeleteButton id={item.id} data-testid="product-delete-button" />
+          <div className="flex flex-col items-start gap-2">
             <CartItemSelect
               value={item.quantity}
               onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
+              className="w-20 h-10 p-4 rounded-lg border border-gray-200 focus:border-yellow-400 focus:ring-yellow-400"
               data-testid="product-select-button"
             >
               {/* TODO: Update this with the v2 way of managing inventory */}
@@ -98,6 +116,15 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                 1
               </option>
             </CartItemSelect>
+            
+            <div className="flex items-center">
+              <DeleteButton 
+                id={item.id} 
+                data-testid="product-delete-button" 
+                className="text-gray-500 hover:text-red-500"
+              />
+            </div>
+            
             {updating && <Spinner />}
           </div>
           <ErrorMessage error={error} data-testid="product-error-message" />
@@ -105,7 +132,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       )}
 
       {type === "full" && (
-        <Table.Cell className="hidden small:table-cell">
+        <Table.Cell className="hidden small:table-cell text-gray-700">
           <LineItemUnitPrice
             item={item}
             style="tight"
@@ -114,7 +141,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </Table.Cell>
       )}
 
-      <Table.Cell className="!pr-0">
+      <Table.Cell className={clx("!pr-0", { "p-4": type === "preview" })}>
         <span
           className={clx("!pr-0", {
             "flex flex-col items-end h-full justify-center": type === "preview",
@@ -130,11 +157,27 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               />
             </span>
           )}
-          <LineItemPrice
-            item={item}
-            style="tight"
-            currencyCode={currencyCode}
-          />
+          {isSubscriptionItem ? (
+            <div className="flex flex-col items-end space-y-1">
+              <span className="line-through text-gray-500">
+                {convertToLocale({ amount: originalLineTotal, currency_code: currencyCode })}
+              </span>
+              <span className="text-lg font-semibold text-green-600">
+                {convertToLocale({ amount: discountedTotal, currency_code: currencyCode })}
+              </span>
+              <span className="text-sm text-green-600">
+                Soodustus {subscriptionPct}%
+              </span>
+            </div>
+          ) : (
+            <div className="font-semibold text-lg text-gray-900">
+              <LineItemPrice
+                item={item}
+                style="tight"
+                currencyCode={currencyCode}
+              />
+            </div>
+          )}
         </span>
       </Table.Cell>
     </Table.Row>

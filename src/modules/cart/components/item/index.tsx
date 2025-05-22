@@ -158,15 +158,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             </span>
           )}
           {isSubscriptionItem ? (
-            <div className="flex flex-col items-end space-y-1">
+            <div className="flex flex-col items-end space-y-0">
               <span className="line-through text-gray-500">
                 {convertToLocale({ amount: originalLineTotal, currency_code: currencyCode })}
               </span>
-              <span className="text-lg font-semibold text-green-600">
+              <span className="text-lg font-semibold text-gray-900">
                 {convertToLocale({ amount: discountedTotal, currency_code: currencyCode })}
-              </span>
-              <span className="text-sm text-green-600">
-                Soodustus {subscriptionPct}%
               </span>
             </div>
           ) : (

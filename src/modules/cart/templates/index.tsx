@@ -30,44 +30,44 @@ const CartTemplate = ({
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
               <div className="flex flex-col gap-y-6">
                 {!customer && (
-                  <div className="bg-white p-6 rounded-2xl shadow-md border-0 mb-4">
+                  <div className="bg-white p-4 rounded-xl shadow-sm border-0 mb-4">
                     <SignInPrompt />
                   </div>
                 )}
                 
-                <div className="bg-white p-6 rounded-2xl shadow-md border-0">
+                <div className="bg-white p-4 rounded-xl shadow-sm border-0">
                   <ItemsTemplate cart={cart} />
                 </div>
 
                 {/* Shopping features */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                  <div className="bg-white p-4 rounded-2xl shadow-md border-0 flex items-center gap-3 group hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center justify-between gap-4 mt-4">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border-0 flex items-center gap-2 group hover:shadow-md transition-shadow duration-200">
                     <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                       <ShoppingBag className="h-5 w-5 text-yellow-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">Turvaline ostlemine</h3>
-                      <p className="text-sm text-gray-600">SSL krüpteeritud</p>
+                      <h3 className="text-sm font-medium text-gray-900">Turvaline</h3>
+                      <p className="text-xs text-gray-600">SSL krüpteeritud</p>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-4 rounded-2xl shadow-md border-0 flex items-center gap-3 group hover:shadow-lg transition-all duration-300">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border-0 flex items-center gap-2 group hover:shadow-md transition-shadow duration-200">
                     <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Clock className="h-5 w-5 text-yellow-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">Kiire kohaletoimetamine</h3>
-                      <p className="text-sm text-gray-600">1-3 tööpäeva jooksul</p>
+                      <h3 className="text-sm font-medium text-gray-900">Kiire kohaletoimetamine</h3>
+                      <p className="text-xs text-gray-600">1-3 tööpäeva</p>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-4 rounded-2xl shadow-md border-0 flex items-center gap-3 group hover:shadow-lg transition-all duration-300">
+                  <div className="bg-white p-2 rounded-xl shadow-sm border-0 flex items-center gap-2 group hover:shadow-md transition-shadow duration-200">
                     <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                       <ShoppingBag className="h-5 w-5 text-yellow-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">Lihtne tagastamine</h3>
-                      <p className="text-sm text-gray-600">30-päevane tagastusõigus</p>
+                      <h3 className="text-sm font-medium text-gray-900">Tagastamine</h3>
+                      <p className="text-xs text-gray-600">30-päeva õigus</p>
                     </div>
                   </div>
                 </div>
@@ -76,7 +76,7 @@ const CartTemplate = ({
               <div className="relative">
                 <div className="sticky top-20">
                   {cart && cart.region && (
-                    <div className="bg-white p-6 rounded-2xl shadow-md border-0 hover:shadow-lg transition-all duration-300">
+                    <div className="bg-white p-4 rounded-xl shadow-sm border-0 hover:shadow-md transition-shadow duration-200">
                       <Summary cart={cart as any} />
                     </div>
                   )}
@@ -85,7 +85,7 @@ const CartTemplate = ({
             </div>
           </>
         ) : (
-          <div className="bg-white p-8 rounded-2xl shadow-md border-0 flex flex-col items-center">
+          <div className="bg-white p-4 rounded-xl shadow-sm border-0 flex flex-col items-center">
             <EmptyCartMessage />
           </div>
         )}

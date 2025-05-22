@@ -158,10 +158,14 @@ export default function CheckoutForm({
   // For "review", the button is not shown.
 
   return (
-    <div className="bg-white p-6 rounded-lg">
+    <div className="bg-white p-8 rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl">
       <div className="mb-10">
         <div className="relative flex items-center justify-between px-6">
           <div className="absolute left-6 right-6 top-1/2 h-0.5 -translate-y-1/2 bg-gray-200 z-0"></div>
+          <div
+            className="absolute left-6 top-1/2 h-0.5 -translate-y-1/2 bg-yellow-400 z-0 transition-all duration-300"
+            style={{ width: `${(currentStepIndex) / (steps.length - 1) * 100}%` }}
+          />
           {steps.map((step, index) => {
             const isActive = currentStepIndex === index;
             const isPast = currentStepIndex > index;

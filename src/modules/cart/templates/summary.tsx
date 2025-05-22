@@ -16,6 +16,10 @@ type SummaryProps = {
 }
 
 function getCheckoutStep(cart: HttpTypes.StoreCart) {
+  // If the cart has any subscription items, start at the autoship step
+  if ((cart.items ?? []).some(item => item.metadata?.purchase_type === "subscription")) {
+    return "autoship"
+  }
   if (!cart?.shipping_address?.address_1 || !cart.email) {
     return "address"
   } else if (cart?.shipping_methods?.length === 0) {

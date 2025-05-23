@@ -1,0 +1,73 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Component Patterns
+
+The Wufi Storefront follows consistent component patterns for maintainability and consistency.
+
+## Component Structure
+- Components are organized in feature-specific modules in [src/modules](mdc:src/modules)
+- Each component typically has its own directory with an index.tsx file
+- UI components use Tailwind CSS for styling
+- Server vs. client components are clearly separated
+
+## Common Components
+- [WufiButton](mdc:src/modules/common/components/wufi-button/index.tsx) - Core button component
+- [Input](mdc:src/modules/common/components/input) - Form input fields
+- [Modal](mdc:src/modules/common/components/modal) - Overlay dialogs
+- [BentoGrid](mdc:src/modules/common/components/bento-grid) - Grid layout system
+
+## Best Practices
+1. **Server Components**:
+   - Used for data fetching directly from APIs
+   - Pass data down to client components
+   - Handle initial rendering without client interaction
+
+2. **Client Components**:
+   - Used for interactive elements
+   - Defined with "use client" directive
+   - Minimize client-side JavaScript
+
+3. **Props & Typing**:
+   - Use TypeScript interfaces for prop typing
+   - Default props for common configurations
+   - Optional props with sensible defaults
+
+4. **Styling**:
+   - Use Tailwind utility classes directly
+   - Conditional classes with clsx utility
+   - Follow the project's color scheme and spacing scale
+
+5. **State Management**:
+   - Local state with React hooks
+   - Form state with controlled components
+   - Cart state via server components and cookies
+
+## Example Pattern
+```tsx
+// Component with variants and proper typing
+interface ComponentProps {
+  variant?: "primary" | "secondary";
+  size?: "small" | "medium" | "large";
+  children: ReactNode;
+}
+
+const Component = ({
+  variant = "primary",
+  size = "medium",
+  children
+}: ComponentProps) => {
+  // Component logic
+  return (
+    <div className={clsx(
+      "base-styles",
+      variant === "primary" ? "primary-styles" : "secondary-styles",
+      sizeStyles[size]
+    )}>
+      {children}
+    </div>
+  )
+}
+```

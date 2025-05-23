@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Folder Structure
+
+The Wufi Storefront follows a modular approach with the following directory structure:
+
+## Main Directories
+- [src/app](mdc:src/app) - Next.js App Router pages and layouts
+- [src/modules](mdc:src/modules) - UI and business logic modules organized by feature
+- [src/lib](mdc:src/lib) - Data fetching, utilities, and helper functions
+- [src/types](mdc:src/types) - TypeScript type definitions
+- [src/styles](mdc:src/styles) - Tailwind and global styles
+- [public](mdc:public) - Static assets
+
+## Modules Structure
+The modules directory is organized by feature:
+- [src/modules/account](mdc:src/modules/account) - User account management
+- [src/modules/cart](mdc:src/modules/cart) - Shopping cart functionality
+- [src/modules/checkout](mdc:src/modules/checkout) - Checkout process
+- [src/modules/products](mdc:src/modules/products) - Product display and management
+- [src/modules/common](mdc:src/modules/common) - Shared UI components
+- [src/modules/layout](mdc:src/modules/layout) - Layout components (header, footer, etc.)

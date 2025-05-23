@@ -1,0 +1,23 @@
+---
+description: Development workflow
+globs: 
+alwaysApply: false
+---
+# Development Workflow
+
+## Local Development
+- Use `yarn dev` to start the development server on port 8000
+- The project requires a running Medusa backend (typically on port 9000)
+
+## Scripts
+All scripts are defined in [package.json](mdc:package.json):
+- `yarn dev` - Start development server with turbopack
+- `yarn build` - Build for production
+- `yarn start` - Start production server
+- `yarn lint` - Run ESLint
+
+## Environment Variables
+Required environment variables are checked in [check-env-variables.js](mdc:check-env-variables.js).
+
+## Deployment
+The storefront is designed to be deployed to a Node.js hosting platform like Vercel.

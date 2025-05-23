@@ -1,0 +1,75 @@
+---
+description: Styling explained
+globs: 
+alwaysApply: false
+---
+# Styling Guidelines
+
+The Wufi Storefront uses a consistent styling approach based on Tailwind CSS with custom components and design patterns.
+
+## Core Styling Principles
+- Uses [Tailwind CSS](mdc:tailwind.config.js) for utility-first styling
+- Consistent color palette with yellow-400 as primary brand color
+- Custom [Satoshi font](mdc:src/styles/globals.css) for typography
+- Mobile-first responsive design
+- Modular component architecture
+
+## Key Style Components
+- [WufiButton](mdc:src/modules/common/components/wufi-button/index.tsx) - Custom button component with variants
+- [Layout](mdc:src/modules/layout) - Consistent page structure components
+- [Hero](mdc:src/modules/home/components/hero/index.tsx) - Homepage hero section with brand styling
+
+## Common UI Patterns
+1. **Containers**:
+   - `.content-container` class for consistent page width and padding
+   - Rounded corners (rounded-2xl) for cards and prominent elements
+
+2. **Colors**:
+   - Yellow-400 as primary brand color
+   - White/black text for high contrast
+   - Subtle gradient overlays on images
+   - Transparent backgrounds with backdrop-blur for glass effects
+
+3. **Interactive Elements**:
+   - Hover effects with scale transformations
+   - Subtle shadows for depth
+   - Consistent border treatments
+   - Micro-animations for feedback
+
+4. **Typography**:
+   - Satoshi font family
+   - Consistent text size utility classes
+   - Bold headings with normal weight body text
+
+5. **Component Structure**:
+   - Functional React components
+   - Props for variants and customization
+   - Compositional pattern with children props
+
+## Spacing & Alignment
+- Use Tailwind's spacing scale consistently (px-6, py-4, m-4, etc.)
+- Common margins:
+  - Sections: `py-16 sm:py-24` (vertical padding)
+  - Content blocks: `mb-8 sm:mb-12` (bottom margin)
+  - Form fields: `mb-4` (bottom margin)
+  - Button groups: `gap-4` (space between)
+- Common alignment:
+  - Content centering: `mx-auto` (horizontal center)
+  - Flex layouts: `flex items-center justify-between`
+  - Grid layouts: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`
+  - Text alignment: `text-center` for headings, `text-left` for content
+
+## Component Reuse
+- **ALWAYS prefer using existing components** over creating new ones
+- All shared components are in [src/modules/common/components](mdc:src/modules/common/components)
+- Check existing modules before implementing new UI patterns
+- Maintain design consistency by leveraging the component library
+
+## Common Components Library
+- [src/modules/common/components/wufi-button](mdc:src/modules/common/components/wufi-button) - Buttons
+- [src/modules/common/components/input](mdc:src/modules/common/components/input) - Form inputs
+- [src/modules/common/components/radio](mdc:src/modules/common/components/radio) - Radio buttons
+- [src/modules/common/components/checkbox](mdc:src/modules/common/components/checkbox) - Checkboxes
+- [src/modules/common/components/modal](mdc:src/modules/common/components/modal) - Modal dialogs
+- [src/modules/common/components/bento-grid](mdc:src/modules/common/components/bento-grid) - Grid layouts
+- [src/modules/common/components/interactive-link](mdc:src/modules/common/components/interactive-link) - Enhanced links

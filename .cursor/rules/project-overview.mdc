@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Overview
+
+This is the Wufi Storefront - a modern, subscription-based pet e-commerce platform tailored for the Estonian market. The storefront is built with Next.js 15 using App Router and Server Components.
+
+## Key Files
+- [package.json](mdc:package.json) - Project configuration and dependencies
+- [next.config.js](mdc:next.config.js) - Next.js configuration
+- [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout component
+- [src/middleware.ts](mdc:src/middleware.ts) - Next.js middleware for routing and auth
+
+## Tech Stack
+- Next.js 15 (App Router, Server Components)
+- TypeScript
+- Tailwind CSS
+- Medusa JS SDK
+- Stripe for payments
+- i18next for internationalization

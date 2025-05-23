@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Next.js App Router Structure
+
+The Wufi Storefront uses Next.js App Router with the following organization:
+
+## Key Components
+- [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout containing global providers
+- [src/app/[countryCode]](mdc:src/app/[countryCode]) - Country-specific routes
+- [src/middleware.ts](mdc:src/middleware.ts) - Handles routing, redirects, and language detection
+
+## Route Structure
+- Routes are organized by country code, allowing for localization
+- The `[countryCode]` dynamic segment contains all localized pages
+- Server components are used extensively for data fetching
+
+## Internationalization
+- i18next is used for translations
+- The middleware detects the user's language and redirects accordingly
+- Locale data is managed in the i18n directory

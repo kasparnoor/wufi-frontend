@@ -2,9 +2,9 @@ import ItemsTemplate from "./items"
 import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
-import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
-import { ShoppingBag, Clock } from "@medusajs/icons"
+import { ShoppingBag, Clock, Shield, ArrowLeft } from "lucide-react"
+import { LocalizedClientLink } from "@lib/components"
 
 const CartTemplate = ({
   cart,
@@ -14,80 +14,87 @@ const CartTemplate = ({
   customer: HttpTypes.StoreCustomer | null
 }) => {
   return (
-    <div className="pt-24 pb-12 bg-gray-50">
-      <div className="content-container" data-testid="cart-container">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-6">
+      <div className="content-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-testid="cart-container">
         {cart?.items?.length ? (
           <>
-            <div className="flex flex-col items-start mb-8">
-              <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/10 px-6 py-2.5 rounded-full border border-yellow-400/30">
-                <ShoppingBag className="h-5 w-5 text-yellow-600" />
-                <span className="text-yellow-700 font-semibold">Teie ostukorv</span>
+            {/* Compact Header */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <LocalizedClientLink
+                  href="/"
+                  className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="text-sm">Tagasi poodi</span>
+                </LocalizedClientLink>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Ostukorvi sisu</h1>
-              <p className="text-gray-600">Vaadake üle oma tooted ja jätkake kassasse</p>
+              
+              <h1 className="heading-hero mb-2">
+                Teie valik
+              </h1>
+              <p className="text-gray-600">
+                Vaadake üle oma tooted ja jätkake turvalise kassasse
+              </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-              <div className="flex flex-col gap-y-6">
+            {/* Main Content */}
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 lg:gap-8">
+              {/* Left Column - Cart Items */}
+              <div className="space-y-4">
+                {/* Sign in prompt for guests */}
                 {!customer && (
-                  <div className="bg-white p-4 rounded-xl shadow-sm border-0 mb-4">
-                    <SignInPrompt />
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Shield className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <SignInPrompt />
+                      </div>
+                    </div>
                   </div>
                 )}
                 
-                <div className="bg-white p-4 rounded-xl shadow-sm border-0">
+                {/* Cart Items */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
                   <ItemsTemplate cart={cart} />
                 </div>
 
-                {/* Shopping features */}
-                <div className="flex items-center justify-between gap-4 mt-4">
-                  <div className="bg-white p-2 rounded-xl shadow-sm border-0 flex items-center gap-2 group hover:shadow-md transition-shadow duration-200">
-                    <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <ShoppingBag className="h-5 w-5 text-yellow-600" />
+                {/* Trust Signals - More Compact */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex items-center gap-2 hover:shadow-md transition-shadow">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Shield className="h-4 w-4 text-green-600" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Turvaline</h3>
+                      <h3 className="text-sm font-semibold text-gray-900">Turvaline</h3>
                       <p className="text-xs text-gray-600">SSL krüpteeritud</p>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-2 rounded-xl shadow-sm border-0 flex items-center gap-2 group hover:shadow-md transition-shadow duration-200">
-                    <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Clock className="h-5 w-5 text-yellow-600" />
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex items-center gap-2 hover:shadow-md transition-shadow">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Clock className="h-4 w-4 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900">Kiire kohaletoimetamine</h3>
+                      <h3 className="text-sm font-semibold text-gray-900">Kiire tarne</h3>
                       <p className="text-xs text-gray-600">1-3 tööpäeva</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white p-2 rounded-xl shadow-sm border-0 flex items-center gap-2 group hover:shadow-md transition-shadow duration-200">
-                    <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <ShoppingBag className="h-5 w-5 text-yellow-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">Tagastamine</h3>
-                      <p className="text-xs text-gray-600">30-päeva õigus</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="sticky top-20">
-                  {cart && cart.region && (
-                    <div className="bg-white p-4 rounded-xl shadow-sm border-0 hover:shadow-md transition-shadow duration-200">
-                      <Summary cart={cart as any} />
-                    </div>
-                  )}
+              {/* Right Column - Summary */}
+              <div className="xl:sticky xl:top-4 h-fit">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                  <Summary cart={cart as any} />
                 </div>
               </div>
             </div>
           </>
         ) : (
-          <div className="bg-white p-4 rounded-xl shadow-sm border-0 flex flex-col items-center">
-            <EmptyCartMessage />
-          </div>
+          <EmptyCartMessage />
         )}
       </div>
     </div>

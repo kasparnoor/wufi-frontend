@@ -1,7 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
+import { Check } from "lucide-react"
 import React from "react"
-import { Check } from "@medusajs/icons"
 
 type OptionSelectProps = {
   option: HttpTypes.StoreProductOption
@@ -27,7 +27,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700">Vali {title.toLowerCase()}</span>
         {current && (
-          <span className="text-xs text-yellow-600 font-medium">
+          <span className="text-xs text-yellow-800 font-medium">
             Valitud
           </span>
         )}
@@ -45,7 +45,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               className={clx(
                 "relative border text-sm font-medium rounded-xl p-3 transition-all duration-200 group",
                 {
-                  "border-yellow-400 bg-yellow-50 text-yellow-700": isSelected,
+                  "border-yellow-400 bg-yellow-50 text-yellow-800": isSelected,
                   "border-gray-200 bg-white text-gray-700 hover:border-yellow-200 hover:bg-yellow-50/50": !isSelected,
                 }
               )}
@@ -55,7 +55,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               <span className="flex items-center justify-between">
                 <span>{v}</span>
                 {isSelected && (
-                  <Check className="h-4 w-4 text-yellow-600" />
+                  <Check className="h-4 w-4 text-yellow-800" />
                 )}
               </span>
               {!isSelected && (

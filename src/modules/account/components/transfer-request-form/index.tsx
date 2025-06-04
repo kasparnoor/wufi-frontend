@@ -3,9 +3,13 @@
 import { useActionState } from "react"
 import { createTransferRequest } from "@lib/data/orders"
 import { Text, Heading, Input, Button, IconButton, Toaster } from "@medusajs/ui"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { CheckCircleMiniSolid, XCircleSolid } from "@medusajs/icons"
+import { SubmitButton } from "@lib/components"
+import { CheckCircle, XCircle } from "lucide-react"
 import { useEffect, useState } from "react"
+import { FieldError } from "react-hook-form"
+import { convertToLocale } from "@lib/util/money"
+import { clx, Label } from "@medusajs/ui"
+import { HttpTypes } from "@medusajs/types"
 
 export default function TransferRequestForm() {
   const [showSuccess, setShowSuccess] = useState(false)
@@ -57,7 +61,7 @@ export default function TransferRequestForm() {
       {showSuccess && (
         <div className="flex justify-between p-4 bg-neutral-50 shadow-borders-base w-full self-stretch items-center">
           <div className="flex gap-x-2 items-center">
-            <CheckCircleMiniSolid className="w-4 h-4 text-emerald-500" />
+            <CheckCircle className="w-4 h-4 text-emerald-500" />
             <div className="flex flex-col gap-y-1">
               <Text className="text-medim-pl text-neutral-950">
                 Transfer for order {state.order?.id} requested
@@ -72,7 +76,7 @@ export default function TransferRequestForm() {
             className="h-fit"
             onClick={() => setShowSuccess(false)}
           >
-            <XCircleSolid className="w-4 h-4 text-neutral-500" />
+            <XCircle className="w-4 h-4 text-neutral-500" />
           </IconButton>
         </div>
       )}

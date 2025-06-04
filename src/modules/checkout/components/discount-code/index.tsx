@@ -1,14 +1,14 @@
 "use client"
 
-import { Input } from "@medusajs/ui"
 import React, { useActionState } from "react";
+import { Tag } from "lucide-react"
+import { HttpTypes } from "@medusajs/types"
 
+import { ModernInput as Input } from "@lib/components"
 import { applyPromotions, submitPromotionForm } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
-import { Tag } from "@medusajs/icons"
-import { HttpTypes } from "@medusajs/types"
 import ErrorMessage from "../error-message"
-import WufiButton from "@modules/common/components/wufi-button"
+import { WufiButton } from "@lib/components"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
@@ -18,6 +18,7 @@ type DiscountCodeProps = {
 
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [codeValue, setCodeValue] = React.useState("")
 
   const { promotions = [] } = cart
   const removePromotionCode = async (code: string) => {
@@ -35,17 +36,13 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     if (!code) {
       return
     }
-    const input = document.getElementById("promotion-input") as HTMLInputElement
     const codes = promotions
       .filter((p) => p.code === undefined)
       .map((p) => p.code!)
     codes.push(code.toString())
 
     await applyPromotions(codes)
-
-    if (input) {
-      input.value = ""
-    }
+    setCodeValue("")
   }
 
   const [message, formAction] = useActionState(submitPromotionForm, null)
@@ -62,24 +59,29 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
             size="medium"
             data-testid="add-discount-button"
           >
-            <Tag className="h-5 w-5 text-yellow-600" />
+            <Tag className="h-5 w-5 text-yellow-800" />
             Lisa sooduskood(id)
           </WufiButton>
         ) : (
           <>
             <div className="flex flex-col w-full gap-2">
               <Input
-                className="w-full rounded-lg border border-gray-200 focus:border-yellow-400 focus:ring-yellow-400 py-3"
                 id="promotion-input"
                 name="code"
+                label="Sooduskood"
+                value={codeValue}
+                onChange={(e) => setCodeValue(e.target.value)}
                 type="text"
-                placeholder="Sisesta sooduskood"
+                icon={Tag}
                 data-testid="discount-input"
               />
               <div className="flex gap-2">
                 <WufiButton
                   variant="secondary"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false)
+                    setCodeValue("")
+                  }}
                   type="button"
                   className="flex-1 bg-transparent hover:bg-gray-100 text-gray-700 border border-gray-300"
                   size="small"

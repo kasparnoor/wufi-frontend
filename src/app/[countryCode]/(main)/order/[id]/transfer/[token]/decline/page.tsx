@@ -1,6 +1,6 @@
 import { declineTransferRequest } from "@lib/data/orders"
 import { Heading, Text } from "@medusajs/ui"
-import TransferImage from "@modules/order/components/transfer-image"
+import { TransferImage } from "@lib/components"
 
 export default async function TransferPage({
   params,

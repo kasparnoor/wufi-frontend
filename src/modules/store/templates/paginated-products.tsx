@@ -1,9 +1,9 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
-import ProductPreview from "@modules/products/components/product-preview"
+import { ProductPreview } from "@lib/components"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list"
-import { Sparkles } from "@medusajs/icons"
+import { Sparkles } from "lucide-react"
 
 const PRODUCT_LIMIT = 24
 
@@ -111,13 +111,13 @@ export default async function PaginatedProducts({
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-6 py-2.5 rounded-full border border-yellow-400/30">
-          <Sparkles className="h-5 w-5 text-yellow-600" />
-          <span className="text-yellow-700 font-semibold">Otsing</span>
+          <Sparkles className="h-5 w-5 text-yellow-800" />
+          <span className="text-yellow-800 font-semibold">Otsing</span>
         </div>
         <h3 className="text-xl font-medium text-yellow-800 mb-2">
           Tooteid ei leitud
         </h3>
-        <p className="text-yellow-600">
+        <p className="text-yellow-800">
           Proovi muuta filtreid või otsi midagi muud
         </p>
       </div>

@@ -1,16 +1,18 @@
-import { login } from "@lib/data/customer"
+"use client"
+
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
-import ErrorMessage from "@modules/checkout/components/error-message"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
-import Input from "@modules/common/components/input"
+import { ErrorMessage } from "@lib/components"
+import { SubmitButton } from "@lib/components"
+import { ModernInput as Input } from "@lib/components"
 import { useActionState } from "react"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
+  loginAction?: (prevState: any, formData: FormData) => Promise<any>
 }
 
-const Login = ({ setCurrentView }: Props) => {
-  const [message, formAction] = useActionState(login, null)
+const Login = ({ setCurrentView, loginAction }: Props) => {
+  const [message, formAction] = useActionState(loginAction || (() => Promise.resolve("No login action provided")), null)
 
   return (
     <div

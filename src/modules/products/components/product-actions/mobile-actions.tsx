@@ -5,8 +5,8 @@ import React, { Fragment, useMemo } from "react"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
-import { ShoppingBag, Spinner } from "@medusajs/icons"
-import WufiButton from "@modules/common/components/wufi-button"
+import { ShoppingBag, LoaderCircle } from "lucide-react"
+import { WufiButton } from "@lib/components"
 
 import { getProductPrice } from "@lib/util/get-product-price"
 import OptionSelect from "./option-select"
@@ -72,7 +72,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
           leaveTo="opacity-0"
         >
           <div
-            className="bg-white flex flex-col gap-y-4 justify-center items-center p-4 h-full w-full border-t border-gray-200"
+            className="bg-white flex flex-col gap-y-3 md:gap-y-4 justify-center items-center p-4 md:p-6 h-full w-full border-t border-gray-200 shadow-lg"
             data-testid="mobile-actions"
           >
             <div className="w-full flex flex-col gap-y-2">
@@ -86,7 +86,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                     </p>
                   )}
                   <span
-                    className={clx("text-base font-medium", {
+                    className={clx("text-lg md:text-xl font-semibold", {
                       "text-ui-fg-interactive":
                         selectedPrice.price_type === "sale",
                     })}
@@ -102,17 +102,17 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               )}
             </div>
 
-            <div className={clx("grid grid-cols-2 w-full gap-x-4", {
+            <div className={clx("grid grid-cols-2 w-full gap-x-3 md:gap-x-4", {
               "!grid-cols-1": isSimple
             })}>
               {!isSimple && <WufiButton
                 onClick={open}
                 variant="secondary"
-                className="w-full text-gray-700"
+                className="w-full text-gray-700 min-h-[44px] md:min-h-[48px] text-sm md:text-base"
                 data-testid="mobile-actions-button"
               >
                 <div className="flex items-center justify-between w-full">
-                  <span className="text-sm font-medium">
+                  <span className="font-medium">
                     {variant
                       ? Object.values(options).join(" / ")
                       : "Vali variant"}
@@ -123,13 +123,13 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               <WufiButton
                 onClick={handleAddToCart}
                 disabled={!inStock || !variant}
-                className="w-full"
+                className="w-full min-h-[44px] md:min-h-[48px] text-sm md:text-base"
                 data-testid="mobile-cart-button"
               >
                 {isAdding ? (
-                  <Spinner className="h-5 w-5 animate-spin" />
+                  <LoaderCircle className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
                 ) : (
-                  <ShoppingBag className="h-5 w-5 mr-2" />
+                  <ShoppingBag className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                 )}
                 {!variant
                   ? "Vali variant"

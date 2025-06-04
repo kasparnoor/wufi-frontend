@@ -3,8 +3,11 @@ import { listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import Image from "next/image"
-import { Sparkles } from "@medusajs/icons"
+import { Sparkles } from "lucide-react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { sortProducts } from "@lib/util/sort-products"
+import { SortOptions } from "@modules/store/components/refinement-list"
+import PaginatedProducts from "@modules/store/templates/paginated-products"
 
 export const metadata: Metadata = {
   title: "Kategooriad | Wufi",
@@ -38,8 +41,8 @@ export default async function CategoriesPage({
         <div className="container mx-auto px-6 lg:px-12 relative">
           <div className="flex flex-col items-center mb-12">
             <div className="inline-flex items-center gap-2 mb-4 bg-yellow-400/20 px-6 py-2.5 rounded-full border border-yellow-400/30">
-              <Sparkles className="h-5 w-5 text-yellow-600" />
-              <span className="text-yellow-700 font-semibold">Kategooriad</span>
+              <Sparkles className="h-5 w-5 text-yellow-800" />
+              <span className="text-yellow-800 font-semibold">Kategooriad</span>
             </div>
             <h1 className="text-3xl font-bold mb-4">Milline on teie lemmikloom?</h1>
             <p className="text-gray-600 text-center max-w-2xl">
@@ -68,10 +71,10 @@ export default async function CategoriesPage({
                       />
                     </div>
                   )}
-                  <h3 className="text-lg font-medium mb-1 text-yellow-800 group-hover:text-yellow-600 transition-colors">
+                  <h3 className="text-lg font-medium mb-1 text-yellow-800 group-hover:text-yellow-800 transition-colors">
                     {category.name}
                   </h3>
-                  <p className="text-sm text-yellow-700 group-hover:text-yellow-600">
+                  <p className="text-sm text-yellow-800 group-hover:text-yellow-800">
                     Vaata tooteid
                   </p>
                 </LocalizedClientLink>

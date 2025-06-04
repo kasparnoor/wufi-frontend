@@ -3,9 +3,9 @@
 import { RadioGroup } from "@headlessui/react"
 import { isStripe as isStripeFunc, paymentInfoMap } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
-import { CreditCard } from "@medusajs/icons"
+import { CreditCard, Shield, Lock } from "lucide-react"
 import { Button, clx } from "@medusajs/ui"
-import ErrorMessage from "@modules/checkout/components/error-message"
+import { ErrorMessage } from "@lib/components"
 import PaymentContainer, {
   StripeCardContainer,
 } from "@modules/checkout/components/payment-container"
@@ -36,160 +36,176 @@ const Payment = ({
   const pathname = usePathname()
 
   const isOpen = searchParams.get("step") === "payment"
-
   const isStripe = isStripeFunc(selectedPaymentMethod)
 
-  const setPaymentMethod = async (method: string) => {
-    setError(null)
-    setIsLoading(true);
-    setSelectedPaymentMethod(method)
-    console.log(`[Payment] Setting payment method to: ${method}`);
-    if (method && !paidByGiftcard) {
+  /**
+   * Starts the payment session for the given provider.
+   */
+  const initiatePayment = useCallback(
+    async (providerId: string) => {
+      setIsLoading(true)
       try {
-        console.log("[Payment] Initiating payment session for cart:", cart?.id);
-        const response = await initiatePaymentSession(cart, { provider_id: method });
-        console.log("[Payment] initiatePaymentSession response:", response);
+        const response = await initiatePaymentSession(cart, {
+          provider_id: providerId,
+        })
+
+        if (!response) {
+          setError("An error occurred, please try again.")
+          return
+        }
       } catch (err: any) {
-        console.error("[Payment] Error initiating payment session:", err);
-        setError(err.message || "Viga makseviisi seadistamisel.");
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
       }
-    }
-    setIsLoading(false);
-  }
-
-  const paidByGiftcard =
-    cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
-
-  const paymentReady =
-    (activeSession && cart?.shipping_methods.length !== 0) || paidByGiftcard
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set(name, value)
-
-      return params.toString()
     },
-    [searchParams]
+    [cart]
+  )
+
+  const handleChange = useCallback(
+    (providerId: string) => {
+      setError(null)
+      setSelectedPaymentMethod(providerId)
+      if (providerId !== activeSession?.provider_id) {
+        initiatePayment(providerId)
+      }
+    },
+    [activeSession?.provider_id, initiatePayment]
   )
 
   const handleEdit = () => {
-    router.push(pathname + "?" + createQueryString("step", "payment"), {
-      scroll: false,
-    })
+    router.push(pathname + "?step=payment", { scroll: false })
   }
-
-  const handleSubmit = async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const paymentSessionIsActiveForSelectedMethod =
-        activeSession?.provider_id === selectedPaymentMethod
-
-      if (!paymentSessionIsActiveForSelectedMethod && selectedPaymentMethod && !paidByGiftcard) {
-        setIsLoading(true);
-        try {
-          console.log("[Payment] handleSubmit: Initiating payment session for cart:", cart?.id, "method:", selectedPaymentMethod);
-          const response = await initiatePaymentSession(cart, { provider_id: selectedPaymentMethod });
-          console.log("[Payment] handleSubmit initiatePaymentSession response:", response);
-        } catch (err: any) {
-          console.error("[Payment] handleSubmit: Error initiating payment session:", err);
-          setError(err.message || "Viga makseviisi kinnitamisel.");
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    setError(null)
-  }, [isOpen])
 
   return (
-    <div className={`${isOpen ? '' : 'opacity-75'} space-y-6`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isOpen ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
-            <CreditCard className="h-4 w-4" />
-          </div>
-          <h3 className="font-medium text-gray-900">Makseinfo</h3>
+    <div className="space-y-6">
+      {/* Security Header */}
+      <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+          <Lock className="h-5 w-5 text-green-600" />
         </div>
-        
-        {!isOpen && paymentReady && (
-          <button
-            onClick={handleEdit}
-            className="text-sm text-yellow-600 hover:text-yellow-700 font-medium"
-            data-testid="edit-payment-button"
-          >
-            Muuda
-          </button>
-        )}
+        <div>
+          <h3 className="font-semibold text-green-800">Turvaline maksmine</h3>
+          <p className="text-sm text-green-600">Teie andmed on SSL krüpteeringuga kaitstud</p>
+        </div>
       </div>
-      
+
       {isOpen ? (
-        <div className="bg-gray-50 p-6 rounded-lg mb-6 space-y-6">
-          {!paidByGiftcard && availablePaymentMethods?.length && (
-            <>
-              <span className="text-sm text-gray-700">Valige oma eelistatud makseviis</span>
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Valige makseviis
+            </h3>
+            
+            {availablePaymentMethods?.length ? (
               <RadioGroup
                 value={selectedPaymentMethod}
-                onChange={(value: string) => setPaymentMethod(value)}
+                onChange={handleChange}
+                className="space-y-3"
               >
-                <div className="space-y-4">
-                  {availablePaymentMethods.map((paymentMethod) => (
-                    <div key={paymentMethod.id}>
-                      {isStripeFunc(paymentMethod.id) ? (
-                        <StripeCardContainer
+                {availablePaymentMethods.map((paymentMethod) => (
+                  <PaymentContainer
+                    paymentProviderId={paymentMethod.id}
+                    key={paymentMethod.id}
+                    paymentInfoMap={paymentInfoMap}
+                    selectedPaymentOptionId={selectedPaymentMethod}
+                    disabled={isLoading}
+                  >
+                    {isStripe && selectedPaymentMethod === paymentMethod.id && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CreditCard className="h-4 w-4 text-gray-600" />
+                          <span className="text-sm font-medium text-gray-700">
+                            Krediitkaardi andmed
+                          </span>
+                        </div>
+                        <StripeCardContainer 
                           paymentProviderId={paymentMethod.id}
-                          selectedPaymentOptionId={selectedPaymentMethod}
                           paymentInfoMap={paymentInfoMap}
+                          selectedPaymentOptionId={selectedPaymentMethod}
                           setCardBrand={setCardBrand}
                           setError={setError}
                           setCardComplete={setCardComplete}
                         />
-                      ) : (
-                        <PaymentContainer
-                          paymentInfoMap={paymentInfoMap}
-                          paymentProviderId={paymentMethod.id}
-                          selectedPaymentOptionId={selectedPaymentMethod}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                        
+                        {/* Accepted Cards */}
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <p className="text-xs text-gray-500 mb-2">Aktsepteerime:</p>
+                          <div className="flex gap-2">
+                            <div className="w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                              V
+                            </div>
+                            <div className="w-8 h-5 bg-red-500 rounded text-white text-xs flex items-center justify-center font-bold">
+                              MC
+                            </div>
+                            <div className="w-8 h-5 bg-green-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                              AE
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </PaymentContainer>
+                ))}
               </RadioGroup>
-            </>
-          )}
+            ) : (
+              <div className="p-6 text-center bg-gray-50 rounded-lg border border-gray-200">
+                <CreditCard className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600">Makseviisid laadimas...</p>
+              </div>
+            )}
 
-          {paidByGiftcard && (
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-gray-500">Makseviis</p>
-              <p className="text-sm text-gray-900">Kinkekaart</p>
+            <ErrorMessage
+              error={error}
+              data-testid="payment-method-error-message"
+            />
+          </div>
+
+          {/* Additional Security Info */}
+          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex items-start gap-3">
+              <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-blue-800 mb-1">Miks on teie andmed turvalised?</p>
+                <ul className="text-blue-700 space-y-1">
+                  <li>• 256-bit SSL krüpteering</li>
+                  <li>• PCI DSS sertifitseeritud</li>
+                  <li>• Kaardandmeid ei salvestata</li>
+                </ul>
+              </div>
             </div>
-          )}
-
-          <ErrorMessage
-            error={error}
-            data-testid="payment-method-error-message"
-          />
-
-          {/* Removed redundant internal submit button; using global progression CTA instead */}
+          </div>
         </div>
       ) : (
-        <div className="space-y-2">
-          {cart && paymentReady && activeSession && (
-            <>
-              <p className="text-xs font-medium text-gray-500">Makseviis</p>
-              <p className="text-sm text-gray-900">
-                {paymentInfoMap[activeSession?.provider_id]?.title ||
-                  activeSession?.provider_id}
-              </p>
-            </>
+        <div className="space-y-4">
+          {cart && activeSession ? (
+            <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {paymentInfoMap[activeSession.provider_id]?.title || "Makseviis valitud"}
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Andmed on turvalised ja krüpteeritud
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleEdit}
+                  className="text-sm text-yellow-700 hover:text-yellow-800 font-medium transition-colors"
+                >
+                  Muuda
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+              <p className="text-sm text-yellow-800">Makseviis pole veel valitud</p>
+            </div>
           )}
         </div>
       )}

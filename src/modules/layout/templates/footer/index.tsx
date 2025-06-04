@@ -1,9 +1,9 @@
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
 import { Text, clx } from "@medusajs/ui"
-import { Sparkles } from "@medusajs/icons"
+import { Sparkles } from "lucide-react"
 
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { LocalizedClientLink } from "@lib/components"
 
 export default async function Footer() {
   const { collections } = await listCollections({

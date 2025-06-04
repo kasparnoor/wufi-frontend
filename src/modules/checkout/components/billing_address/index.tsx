@@ -1,7 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
-import Input from "@modules/common/components/input"
+import { ModernInput as Input } from "@lib/components"
 import React, { useState } from "react"
-import CountrySelect from "../country-select"
+import { User, MapPin, Building2, Phone } from "lucide-react"
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const [formData, setFormData] = useState<any>({
@@ -27,6 +27,13 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     })
   }
 
+  const handlePhoneChange = (phone: string) => {
+    setFormData({
+      ...formData,
+      "billing_address.phone": phone,
+    })
+  }
+
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
@@ -37,6 +44,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           value={formData["billing_address.first_name"]}
           onChange={handleChange}
           required
+          icon={User}
           data-testid="billing-first-name-input"
         />
         <Input
@@ -46,6 +54,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           value={formData["billing_address.last_name"]}
           onChange={handleChange}
           required
+          icon={User}
           data-testid="billing-last-name-input"
         />
         <Input
@@ -55,6 +64,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           value={formData["billing_address.address_1"]}
           onChange={handleChange}
           required
+          icon={MapPin}
           data-testid="billing-address-input"
         />
         <Input
@@ -63,6 +73,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           value={formData["billing_address.company"]}
           onChange={handleChange}
           autoComplete="organization"
+          icon={Building2}
           data-testid="billing-company-input"
         />
         <Input
@@ -81,16 +92,18 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           value={formData["billing_address.city"]}
           onChange={handleChange}
           required
-          placeholder="Nt: Tallinn"
           data-testid="billing-city-input"
         />
-        <CountrySelect
+        <Input
+          variant="select"
+          label="Riik"
           name="billing_address.country_code"
           autoComplete="country"
           region={cart?.region}
           value={formData["billing_address.country_code"]}
           onChange={handleChange}
           required
+          icon={MapPin}
           data-testid="billing-country-select"
         />
         <Input
@@ -102,12 +115,13 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-province-input"
         />
         <Input
+          variant="phone"
           label="Telefon"
           name="billing_address.phone"
-          autoComplete="tel"
-          type="tel"
           value={formData["billing_address.phone"]}
+          onPhoneChange={handlePhoneChange}
           onChange={handleChange}
+          defaultCountry="ee"
           data-testid="billing-phone-input"
         />
       </div>

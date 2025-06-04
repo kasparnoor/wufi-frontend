@@ -1,27 +1,43 @@
-const Radio = ({ checked, 'data-testid': dataTestId }: { checked: boolean, 'data-testid'?: string }) => {
-  return (
-    <>
-      <button
-        type="button"
-        role="radio"
-        aria-checked="true"
-        data-state={checked ? "checked" : "unchecked"}
-        className="group relative flex h-5 w-5 items-center justify-center outline-none"
-        data-testid={dataTestId || 'radio-button'}
-      >
-        <div className="shadow-borders-base group-hover:shadow-borders-strong-with-shadow bg-ui-bg-base group-data-[state=checked]:bg-ui-bg-interactive group-data-[state=checked]:shadow-borders-interactive group-focus:!shadow-borders-interactive-with-focus group-disabled:!bg-ui-bg-disabled group-disabled:!shadow-borders-base flex h-[14px] w-[14px] items-center justify-center rounded-full transition-all">
-          {checked && (
-            <span
-              data-state={checked ? "checked" : "unchecked"}
-              className="group flex items-center justify-center"
-            >
-              <div className="bg-ui-bg-base shadow-details-contrast-on-bg-interactive group-disabled:bg-ui-fg-disabled rounded-full group-disabled:shadow-none h-1.5 w-1.5"></div>
-            </span>
-          )}
-        </div>
-      </button>
-    </>
-  )
-}
+import React from "react"
+import { clx } from "@medusajs/ui"
 
-export default Radio
+type RadioProps = {
+  label?: string
+  description?: string
+  className?: string
+} & React.InputHTMLAttributes<HTMLInputElement>
+
+const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
+  ({ label, description, className, ...props }, ref) => {
+    return (
+      <div className={clx("flex items-start gap-3", className)}>
+        <input
+          ref={ref}
+          type="radio"
+          className={clx(
+            "mt-1 h-4 w-4 text-blue-600 border-gray-300",
+            "focus:ring-blue-500 focus:ring-2 focus:ring-offset-0",
+            "disabled:bg-gray-100 disabled:cursor-not-allowed"
+          )}
+          {...props}
+        />
+        {(label || description) && (
+          <div className="flex flex-col">
+            {label && (
+              <label className="text-sm font-medium text-gray-900">
+                {label}
+              </label>
+            )}
+            {description && (
+              <p className="text-sm text-gray-500">{description}</p>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+)
+
+Radio.displayName = "Radio"
+
+export default Radio 

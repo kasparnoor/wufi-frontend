@@ -1,15 +1,15 @@
 "use client"
 
 import React, { useEffect, useState, useActionState } from "react"
-import { PencilSquare as Edit, Trash } from "@medusajs/icons"
+import { Edit, Trash } from "lucide-react"
 import { Button, Heading, Text, clx } from "@medusajs/ui"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
-import CountrySelect from "@modules/checkout/components/country-select"
-import Input from "@modules/common/components/input"
-import Modal from "@modules/common/components/modal"
+import { CountrySelect } from "@lib/components"
+import { ModernInput as Input } from "@lib/components"
+import { Dialog as Modal, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@lib/components"
 import Spinner from "@modules/common/icons/spinner"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
+import { SubmitButton } from "@lib/components"
 import { HttpTypes } from "@medusajs/types"
 import {
   deleteCustomerAddress,

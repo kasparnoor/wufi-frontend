@@ -2,7 +2,7 @@
 
 import { setAddresses } from "@lib/data/cart"
 import compareAddresses from "@lib/util/compare-addresses"
-import { MapPin } from "@medusajs/icons"
+import { MapPin } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import { useToggleState } from "@medusajs/ui"
 import Spinner from "@modules/common/icons/spinner"
@@ -55,7 +55,7 @@ const Addresses = ({
         {!isOpen && cart?.shipping_address && (
           <button
             onClick={handleEdit}
-            className="text-sm text-yellow-600 hover:text-yellow-700 font-medium transition-colors"
+            className="text-sm text-yellow-800 hover:text-yellow-800 font-medium transition-colors"
             data-testid="edit-address-button"
           >
             Muuda
@@ -65,7 +65,7 @@ const Addresses = ({
       
       {isOpen ? (
         <form action={formAction} id="address-form">
-          <div className="bg-gray-50 p-6 rounded-lg mb-6 space-y-6">
+          <div className="space-y-8">
             <ShippingAddress
               customer={customer}
               checked={sameAsBilling}
@@ -74,11 +74,10 @@ const Addresses = ({
             />
 
             {!sameAsBilling && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-3 mt-6">
+              <div className="pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">
                   Arveldusaadress
                 </h3>
-
                 <BillingAddress cart={cart} />
               </div>
             )}
@@ -157,7 +156,7 @@ const Addresses = ({
               {/* {isOpen === null && (
                 <button
                   onClick={handleContinue}
-                  className="w-full mt-5 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-sm"
+                  className="w-full mt-5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-medium py-3 px-4 rounded-lg transition-colors shadow-sm"
                 >
                   Jätka tarnimisega
                 </button>

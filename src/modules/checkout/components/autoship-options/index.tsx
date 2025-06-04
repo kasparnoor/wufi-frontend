@@ -3,11 +3,12 @@
 import { HttpTypes } from "@medusajs/types";
 import { RadioGroup } from "@headlessui/react";
 import { clx } from "@medusajs/ui";
-import MedusaRadio from "@modules/common/components/radio";
+import { RadioGroup as MedusaRadio, RadioGroupItem } from "@lib/components";
 import { updateLineItemMetadata } from "@lib/data/cart";
 import { useState, useEffect } from "react";
-import Thumbnail from "@modules/products/components/thumbnail";
-import { CheckCircleSolid } from "@medusajs/icons";
+import { Thumbnail } from "@lib/components";
+import { CheckCircle } from "lucide-react";
+import { getAvailableIntervals } from "@lib/util/subscription-intervals";
 
 interface AutoshipOptionsProps {
   cart: HttpTypes.StoreCart;
@@ -50,14 +51,12 @@ interface AutoshipItemOptionProps {
   cart: HttpTypes.StoreCart;
 }
 
-const AUTOSHIP_INTERVALS = [
-  { value: "2w", label: "Iga 2 nädala tagant" },
-  { value: "4w", label: "Iga 4 nädala tagant" },
-  { value: "6w", label: "Iga 6 nädala tagant" },
-  { value: "8w", label: "Iga 8 nädala tagant" },
-];
-
 const AutoshipItemOption: React.FC<AutoshipItemOptionProps> = ({ item, cart }) => {
+  // Get available intervals for this product
+  const availableIntervals = getAvailableIntervals(
+    (item.product as any)?.metadata?.available_intervals as string[] | undefined
+  );
+  
   // Initial purchase type respects what might have been set on product page (from item metadata),
   // otherwise defaults to 'one_time'.
   const getInitialPurchaseType = () => {
@@ -71,7 +70,7 @@ const AutoshipItemOption: React.FC<AutoshipItemOptionProps> = ({ item, cart }) =
   };
 
   const [purchaseType, setPurchaseType] = useState<"one_time" | "subscription">(getInitialPurchaseType());
-  const initialInterval = (item.metadata?.interval as string | undefined) || AUTOSHIP_INTERVALS[1].value;
+  const initialInterval = (item.metadata?.interval as string | undefined) || availableIntervals[0]?.value || "2w";
   const [selectedInterval, setSelectedInterval] = useState<string>(
     initialInterval
   );
@@ -195,15 +194,15 @@ const AutoshipItemOption: React.FC<AutoshipItemOptionProps> = ({ item, cart }) =
                 <div className={clx("mt-4", {"opacity-0 h-0 overflow-hidden": !checked, "opacity-100": checked})}>
                   <ul className="space-y-1.5 mt-3">
                     <li className="flex items-start text-sm text-gray-600">
-                      <CheckCircleSolid className="h-5 w-5 text-green-500 flex-shrink-0 mr-2" />
+                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mr-2" />
                       <span>Regulaarsed tarned sinu valitud graafiku alusel</span>
                     </li>
                     <li className="flex items-start text-sm text-gray-600">
-                      <CheckCircleSolid className="h-5 w-5 text-green-500 flex-shrink-0 mr-2" />
+                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mr-2" />
                       <span>Jäta vahele, muuda või tühista millal iganes</span>
                     </li>
                     <li className="flex items-start text-sm text-gray-600">
-                      <CheckCircleSolid className="h-5 w-5 text-green-500 flex-shrink-0 mr-2" />
+                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mr-2" />
                       <span>Automaatne tellimuse haldamine</span>
                     </li>
                   </ul>
@@ -221,7 +220,7 @@ const AutoshipItemOption: React.FC<AutoshipItemOptionProps> = ({ item, cart }) =
                         disabled={isLoading}
                         className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg shadow-sm"
                       >
-                        {AUTOSHIP_INTERVALS.map(interval => (
+                        {availableIntervals.map(interval => (
                           <option key={interval.value} value={interval.value}>
                             {interval.label}
                           </option>

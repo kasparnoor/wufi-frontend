@@ -1,13 +1,14 @@
 "use client"
 
-import { XMark } from "@medusajs/icons"
+import { Heading } from "@medusajs/ui"
+import { X } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Help from "@modules/order/components/help"
-import Items from "@modules/order/components/items"
-import OrderDetails from "@modules/order/components/order-details"
-import OrderSummary from "@modules/order/components/order-summary"
-import ShippingDetails from "@modules/order/components/shipping-details"
+import { LocalizedClientLink } from "@lib/components"
+import { Help } from "@lib/components"
+import { Items } from "@lib/components"
+import { OrderDetails } from "@lib/components"
+import { OrderSummary } from "@lib/components"
+import { ShippingDetails } from "@lib/components"
 import React from "react"
 
 type OrderDetailsTemplateProps = {
@@ -26,7 +27,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
           className="flex gap-2 items-center text-ui-fg-subtle hover:text-ui-fg-base"
           data-testid="back-to-overview-button"
         >
-          <XMark /> Back to overview
+          <X /> Back to overview
         </LocalizedClientLink>
       </div>
       <div

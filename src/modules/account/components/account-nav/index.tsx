@@ -1,14 +1,9 @@
 "use client"
 
 import { clx } from "@medusajs/ui"
-import { ArrowRightOnRectangle } from "@medusajs/icons"
+import { LogOut, ChevronDown, User, MapPin, CreditCard } from "lucide-react"
 import { useParams, usePathname } from "next/navigation"
-
-import ChevronDown from "@modules/common/icons/chevron-down"
-import User from "@modules/common/icons/user"
-import MapPin from "@modules/common/icons/map-pin"
-import Package from "@modules/common/icons/package"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { LocalizedClientLink } from "@lib/components"
 import { HttpTypes } from "@medusajs/types"
 import { signout } from "@lib/data/customer"
 
@@ -22,6 +17,12 @@ const AccountNav = ({
 
   const handleLogout = async () => {
     await signout(countryCode)
+  }
+
+  // Helper function to check if a route is active
+  const isActiveRoute = (href: string) => {
+    const currentPath = route.split(countryCode)[1]
+    return currentPath === href
   }
 
   return (
@@ -48,12 +49,17 @@ const AccountNav = ({
                 <li>
                   <LocalizedClientLink
                     href="/account/profile"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/profile"),
+                      }
+                    )}
                     data-testid="profile-link"
                   >
                     <>
                       <div className="flex items-center gap-x-2">
-                        <User size={20} />
+                        <User />
                         <span>Profiil</span>
                       </div>
                       <ChevronDown className="transform -rotate-90" />
@@ -63,12 +69,17 @@ const AccountNav = ({
                 <li>
                   <LocalizedClientLink
                     href="/account/addresses"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/addresses"),
+                      }
+                    )}
                     data-testid="addresses-link"
                   >
                     <>
                       <div className="flex items-center gap-x-2">
-                        <MapPin size={20} />
+                        <MapPin />
                         <span>Aadressid</span>
                       </div>
                       <ChevronDown className="transform -rotate-90" />
@@ -77,13 +88,74 @@ const AccountNav = ({
                 </li>
                 <li>
                   <LocalizedClientLink
+                    href="/account/billing"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/billing"),
+                      }
+                    )}
+                    data-testid="billing-link"
+                  >
+                    <>
+                      <div className="flex items-center gap-x-2">
+                        <CreditCard className="h-5 w-5" />
+                        <span>Arveldus</span>
+                      </div>
+                      <ChevronDown className="transform -rotate-90" />
+                    </>
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
                     href="/account/orders"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/orders"),
+                      }
+                    )}
                     data-testid="orders-link"
                   >
                     <div className="flex items-center gap-x-2">
-                      <Package size={20} />
+                      <User />
                       <span>Tellimused</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/subscriptions"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/subscriptions"),
+                      }
+                    )}
+                    data-testid="subscriptions-link"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <User />
+                      <span>Püsitellimused</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/pets"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/pets"),
+                      }
+                    )}
+                    data-testid="pets-link"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <User />
+                      <span>Lemmikloomad</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
                   </LocalizedClientLink>
@@ -96,7 +168,7 @@ const AccountNav = ({
                     data-testid="logout-button"
                   >
                     <div className="flex items-center gap-x-2">
-                      <ArrowRightOnRectangle />
+                      <LogOut />
                       <span>Logi välja</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
@@ -143,11 +215,38 @@ const AccountNav = ({
               </li>
               <li>
                 <AccountNavLink
+                  href="/account/billing"
+                  route={route!}
+                  data-testid="billing-link"
+                >
+                  Arveldus
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
                   href="/account/orders"
                   route={route!}
                   data-testid="orders-link"
                 >
                   Tellimused
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/subscriptions"
+                  route={route!}
+                  data-testid="subscriptions-link"
+                >
+                  Püsitellimused
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/pets"
+                  route={route!}
+                  data-testid="pets-link"
+                >
+                  Lemmikloomad
                 </AccountNavLink>
               </li>
               <li className="text-grey-700">
@@ -187,7 +286,7 @@ const AccountNavLink = ({
     <LocalizedClientLink
       href={href}
       className={clx("text-ui-fg-subtle hover:text-ui-fg-base", {
-        "text-ui-fg-base font-semibold": active,
+        "text-blue-600 font-semibold": active,
       })}
       data-testid={dataTestId}
     >

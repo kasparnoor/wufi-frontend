@@ -39,6 +39,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Image optimization output
+/public/optimized/
+
 # typescript
 *.tsbuildinfo
 node_modules

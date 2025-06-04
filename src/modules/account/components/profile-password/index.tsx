@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useActionState } from "react"
-import Input from "@modules/common/components/input"
+import { ModernInput as Input } from "@lib/components"
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
 import { toast } from "@medusajs/ui"

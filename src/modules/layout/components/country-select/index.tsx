@@ -12,7 +12,6 @@ import ReactCountryFlag from "react-country-flag"
 
 import { StateType } from "@lib/hooks/use-toggle-state"
 import { useParams, usePathname } from "next/navigation"
-import { updateRegion } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 
 type CountryOption = {
@@ -24,9 +23,10 @@ type CountryOption = {
 type CountrySelectProps = {
   toggleState: StateType
   regions: HttpTypes.StoreRegion[]
+  onRegionChange?: (country: string, currentPath: string) => void
 }
 
-const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
+const CountrySelect = ({ toggleState, regions, onRegionChange }: CountrySelectProps) => {
   const [current, setCurrent] = useState<
     | { country: string | undefined; region: string; label: string | undefined }
     | undefined
@@ -58,7 +58,12 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
   }, [options, countryCode])
 
   const handleChange = (option: CountryOption) => {
-    updateRegion(option.country, currentPath)
+    if (onRegionChange) {
+      onRegionChange(option.country, currentPath)
+    } else {
+      // Fallback to client-side navigation if no handler provided
+      window.location.href = `/${option.country}${currentPath}`
+    }
     close()
   }
 

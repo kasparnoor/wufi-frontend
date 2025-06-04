@@ -1,16 +1,16 @@
 import { Metadata } from "next"
 
-import Overview from "@modules/account/components/overview"
+import { Dashboard } from "@lib/components"
 import { notFound } from "next/navigation"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 
 export const metadata: Metadata = {
-  title: "Account",
-  description: "Overview of your account activity.",
+  title: "Konto ülevaade",
+  description: "Ülevaade teie konto tegevusest ja lemmikloomadest.",
 }
 
-export default async function OverviewTemplate() {
+export default async function DashboardPage() {
   const customer = await retrieveCustomer().catch(() => null)
   const orders = (await listOrders().catch(() => null)) || null
 
@@ -18,5 +18,5 @@ export default async function OverviewTemplate() {
     notFound()
   }
 
-  return <Overview customer={customer} orders={orders} />
+  return <Dashboard customer={customer} />
 }

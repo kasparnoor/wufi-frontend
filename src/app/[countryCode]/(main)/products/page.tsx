@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
-import ProductPreview from "@modules/products/components/product-preview"
+import { ProductPreview } from "@lib/components"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 export const metadata: Metadata = {

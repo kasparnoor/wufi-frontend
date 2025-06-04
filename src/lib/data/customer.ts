@@ -259,3 +259,170 @@ export const updateCustomerAddress = async (
       return { success: false, error: err.toString() }
     })
 }
+
+// New Customer Dashboard API Functions
+
+export const retrieveCustomerDashboard = async () => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  if (!headers) return null
+
+  const next = {
+    ...(await getCacheOptions("customers")),
+  }
+
+  return await sdk.client
+    .fetch(`/store/customers/me/dashboard`, {
+      method: "GET",
+      headers,
+      next,
+      cache: "force-cache",
+    })
+    .then((response: any) => response.dashboard)
+    .catch(() => null)
+}
+
+export const retrieveCustomerPets = async () => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  if (!headers) return null
+
+  const next = {
+    ...(await getCacheOptions("customers")),
+  }
+
+  return await sdk.client
+    .fetch(`/store/customers/me/pets`, {
+      method: "GET",
+      headers,
+      next,
+      cache: "force-cache",
+    })
+    .then((response: any) => response.pets)
+    .catch(() => null)
+}
+
+export const updateCustomerPets = async (pets: any[]) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const updateRes = await sdk.client
+    .fetch(`/store/customers/me/pets`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ pets }),
+    })
+    .then((response: any) => response.pets)
+    .catch(medusaError)
+
+  const cacheTag = await getCacheTag("customers")
+  revalidateTag(cacheTag)
+
+  return updateRes
+}
+
+export const deleteCustomerPets = async () => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const deleteRes = await sdk.client
+    .fetch(`/store/customers/me/pets`, {
+      method: "DELETE",
+      headers,
+    })
+    .then((response: any) => response)
+    .catch(medusaError)
+
+  const cacheTag = await getCacheTag("customers")
+  revalidateTag(cacheTag)
+
+  return deleteRes
+}
+
+export const retrieveCustomerSubscription = async (subscriptionId: string) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  if (!headers) return null
+
+  const next = {
+    ...(await getCacheOptions("customers")),
+  }
+
+  return await sdk.client
+    .fetch(`/store/customers/me/subscriptions/${subscriptionId}`, {
+      method: "GET",
+      headers,
+      next,
+      cache: "force-cache",
+    })
+    .then((response: any) => response.subscription)
+    .catch(() => null)
+}
+
+export const updateCustomerSubscription = async (
+  subscriptionId: string,
+  updateData: any
+) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const updateRes = await sdk.client
+    .fetch(`/store/customers/me/subscriptions/${subscriptionId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(updateData),
+    })
+    .then((response: any) => response.subscription)
+    .catch(medusaError)
+
+  const cacheTag = await getCacheTag("customers")
+  revalidateTag(cacheTag)
+
+  return updateRes
+}
+
+export const completeAccountSetup = async (setupData: {
+  token: string
+  email: string
+  password: string
+  first_name?: string
+  last_name?: string
+  pets?: any[]
+}) => {
+  const setupRes = await sdk.client
+    .fetch(`/store/customers/account-setup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(setupData),
+    })
+    .then((response: any) => response)
+    .catch(medusaError)
+
+  return setupRes
+}
+
+export const requestNewSetupToken = async (email: string) => {
+  const requestRes = await sdk.client
+    .fetch(`/store/customers/account-setup`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    })
+    .then((response: any) => response)
+    .catch(medusaError)
+
+  return requestRes
+}

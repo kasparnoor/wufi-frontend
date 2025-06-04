@@ -2,6 +2,7 @@ import { updateLineItemMetadata } from "@lib/data/cart";
 import { Switch } from "@headlessui/react";
 import { useState, useEffect } from "react";
 import { clx } from "@medusajs/ui";
+import { getAvailableIntervals } from "@lib/util/subscription-intervals";
 
 interface SubscribeToggleProps {
   lineId: string;
@@ -9,6 +10,8 @@ interface SubscribeToggleProps {
   onStateChange?: (isSubscribed: boolean, newInterval?: string) => Promise<void> | void;
   forceEnable?: boolean;
   isLoading?: boolean;
+  productMetadata?: Record<string, any> | null | undefined;
+  quantity: number;
 }
 
 const SubscribeToggle: React.FC<SubscribeToggleProps> = ({ 
@@ -16,10 +19,17 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
   initialMetadata, 
   onStateChange,
   forceEnable,
-  isLoading: parentIsLoading
+  isLoading: parentIsLoading,
+  productMetadata,
+  quantity
 }) => {
+  // Get available intervals for this product
+  const availableIntervals = getAvailableIntervals(
+    productMetadata?.available_intervals as string[] | undefined
+  );
+  
   const [enabled, setEnabled] = useState(forceEnable ?? (initialMetadata?.subscribe === true || String(initialMetadata?.subscribe) === "true"));
-  const [interval, setInterval] = useState(initialMetadata?.interval || "4w");
+  const [interval, setInterval] = useState(initialMetadata?.interval || availableIntervals[0]?.value || "2w");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,7 +55,8 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
           ...(initialMetadata || {}),
           subscribe: newEnabledState, 
           interval: currentInterval 
-        }
+        },
+        quantity
       });
     }
     setLoading(false);
@@ -65,7 +76,8 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
               ...(initialMetadata || {}), 
               subscribe: true, 
               interval: newInterval 
-            }
+            },
+            quantity
         });
       }
       setLoading(false);
@@ -115,10 +127,11 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
             onChange={handleIntervalChange}
             disabled={isDisabled}
           >
-            <option value="2w">Iga 2 nädala tagant</option>
-            <option value="4w">Iga 4 nädala tagant</option>
-            <option value="6w">Iga 6 nädala tagant</option>
-            <option value="8w">Iga 8 nädala tagant</option>
+            {availableIntervals.map((interval) => (
+              <option key={interval.value} value={interval.value}>
+                {interval.label}
+              </option>
+            ))}
           </select>
         </div>
       )}

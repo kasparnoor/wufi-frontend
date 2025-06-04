@@ -1,19 +1,19 @@
 "use client"
 
 import { useActionState } from "react"
-import Input from "@modules/common/components/input"
+import { ModernInput as Input } from "@lib/components"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
-import ErrorMessage from "@modules/checkout/components/error-message"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { signup } from "@lib/data/customer"
+import { ErrorMessage } from "@lib/components"
+import { SubmitButton } from "@lib/components"
+import { LocalizedClientLink } from "@lib/components"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
+  signupAction?: (prevState: any, formData: FormData) => Promise<any>
 }
 
-const Register = ({ setCurrentView }: Props) => {
-  const [message, formAction] = useActionState(signup, null)
+const Register = ({ setCurrentView, signupAction }: Props) => {
+  const [message, formAction] = useActionState(signupAction || (() => Promise.resolve("No signup action provided")), null)
 
   return (
     <div

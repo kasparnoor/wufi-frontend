@@ -2,12 +2,13 @@ import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
+import { PaymentWrapper } from "@lib/components"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { ShieldCheck } from "@medusajs/icons"
+import { Shield, ArrowLeft } from "lucide-react"
+import { LocalizedClientLink } from "@lib/components"
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Checkout({ 
-  params, // countryCode is in params
+  params,
   searchParams 
 }: { 
   params: { countryCode: string }; 
@@ -32,46 +33,83 @@ export default async function Checkout({
   await listCartShippingMethods(cart.id)
   await listCartPaymentMethods(cart.region?.id ?? "")
 
-  const currentStep = searchParams?.step; // Read step into a variable
+  const currentStep = searchParams?.step;
+  const isReviewStep = currentStep === 'review';
 
   return (
-    <div className="py-8 bg-gray-50 min-h-[85vh]">
+    <div className="min-h-screen bg-gray-50 py-6">
       <div className="content-container max-w-7xl mx-auto px-4 sm:px-6" data-testid="checkout-container">
-        <div className={`grid grid-cols-1 gap-8 ${currentStep === 'review' ? 'lg:grid-cols-1' : 'lg:grid-cols-[1fr_380px]'}`}>
-          <div>
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <PaymentWrapper cart={cart}>
-                <CheckoutForm 
-                  cart={cart} 
-                  customer={customer} 
-                />
-              </PaymentWrapper>
-            </div>
+        {/* Back to Store Link */}
+        <div className="mb-6">
+          <LocalizedClientLink
+            href="/cart"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="text-sm">Tagasi ostukorvi</span>
+          </LocalizedClientLink>
+        </div>
+
+        {/* Responsive Layout */}
+        <div className={
+          isReviewStep 
+            ? "grid grid-cols-1 gap-8" 
+            : "grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-8"
+        }>
+          {/* Main Content */}
+          <div className={isReviewStep ? "max-w-6xl mx-auto" : ""}>
+            <PaymentWrapper cart={cart}>
+              <CheckoutForm 
+                cart={cart} 
+                customer={customer} 
+              />
+            </PaymentWrapper>
           </div>
           
-          <div className="h-fit">
-            <div className="sticky top-20">
-              {currentStep !== 'review' && (
-                <div className="bg-white p-6 rounded-2xl shadow-md border-0 hover:shadow-lg transition-all duration-300">
+          {/* Sidebar - Hidden on Review Step */}
+          {!isReviewStep && (
+            <div className="xl:sticky xl:top-6 h-fit">
+              <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div className="p-6">
                   <CheckoutSummary cart={cart} />
                 </div>
-              )}
+              </div>
               
-              {currentStep !== 'review' && (
-                <div className="mt-4 bg-white rounded-xl shadow-sm p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <ShieldCheck className="h-5 w-5 text-yellow-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Turvaline ostlemine</p>
-                      <p className="text-xs text-gray-500">Kõik andmed on SSL krüpteeritud ja turvalised</p>
-                    </div>
+              {/* Security Badge */}
+              <div className="mt-4 bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Shield className="h-5 w-5 text-green-800" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Turvaline ostlemine</p>
+                    <p className="text-xs text-gray-500">256-bit SSL krüpteering ja PCI sertifitseeritud</p>
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* Support */}
+              <div className="mt-4 bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-900 mb-2">Vajate abi?</p>
+                  <div className="space-y-1">
+                    <a 
+                      href="mailto:help@wufi.ee" 
+                      className="block text-sm text-yellow-700 hover:text-yellow-800 transition-colors"
+                    >
+                      📧 help@wufi.ee
+                    </a>
+                    <a 
+                      href="tel:+372123456" 
+                      className="block text-sm text-yellow-700 hover:text-yellow-800 transition-colors"
+                    >
+                      📞 +372 123 456
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

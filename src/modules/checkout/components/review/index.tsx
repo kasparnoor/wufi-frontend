@@ -1,13 +1,14 @@
 "use client"
 
-import { ShoppingBag, Clock, CreditCard, ArrowPathMini } from '@medusajs/icons'
+import { ShoppingBag, Clock, CreditCard, RotateCcw, CheckCircle, Phone, Mail, MapPin, Shield } from 'lucide-react'
 import { convertToLocale } from '@lib/util/money'
 import { paymentInfoMap } from '@lib/constants'
 import { placeOrder } from '@lib/data/cart'
 import { useState } from 'react'
 import { useSearchParams } from "next/navigation"
-import WufiButton from '@modules/common/components/wufi-button'
-import Thumbnail from '@modules/products/components/thumbnail'
+import { WufiButton } from "@lib/components"
+import { Thumbnail } from "@lib/components"
+import { convertIntervalToText } from '@lib/util/subscription-intervals'
 
 const Review = ({ cart, customer }: { cart: any, customer: any }) => {
   const searchParams = useSearchParams()
@@ -60,17 +61,6 @@ const Review = ({ cart, customer }: { cart: any, customer: any }) => {
     return date.toLocaleDateString()
   }
 
-  // FIRST_EDIT: Insert interval converter to human-readable Estonian text
-  const convertIntervalToText = (interval?: string): string => {
-    if (!interval) return '—'
-    const match = interval.match(/(\d+)(\w+)/)
-    if (!match) return interval
-    const [, value, unit] = match
-    const mapping: Record<string, string> = { w: 'nädala', m: 'kuu', d: 'päeva' }
-    const unitText = mapping[unit] || unit
-    return `iga ${value} ${unitText} tagant`
-  }
-
   // Compute first and subsequent order totals including discounts and shipping
   const currencyCode = cart.region?.currency_code || ''
   const recurringDiscountPct = 5
@@ -105,151 +95,221 @@ const Review = ({ cart, customer }: { cart: any, customer: any }) => {
     }
   }
 
+  if (!isOpen || !previousStepsCompleted) {
+    return null
+  }
+
   return (
-    <div className={`${isOpen ? '' : 'opacity-75'} space-y-6`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isOpen ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
-            <ShoppingBag className="h-4 w-4" />
-          </div>
-          <h3 className="font-medium text-lg text-gray-900">Tellimuse ülevaatus</h3>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+          <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
+        <h2 className="text-3xl font-bold text-gray-900">Valmis tellimiseks!</h2>
+        <p className="text-lg text-gray-600">Kontrollige andmeid ja kinnitage tellimus</p>
       </div>
-      
-      {isOpen && previousStepsCompleted && (
-        <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-          {/* Tooted */}
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-            <h4 className="text-lg font-semibold flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5 text-gray-700" aria-hidden="true" /> Tooted
-            </h4>
-            <div className="divide-y divide-gray-200">
-              {cart.items.map((item: any) => {
-                const basePrice = (item.unit_price || 0) * (item.quantity || 1)
-                const discountPct = item.metadata?.purchase_type === 'subscription'
-                  ? (item.metadata?.is_first_order === 'true'
-                      ? parseFloat(item.metadata.subscription_discount || '0')
-                      : recurringDiscountPct)
-                  : 0
-                const discountAmount = basePrice * (discountPct / 100)
-                return (
-                  <div key={item.id} className="py-4 flex justify-between items-start">
-                    <div className="flex items-start gap-4">
-                      <Thumbnail
-                        thumbnail={item.thumbnail}
-                        images={item.variant?.product?.images}
-                        size="square"
-                        className="w-12 h-12 p-1 rounded-lg border border-gray-100"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-900">{item.product_title} ×{item.quantity}</p>
-                        {item.variant?.title && (
-                          <p className="text-sm text-gray-600 mt-1">{item.variant.title}</p>
-                        )}
-                        {item.metadata?.purchase_type === 'subscription' && (
-                          <div className="mt-1 space-y-1">
-                            <p className="text-sm text-gray-500">{convertIntervalToText(item.metadata.interval)}</p>
-                            <p className="text-sm text-gray-500">Järgmine arveldus: {getNextChargeDate(item.metadata.interval) || '–'}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      {discountAmount > 0 ? (
+
+      {/* Order Summary Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Products */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+              <ShoppingBag className="h-5 w-5 text-yellow-700" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900">Teie tellimus</h3>
+          </div>
+          
+          <div className="space-y-4">
+            {cart.items.map((item: any) => {
+              const basePrice = (item.unit_price || 0) * (item.quantity || 1)
+              const discountPct = item.metadata?.purchase_type === 'subscription'
+                ? (item.metadata?.is_first_order === 'true'
+                    ? parseFloat(item.metadata.subscription_discount || '0')
+                    : recurringDiscountPct)
+                : 0
+              const discountAmount = basePrice * (discountPct / 100)
+              return (
+                <div key={item.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                  <Thumbnail
+                    thumbnail={item.thumbnail}
+                    images={item.variant?.product?.images}
+                    size="square"
+                    className="w-16 h-16 rounded-lg border border-gray-200 flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 mb-1">
+                      {item.product_title}
+                    </h4>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {item.variant?.title && <p>{item.variant.title}</p>}
+                      <p>Kogus: {item.quantity}</p>
+                      {item.metadata?.purchase_type === 'subscription' && (
                         <>
-                          <p className="text-sm line-through text-gray-500">
-                            Hind: {convertToLocale({ amount: basePrice, currency_code: currencyCode })}
+                          <p className="text-yellow-700 font-medium">
+                            📅 {convertIntervalToText(item.metadata.interval)}
                           </p>
-                          <p className="text-lg font-semibold text-green-600">
-                            Hind: {convertToLocale({ amount: basePrice - discountAmount, currency_code: currencyCode })}
-                          </p>
+                          <p>Järgmine: {getNextChargeDate(item.metadata.interval) || '–'}</p>
                         </>
-                      ) : (
-                        <p className="text-gray-900 font-medium">
-                          Hind: {convertToLocale({ amount: basePrice, currency_code: currencyCode })}
-                        </p>
                       )}
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Üldinfo */}
-          <div className="bg-white rounded-xl shadow-sm p-6 divide-y divide-gray-200 space-y-6">
-            {/* Tarneteave */}
-            <section className="pt-0 space-y-2">
-              <h4 className="text-lg font-semibold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-gray-700" aria-hidden="true" /> Tarneteave
-              </h4>
-              <p className="text-sm text-gray-700">{cart.shipping_methods?.[0]?.name || '–'} aadressile {cart.shipping_address?.address_1}, {cart.shipping_address?.postal_code} {cart.shipping_address?.city}.</p>
-              <p className="text-sm text-gray-700">Tarnetasu: {convertToLocale({ amount: shippingCost, currency_code: currencyCode })}</p>
-            </section>
-            {/* Makseviis */}
-            <section className="py-6 space-y-2">
-              <h4 className="text-lg font-semibold flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-gray-700" aria-hidden="true" /> Makseviis
-              </h4>
-              <p className="text-sm text-gray-700">{paymentInfoMap[cart.payment_collection?.payment_sessions?.[0]?.provider_id]?.title || '–'}</p>
-            </section>
-            {/* Kasutajakonto */}
-            <section className="py-6 space-y-2">
-              <h4 className="text-lg font-semibold flex items-center gap-2">
-                <ArrowPathMini className="h-5 w-5 text-gray-700" aria-hidden="true" /> Kasutajakonto
-              </h4>
-              <p className="text-sm text-gray-700">
-                {customer
-                  ? `Tellimus lisatakse sinu kontole ${customer.email}. Järgmine arveldus ja muu tellimuse haldus näed portaalis.`
-                  : `Uus konto luuakse e-posti ${cart.email} alusel, kus saad muuta sagedust, makseviisi ja tarnet.`}
-              </p>
-            </section>
-            {/* Kontakt */}
-            <section className="pt-6 space-y-2">
-              <h4 className="text-lg font-semibold flex items-center gap-2">
-                <span role="img" aria-label="Telefon" className="h-5 w-5">📞</span> Küsimuste korral
-              </h4>
-              <p className="text-sm text-gray-700">Helista +372 1234 5678 (E–R 9–18)</p>
-            </section>
-          </div>
-
-          {/* Kulud */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h4 className="text-lg font-semibold mb-4">Kulud</h4>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center tabular-nums">
-                <span className="flex items-center">
-                  <span>Esimene tellimus</span>
-                  <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded">30% soodustus</span>
-                </span>
-                <span className="font-semibold">{convertToLocale({ amount: firstOrderTotal, currency_code: currencyCode })}</span>
-              </div>
-              <div className="flex justify-between items-center tabular-nums">
-                <span className="flex items-center">
-                  <span>Järgnevad tellimused</span>
-                  <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded">5% püsisoodustus</span>
-                </span>
-                <span className="font-semibold">{convertToLocale({ amount: nextOrdersTotal, currency_code: currencyCode })}</span>
-              </div>
-            </div>
-            <p className="mt-4 text-xs text-gray-500">Tellimust saab muuta või tühistada hiljem konto alt.</p>
-          </div>
-
-          {/* Confirm button */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <hr className="border-t border-gray-200 mb-4" />
-            <WufiButton
-              onClick={handleConfirm}
-              disabled={isSubmitting}
-              className="w-full bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-50"
-              aria-label="Kinnita tellimus"
-            >
-              {isSubmitting ? 'Kinnitan...' : 'Kinnita tellimus'}
-            </WufiButton>
-            {submitError && <p className="mt-2 text-sm text-red-600">{submitError}</p>}
+                  <div className="text-right">
+                    {discountAmount > 0 ? (
+                      <>
+                        <p className="text-sm line-through text-gray-400">
+                          {convertToLocale({ amount: basePrice, currency_code: currencyCode })}
+                        </p>
+                        <p className="text-lg font-bold text-green-600">
+                          {convertToLocale({ amount: basePrice - discountAmount, currency_code: currencyCode })}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-lg font-semibold text-gray-900">
+                        {convertToLocale({ amount: basePrice, currency_code: currencyCode })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
-      )}
+
+        {/* Order Details */}
+        <div className="space-y-6">
+          {/* Delivery */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <MapPin className="h-5 w-5 text-blue-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Tarneinfo</h3>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Tarneviis:</span>
+                <span className="font-medium">{cart.shipping_methods?.[0]?.name || '–'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Aadress:</span>
+                <span className="font-medium text-right">
+                  {cart.shipping_address?.address_1}<br />
+                  {cart.shipping_address?.postal_code} {cart.shipping_address?.city}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Tarnetasu:</span>
+                <span className="font-medium">
+                  {convertToLocale({ amount: shippingCost, currency_code: currencyCode })}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Payment */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <CreditCard className="h-5 w-5 text-green-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Makseinfo</h3>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Makseviis:</span>
+                <span className="font-medium">
+                  {paymentInfoMap[cart.payment_collection?.payment_sessions?.[0]?.provider_id]?.title || '–'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-green-700">
+                <Shield className="h-4 w-4" />
+                <span className="text-xs">SSL turvaline krüpteering</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <Mail className="h-5 w-5 text-purple-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Kontakt</h3>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">E-post:</span>
+                <span className="font-medium">{cart.email}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Telefon:</span>
+                <span className="font-medium">{cart.shipping_address?.phone || '–'}</span>
+              </div>
+              {customer ? (
+                <p className="text-xs text-green-700 bg-green-50 p-2 rounded">
+                  ✅ Tellimus lisatakse teie kontole
+                </p>
+              ) : (
+                <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded">
+                  ℹ️ Loome teile uue konto e-posti {cart.email} alusel
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Order Total */}
+      <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-900">Kokku maksta</h3>
+          <div className="text-right">
+            <p className="text-3xl font-bold text-yellow-800">
+              {convertToLocale({ amount: cart.total, currency_code: currencyCode })}
+            </p>
+            {subscriptionItems.length > 0 && (
+              <p className="text-sm text-gray-600">
+                Järgmised tellimused: {convertToLocale({ amount: nextOrdersTotal, currency_code: currencyCode })}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-4 pt-6 border-t border-gray-200">
+        {submitError && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm">{submitError}</p>
+          </div>
+        )}
+        
+        <WufiButton
+          variant="primary"
+          size="large"
+          onClick={handleConfirm}
+          disabled={isSubmitting}
+          className="w-full py-4 text-lg font-bold"
+        >
+          {isSubmitting ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+              Tellimuse esitamine...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="h-5 w-5 mr-2" />
+              Kinnita tellimus
+            </>
+          )}
+        </WufiButton>
+
+        <div className="text-center text-sm text-gray-600">
+          <p>Tellimuse kinnitamisega nõustute meie <a href="/tingimused" className="text-yellow-700 hover:underline">tingimustega</a></p>
+        </div>
+      </div>
     </div>
   )
 }

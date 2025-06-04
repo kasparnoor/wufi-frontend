@@ -1,15 +1,16 @@
 import React, { Suspense } from "react"
 
-import ImageGallery from "@modules/products/components/image-gallery"
-import ProductActions from "@modules/products/components/product-actions"
-import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
-import RelatedProducts from "@modules/products/components/related-products"
+import { ImageGallery } from "@lib/components"
+import { ProductActions } from "@lib/components"
+import { ProductOnboardingCta } from "@lib/components"
+import { ProductTabs } from "@lib/components"
+import { RelatedProducts } from "@lib/components"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
-import { Sparkles } from "@medusajs/icons"
+import { Sparkles } from "lucide-react"
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 
@@ -56,82 +57,120 @@ const ProductTemplate: React.FC<ProductTemplateProps> = async ({
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-10 lg:py-12 mt-6 sm:mt-8 lg:mt-12">
-        {/* Main Product Section: Images + Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Product Images + Actions */}
-          <div className="lg:col-span-7 lg:sticky lg:top-24" style={{ maxHeight: 'calc(100vh - 80px)' }}>
-            <div className="space-y-2 max-h-full">
-              {/* Gallery */}
-              <div className="rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 bg-white p-2">
-                <ImageGallery images={product?.images || []} />
-              </div>
-              
-              {/* Product Actions */}
-              <div className="rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 bg-white p-3">
-                <Suspense
-                  fallback={
-                    <ProductActions
-                      disabled={true}
-                      product={product}
-                      region={region}
-                    />
-                  }
-                >
-                  <ProductActionsWrapper id={product.id} region={region} />
-                </Suspense>
-              </div>
+      {/* Mobile Layout */}
+      <div className="lg:hidden">
+        <div className="px-4 py-6">
+          {/* Mobile Image Gallery */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
+            <ImageGallery images={product?.images || []} />
+          </div>
+          
+          {/* Mobile Product Info Header */}
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30 mb-3">
+              <Sparkles className="h-4 w-4 text-yellow-800" />
+              <span className="text-sm text-yellow-800 font-semibold">Toote info</span>
             </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.title}</h1>
+            {product.collection && (
+              <p className="text-sm text-gray-600 mb-3">{product.collection.title}</p>
+            )}
           </div>
 
-          {/* Right Column: Product Info */}
-          <div className="lg:col-span-5">
-            {/* Product Title & Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-              <div className="mb-4 sm:mb-8">
-                <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
-                  <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
-                  <span className="text-xs sm:text-base text-yellow-700 font-semibold">Toote info</span>
+          {/* Mobile Buying Options - Compact */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
+            <Suspense
+              fallback={
+                <ProductActions
+                  disabled={true}
+                  product={product}
+                  region={region}
+                />
+              }
+            >
+              <ProductActionsWrapper id={product.id} region={region} />
+            </Suspense>
+          </div>
+
+          {/* Mobile Product Description */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+            <ProductInfo product={product} />
+            <div className="mt-6 pt-6 border-t border-gray-100">
+              <ProductOnboardingCta />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout - Smart Vertical Responsiveness */}
+      <div className="hidden lg:block">
+        {/* Add header clearance padding */}
+        <div className="container mx-auto px-6 py-12 max-w-7xl">
+          <div className="grid grid-cols-2 gap-12 relative">
+            {/* Left Column: Images + Actions - Smart Sticky Behavior */}
+            <div className="xl:sticky xl:top-6 xl:self-start xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto">
+              {/* Combined Images + Actions Card */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                {/* Images Section */}
+                <div className="2xl:max-h-[70vh] mb-6">
+                  <ImageGallery images={product?.images || []} />
+                </div>
+                
+                {/* Divider between sections */}
+                <div className="border-t border-gray-100 pt-6">
+                  {/* Compact Actions */}
+                  <Suspense
+                    fallback={
+                      <ProductActions
+                        disabled={true}
+                        product={product}
+                        region={region}
+                      />
+                    }
+                  >
+                    <ProductActionsWrapper id={product.id} region={region} />
+                  </Suspense>
                 </div>
               </div>
-              <ProductInfo product={product} />
-              
-              {/* Product Onboarding */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <ProductOnboardingCta />
+            </div>
+
+            {/* Right Column: Scrollable Product Info */}
+            <div className="min-h-screen">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <div className="mb-6">
+                  <div className="inline-flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
+                    <Sparkles className="h-5 w-5 text-yellow-800" />
+                    <span className="text-base text-yellow-800 font-semibold">Toote info</span>
+                  </div>
+                </div>
+                
+                <ProductInfo product={product} />
+                
+                <div className="mt-8 pt-6 border-t border-gray-100">
+                  <ProductOnboardingCta />
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Product Details Section - REMOVED */}
-        {/* <div className="mt-8 border-t border-gray-100 pt-6">
-          <div className="mb-4 sm:mb-8">
-            <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
-              <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
-              <span className="text-xs sm:text-base text-yellow-700 font-semibold">Toote detailid</span>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-            <ProductTabs product={product} />
-          </div>
-        </div> */}
-
-        {/* Related Products Section - Conditionally Rendered */}
-        {relatedProductsList && relatedProductsList.length > 0 && (
-          <div className="mt-8 border-t border-gray-100 pt-6">
-            <div className="mb-4 sm:mb-8">
-              <div className="inline-flex items-center gap-1 sm:gap-2 bg-yellow-400/20 px-2 sm:px-6 py-1 sm:py-2 rounded-full border border-yellow-400/30">
-                <Sparkles className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-600" />
-                <span className="text-xs sm:text-base text-yellow-700 font-semibold">Sarnased tooted</span>
+      {/* Related Products Section */}
+      {relatedProductsList && relatedProductsList.length > 0 && (
+        <div className="border-t border-gray-100 bg-gray-50">
+          <div className="container mx-auto px-4 lg:px-6 py-8 lg:py-16">
+            <div className="mb-6 lg:mb-8">
+              <div className="inline-flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
+                <Sparkles className="h-4 w-4 lg:h-5 lg:w-5 text-yellow-800" />
+                <span className="text-sm lg:text-base text-yellow-800 font-semibold">Sarnased tooted</span>
               </div>
             </div>
             <Suspense fallback={<SkeletonRelatedProducts />}>
               <RelatedProducts product={product} countryCode={countryCode} />
             </Suspense>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { useCartState } from "@modules/common/components/cart-state"
-import { ShoppingBag } from "@medusajs/icons"
+import { LocalizedClientLink } from "@lib/components"
+import { useCartState } from "@lib/components"
+import { ShoppingBag } from "lucide-react"
 
 export default function CartButton({ isScrolled, isHomePage }: { isScrolled: boolean, isHomePage: boolean }) {
   // Use the shared cart state instead of local state
@@ -10,12 +10,24 @@ export default function CartButton({ isScrolled, isHomePage }: { isScrolled: boo
 
   return (
     <LocalizedClientLink
-      className={`text-base font-medium transition-all duration-200 hover:scale-105 ${isScrolled || !isHomePage ? "hover:text-yellow-600" : "hover:text-yellow-400"} flex items-center gap-1.5`}
+      className={`relative flex items-center space-x-1.5 text-sm font-medium transition-colors duration-200 ${
+        isScrolled || !isHomePage
+          ? "text-gray-700 hover:text-yellow-800"
+          : "text-gray-700 hover:text-yellow-800"
+      }`}
       href="/cart"
       data-testid="nav-cart-link"
     >
-      <ShoppingBag className="h-5 w-5 relative -top-[1px]" aria-hidden="true" />
-      <span>Ostukorv ({itemCount})</span>
+      <div className="relative">
+        <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+        {itemCount > 0 && (
+          <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+            {itemCount > 99 ? '99+' : itemCount}
+          </span>
+        )}
+      </div>
+      <span className="hidden sm:inline">Ostukorv</span>
+      <span className="sm:hidden">({itemCount})</span>
     </LocalizedClientLink>
   )
 }

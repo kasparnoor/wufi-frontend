@@ -1,49 +1,51 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react"
-
-import NativeSelect, {
-  NativeSelectProps,
-} from "@modules/common/components/native-select"
+import { forwardRef, useMemo } from "react"
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@lib/components"
 import { HttpTypes } from "@medusajs/types"
 
-const CountrySelect = forwardRef<
-  HTMLSelectElement,
-  NativeSelectProps & {
-    region?: HttpTypes.StoreRegion
+interface CountrySelectProps {
+  placeholder?: string
+  region?: HttpTypes.StoreRegion
+  value?: string
+  onValueChange?: (value: string) => void
+  disabled?: boolean
+  name?: string
+}
+
+const CountrySelect = forwardRef<HTMLButtonElement, CountrySelectProps>(
+  ({ placeholder = "Country", region, value, onValueChange, disabled, name }, ref) => {
+    const countryOptions = useMemo(() => {
+      if (!region) {
+        return []
+      }
+
+      return region.countries?.map((country) => ({
+        value: country.iso_2,
+        label: country.display_name,
+      })) || []
+    }, [region])
+
+    return (
+      <Select value={value} onValueChange={onValueChange} disabled={disabled} name={name}>
+        <SelectTrigger ref={ref} className="h-16">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {countryOptions.map(({ value, label }) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )
   }
->(({ placeholder = "Country", region, defaultValue, ...props }, ref) => {
-  const innerRef = useRef<HTMLSelectElement>(null)
-
-  useImperativeHandle<HTMLSelectElement | null, HTMLSelectElement | null>(
-    ref,
-    () => innerRef.current
-  )
-
-  const countryOptions = useMemo(() => {
-    if (!region) {
-      return []
-    }
-
-    return region.countries?.map((country) => ({
-      value: country.iso_2,
-      label: country.display_name,
-    }))
-  }, [region])
-
-  return (
-    <NativeSelect
-      ref={innerRef}
-      placeholder={placeholder}
-      defaultValue={defaultValue}
-      {...props}
-    >
-      {countryOptions?.map(({ value, label }, index) => (
-        <option key={index} value={value}>
-          {label}
-        </option>
-      ))}
-    </NativeSelect>
-  )
-})
+)
 
 CountrySelect.displayName = "CountrySelect"
 

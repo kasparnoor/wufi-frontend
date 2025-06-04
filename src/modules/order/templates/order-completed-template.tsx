@@ -1,13 +1,13 @@
 import { Heading } from "@medusajs/ui"
 import { cookies as nextCookies } from "next/headers"
 
-import CartTotals from "@modules/common/components/cart-totals"
-import Help from "@modules/order/components/help"
-import Items from "@modules/order/components/items"
-import OnboardingCta from "@modules/order/components/onboarding-cta"
-import OrderDetails from "@modules/order/components/order-details"
-import ShippingDetails from "@modules/order/components/shipping-details"
-import PaymentDetails from "@modules/order/components/payment-details"
+import { CartTotals } from "@lib/components"
+import { Help } from "@lib/components"
+import { Items } from "@lib/components"
+import { OnboardingCta } from "@lib/components"
+import { OrderDetails } from "@lib/components"
+import { ShippingDetails } from "@lib/components"
+import { PaymentDetails } from "@lib/components"
 import { HttpTypes } from "@medusajs/types"
 
 type OrderCompletedTemplateProps = {
@@ -41,7 +41,7 @@ export default async function OrderCompletedTemplate({
             Kokkuvõte
           </Heading>
           <Items order={order} />
-          <CartTotals totals={order} />
+          <CartTotals totals={order} hasShippingMethod={true} />
           <ShippingDetails order={order} />
           <PaymentDetails order={order} />
           <Help />

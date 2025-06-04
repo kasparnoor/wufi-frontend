@@ -2,9 +2,9 @@
 
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import WufiButton from "@modules/common/components/wufi-button"
-import { Star, ShoppingBag } from "@medusajs/icons"
+import { LocalizedClientLink } from "@lib/components"
+import { WufiButton } from "@lib/components"
+import { ShoppingBag } from "lucide-react"
 import Image from "next/image"
 
 type ProductPreviewProps = {
@@ -19,10 +19,6 @@ export default function ProductPreview({
   priority = false
 }: ProductPreviewProps) {
   const { cheapestPrice } = getProductPrice({ product })
-
-  // Calculate rating (this should come from your backend)
-  const rating = 4.5
-  const reviewCount = 12
 
   return (
     <LocalizedClientLink 
@@ -43,25 +39,16 @@ export default function ProductPreview({
 
       {/* Product Info */}
       <div className="p-4">
-        <h3 className="text-base font-medium text-gray-900 group-hover:text-yellow-700 transition-colors line-clamp-2 min-h-[2.5rem]">
+        <h3 className="text-base font-medium text-gray-900 group-hover:text-yellow-800 transition-colors line-clamp-2 min-h-[2.5rem]">
           {product.title}
         </h3>
 
-        <div className="mt-2 flex items-center gap-1">
-          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-          <span className="text-sm font-medium text-gray-700">{rating}</span>
-          <span className="text-sm text-gray-500">({reviewCount})</span>
-        </div>
-
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between">
           <div className="flex items-baseline gap-1">
             {cheapestPrice && (
-              <>
-                <span className="text-lg font-semibold text-gray-900">
-                  {cheapestPrice.calculated_price}
-                </span>
-                <span className="text-sm text-gray-500">/kuu</span>
-              </>
+              <span className="text-lg font-semibold text-gray-900">
+                {cheapestPrice.calculated_price}
+              </span>
             )}
           </div>
           <WufiButton 

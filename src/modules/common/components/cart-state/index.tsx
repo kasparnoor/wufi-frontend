@@ -1,12 +1,12 @@
 "use client"
 
-import React, { createContext, useContext, useState, useCallback } from "react"
-import { retrieveCart } from "@lib/data/cart"
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react"
 
 type CartStateType = {
   itemCount: number
-  updateCart: () => Promise<void>
+  updateCart: (cart?: any) => void
   forceUpdate: () => void
+  setItemCount: (count: number) => void
 }
 
 const CartStateContext = createContext<CartStateType | undefined>(undefined)
@@ -19,39 +19,68 @@ export const useCartState = () => {
   return context
 }
 
-export const CartStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [itemCount, setItemCount] = useState(0)
+export const CartStateProvider: React.FC<{ 
+  children: React.ReactNode
+  initialCart?: any
+}> = ({ children, initialCart }) => {
+  // Calculate initial item count from cart or localStorage
+  const getInitialItemCount = () => {
+    if (initialCart?.items) {
+      return initialCart.items.reduce((total: number, item: any) => {
+        return total + (item.quantity || 0)
+      }, 0) || 0
+    }
+    
+    // Fallback to localStorage if available
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("cart-item-count")
+      return stored ? parseInt(stored, 10) : 0
+    }
+    
+    return 0
+  }
+
+  const [itemCount, setItemCountState] = useState(getInitialItemCount)
   const [forceUpdateCount, setForceUpdateCount] = useState(0)
 
-  const updateCart = useCallback(async () => {
-    try {
-      const cart = await retrieveCart()
-      
+  // Custom setItemCount that also updates localStorage
+  const setItemCount = useCallback((count: number) => {
+    setItemCountState(count)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cart-item-count", count.toString())
+    }
+  }, [])
+
+  const updateCart = useCallback((cart?: any) => {
+    if (cart) {
       // Calculate total quantity by summing up quantities of all items
-      const totalQuantity = cart?.items?.reduce((total, item) => {
+      const totalQuantity = cart?.items?.reduce((total: number, item: any) => {
         return total + (item.quantity || 0)
       }, 0) || 0
       
       setItemCount(totalQuantity)
       console.log("Cart state updated, total quantity:", totalQuantity)
-    } catch (error) {
-      console.error("Error updating cart state:", error)
-      setItemCount(0)
+    } else {
+      // If no cart provided, we can't update the count
+      console.log("No cart provided to updateCart")
     }
-  }, [])
+  }, [setItemCount])
 
   const forceUpdate = useCallback(() => {
     setForceUpdateCount(prev => prev + 1)
-    updateCart()
-  }, [updateCart])
+    // Note: This no longer automatically fetches cart data
+    // Components using this should handle cart updates themselves
+  }, [])
 
-  // Initial fetch happens when the component mounts (client-side)
-  React.useEffect(() => {
-    updateCart()
-  }, [updateCart, forceUpdateCount])
+  // Update localStorage when itemCount changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cart-item-count", itemCount.toString())
+    }
+  }, [itemCount])
 
   return (
-    <CartStateContext.Provider value={{ itemCount, updateCart, forceUpdate }}>
+    <CartStateContext.Provider value={{ itemCount, updateCart, forceUpdate, setItemCount }}>
       {children}
     </CartStateContext.Provider>
   )

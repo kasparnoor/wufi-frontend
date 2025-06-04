@@ -1,8 +1,8 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import "styles/globals.css"
-import { ToastProvider, ToastStyles } from "@modules/common/components/toast"
-import { CartStateProvider } from "@modules/common/components/cart-state"
+import { ToastProvider, ToastStyles, TooltipProvider } from "@lib/components"
+import { CartStateProvider } from "@lib/components"
 import QueryProvider from "@lib/context/query-provider"
 
 export const metadata: Metadata = {
@@ -18,12 +18,14 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       </head>
       <body>
         <QueryProvider>
-          <ToastProvider>
-            <CartStateProvider>
-              <ToastStyles />
-              <main className="relative">{props.children}</main>
-            </CartStateProvider>
-          </ToastProvider>
+          <TooltipProvider>
+            <ToastProvider>
+              <CartStateProvider>
+                <ToastStyles />
+                <main className="relative">{props.children}</main>
+              </CartStateProvider>
+            </ToastProvider>
+          </TooltipProvider>
         </QueryProvider>
       </body>
     </html>

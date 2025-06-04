@@ -1,11 +1,29 @@
----
-description: Read this before creating a new component
-globs: 
-alwaysApply: false
----
 # Component Patterns
 
-The Wufi Storefront follows consistent component patterns for maintainability and consistency.
+The Wufi Storefront follows consistent component patterns for maintainability and consistency, using a unified component system that integrates shadcn/ui, Medusa UI, and custom Wufi components.
+
+## Unified Component System
+The storefront uses a **three-tier component architecture**:
+
+### 1. shadcn/ui Components (Preferred for new UI)
+**Location**: `src/lib/components/ui/`
+**Import**: `@lib/components/ui`
+- Modern, accessible components built on Radix UI primitives
+- Perfect for forms, interactive elements, and new UI features
+- Examples: `Button`, `Input`, `Form`, `Select`, `Textarea`
+
+### 2. Medusa UI Components (For e-commerce patterns)
+**Location**: Re-exported from `@medusajs/ui` 
+**Import**: `@lib/components/ui` (unified) or `@medusajs/ui` (direct)
+- Official Medusa design system components
+- Ideal for data display and commerce-specific layouts
+- Examples: `Container`, `Text`, `Table`, `Badge` (aliased as `MedusaButton`)
+
+### 3. Custom Wufi Components (For brand identity)
+**Location**: `src/modules/common/components/`
+**Import**: `@lib/components/ui` (unified) or direct module paths
+- Brand-specific styling and unique functionality
+- Examples: `WufiButton`, `WufiTooltip`, `Modal`, `ToastProvider`
 
 ## Component Structure
 - Components are organized in feature-specific modules in [src/modules](mdc:src/modules)
@@ -13,11 +31,24 @@ The Wufi Storefront follows consistent component patterns for maintainability an
 - UI components use Tailwind CSS for styling
 - Server vs. client components are clearly separated
 
-## Common Components
-- [WufiButton](mdc:src/modules/common/components/wufi-button/index.tsx) - Core button component
-- [Input](mdc:src/modules/common/components/input) - Form input fields
-- [Modal](mdc:src/modules/common/components/modal) - Overlay dialogs
-- [BentoGrid](mdc:src/modules/common/components/bento-grid) - Grid layout system
+## Import Patterns
+
+### Unified Import (Recommended)
+```tsx
+import { 
+  // shadcn components
+  Button, Input, Form, FormField,
+  // Medusa components  
+  Container, Text, Table,
+  // Custom Wufi components
+  WufiButton, WufiTooltip, Modal
+} from "@lib/components/ui"
+```
+
+### Component Selection Guide
+- **New forms & interactive UI** → shadcn components (`Button`, `Input`, `Form`)
+- **Data display & layouts** → Medusa components (`Container`, `Text`, `Table`)
+- **Brand elements & custom features** → Wufi components (`WufiButton`, `WufiTooltip`)
 
 ## Best Practices
 1. **Server Components**:
@@ -38,36 +69,41 @@ The Wufi Storefront follows consistent component patterns for maintainability an
 4. **Styling**:
    - Use Tailwind utility classes directly
    - Conditional classes with clsx utility
-   - Follow the project's color scheme and spacing scale
+   - Follow shadcn patterns for consistency
+   - Maintain Wufi brand colors (yellow-400 primary)
 
-5. **State Management**:
+5. **Form Handling**:
+   - Use shadcn `Form` components with React Hook Form + Zod
+   - Provides perfect accessibility and validation out of the box
+
+6. **State Management**:
    - Local state with React hooks
    - Form state with controlled components
    - Cart state via server components and cookies
 
-## Example Pattern
-```tsx
-// Component with variants and proper typing
-interface ComponentProps {
-  variant?: "primary" | "secondary";
-  size?: "small" | "medium" | "large";
-  children: ReactNode;
-}
+## Example Patterns
 
-const Component = ({
-  variant = "primary",
-  size = "medium",
-  children
-}: ComponentProps) => {
-  // Component logic
-  return (
-    <div className={clsx(
-      "base-styles",
-      variant === "primary" ? "primary-styles" : "secondary-styles",
-      sizeStyles[size]
-    )}>
-      {children}
-    </div>
-  )
-}
+### Modern Form (shadcn + React Hook Form)
+```tsx
+import { Button, Form, FormField, FormControl, FormLabel, FormMessage, Input } from "@lib/components/ui"
+
+// Perfect centering, accessibility, validation
 ```
+
+### Data Display (Medusa Components)  
+```tsx
+import { Container, Text, Table } from "@lib/components/ui"
+
+// Proven e-commerce patterns
+```
+
+### Brand Element (Custom Wufi)
+```tsx
+import { WufiButton, WufiTooltip } from "@lib/components/ui"
+
+<WufiButton variant="primary">Brand Consistency</WufiButton>
+```
+
+## Adding New Components
+- **shadcn components**: `npx shadcn@latest add <component>`
+- **Custom components**: Create in `src/modules/common/components/` and add to unified exports

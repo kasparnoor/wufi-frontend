@@ -5,7 +5,7 @@ import React, { useContext, useMemo, type JSX } from "react"
 import { RadioGroup as Radio, RadioGroupItem } from "@lib/components"
 
 import { isManual } from "@lib/constants"
-import { SkeletonCardDetails } from "@lib/components"
+import SkeletonCardDetails from "@lib/components/ui/skeleton-card-details"
 import { CardElement } from "@stripe/react-stripe-js"
 import { StripeCardElementOptions } from "@stripe/stripe-js"
 import PaymentTest from "../payment-test"

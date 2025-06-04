@@ -4,7 +4,7 @@ import { Table, Text } from "@medusajs/ui"
 import { LineItemOptions } from "@lib/components"
 import { LineItemPrice } from "@lib/components"
 import { LineItemUnitPrice } from "@lib/components"
-import { Thumbnail } from "@lib/components"
+import Thumbnail from "@modules/products/components/thumbnail"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem

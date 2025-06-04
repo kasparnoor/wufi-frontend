@@ -2,12 +2,12 @@ import { Heading } from "@medusajs/ui"
 import { cookies as nextCookies } from "next/headers"
 
 import { CartTotals } from "@lib/components"
-import { Help } from "@lib/components"
-import { Items } from "@lib/components"
-import { OnboardingCta } from "@lib/components"
-import { OrderDetails } from "@lib/components"
-import { ShippingDetails } from "@lib/components"
-import { PaymentDetails } from "@lib/components"
+import Help from "@modules/account/components/help"
+import Items from "@modules/account/components/items"
+import OnboardingCta from "@modules/account/components/onboarding-cta"
+import OrderDetails from "@modules/order/components/order-details"
+import ShippingDetails from "@modules/account/components/shipping-details"
+import PaymentDetails from "@modules/account/components/payment-details"
 import { HttpTypes } from "@medusajs/types"
 
 type OrderCompletedTemplateProps = {

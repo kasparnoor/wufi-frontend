@@ -20,89 +20,106 @@ export {
   FormMessage 
 } from "./ui/form"
 export { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
-export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
-export { Checkbox } from "./ui/checkbox"
-export { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 export { Separator } from "./ui/separator"
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
+export { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+export { Checkbox } from "./ui/checkbox"
 
-// Modern component replacements (enhanced shadcn)
-export { ModernInput } from "./ui/modern-input"
-export { ModernTooltip, InfoTooltip, WufiTooltip } from "./ui/modern-tooltip"
+// Modern UI enhancements (alias Input as ModernInput for backward compatibility)
+export { Input as ModernInput } from "./ui/input"
+export { Tooltip as ModernTooltip } from "./ui/tooltip"
 
-// Toast system - now from modules
-export { ToastProvider, useToast, ToastStyles } from "@modules/common/components/toast"
+// ============= SKELETON COMPONENTS =============
+export { default as SkeletonProductPreview } from "./ui/skeleton-product-preview"
+export { default as SkeletonCartItem } from "./ui/skeleton-cart-item"
+export { default as SkeletonCodeForm } from "./ui/skeleton-code-form"
+export { default as SkeletonOrderSummary } from "./ui/skeleton-order-summary"
+export { default as SkeletonLineItem } from "./ui/skeleton-line-item"
+export { default as SkeletonCardDetails } from "./ui/skeleton-card-details"
+export { default as SkeletonCartTotals } from "./ui/skeleton-cart-totals"
+export { default as SkeletonButton } from "./ui/skeleton-button"
+export { default as SkeletonOrderConfirmedHeader } from "./ui/skeleton-order-confirmed-header"
+export { default as SkeletonOrderItems } from "./ui/skeleton-order-items"
+export { default as SkeletonOrderInformation } from "./ui/skeleton-order-information"
 
-// ============= WUFI COMPONENTS (Brand-specific) =============
-// Wufi-specific components that use ModernInput internally
+// ============= WUFI COMPONENTS =============
 export { default as WufiButton } from "./wufi/wufi-button"
-export { default as EmailInput } from "./wufi/email-input"
-export { default as PhoneInput } from "./wufi/phone-input"
-export { default as EstonianAddressInput } from "./wufi/estonian-address-input"
 
-// ============= MEDUSA COMPONENTS (E-commerce) =============
-// Re-export from modules
+// ============= COMMON COMPONENTS =============
+export { default as LocalizedClientLink } from "@modules/common/components/localized-client-link"
+export { CartStateProvider, useCartState } from "@modules/common/components/cart-state"
+export { default as CartTotals } from "@modules/common/components/cart-totals"
+export { default as InteractiveLink } from "@modules/common/components/interactive-link"
 export { default as LineItemOptions } from "@modules/common/components/line-item-options"
 export { default as LineItemPrice } from "@modules/common/components/line-item-price"
 export { default as LineItemUnitPrice } from "@modules/common/components/line-item-unit-price"
-export { default as CartTotals } from "@modules/common/components/cart-totals"
-export { CartStateProvider, useCartState } from "@modules/common/components/cart-state"
-export { default as InteractiveLink } from "@modules/common/components/interactive-link"
-export { default as LocalizedClientLink } from "@modules/common/components/localized-client-link"
-
-// Account components
-export { default as Login } from "@modules/account/components/login"
-export { default as Register } from "@modules/account/components/register"
-
-// Common utility components
-export { default as ErrorMessage } from "@modules/checkout/components/error-message"
-export { SubmitButton } from "@modules/checkout/components/submit-button"
-
-// Recovered components
 export { default as DeleteButton } from "@modules/common/components/delete-button"
-export { default as Modal } from "@modules/common/components/modal"
-export { default as Divider } from "@modules/common/components/divider"
-export { default as NativeSelect } from "@modules/common/components/native-select"
-export { default as Radio } from "@modules/common/components/radio"
-export { default as CartMismatchBanner } from "@modules/layout/components/cart-mismatch-banner"
-export { default as Search } from "@modules/store/components/search"
-
-// ============= LAYOUT COMPONENTS (Layout & utility) =============
-// Re-export from modules
 export { BentoGrid, BentoCard } from "@modules/common/components/bento-grid"
 export { default as FilterRadioGroup } from "@modules/common/components/filter-radio-group"
+export { default as Divider } from "@modules/common/components/divider"
+export { default as Modal } from "@modules/common/components/modal"
+export { default as NativeSelect } from "@modules/common/components/native-select"
+export { default as Radio } from "@modules/common/components/radio"
 
-// Layout components
+// Toast exports
+export { ToastProvider, useToast, ToastStyles } from "@modules/common/components/toast"
+
+// ============= LAYOUT COMPONENTS =============
 export { default as CartButton } from "@modules/layout/components/cart-button"
 export { default as SearchBar } from "@modules/layout/components/search-bar"
 export { default as CountrySelect } from "@modules/layout/components/country-select"
 export { default as MegaMenu } from "@modules/layout/components/mega-menu"
+export { default as CartDropdown } from "@modules/layout/components/cart-dropdown"
+export { default as SideMenu } from "@modules/layout/components/side-menu"
+export { default as MedusaCTA } from "@modules/layout/components/medusa-cta"
 
-// Home components
-export { default as Hero } from "@modules/home/components/hero"
+// ============= ACCOUNT COMPONENTS =============
+export { default as Dashboard } from "@modules/account/components/dashboard"
+export { default as AddressManagement } from "@modules/account/components/address-management"
+export { default as BillingManagement } from "@modules/account/components/billing-management"
+export { default as OrdersManagement } from "@modules/account/components/orders-management"
+export { default as PetManagement } from "@modules/account/components/pet-management"
+export { default as ProfileManagement } from "@modules/account/components/profile-management"
+export { default as SubscriptionManagement } from "@modules/account/components/subscription-management"
+export { default as AccountSetup } from "@modules/account/components/account-setup"
+export { default as Login } from "@modules/account/components/login"
+export { default as Register } from "@modules/account/components/register"
+
+// ============= CHECKOUT COMPONENTS =============
+export { default as DiscountCode } from "@modules/checkout/components/discount-code"
+export { default as CheckoutErrorBoundary } from "@modules/checkout/components/checkout-error-boundary"
+export { default as AutoshipOptions } from "@modules/checkout/components/autoship-options"
+export { default as Addresses } from "@modules/checkout/components/addresses"
+export { default as Shipping } from "@modules/checkout/components/shipping"
+export { default as Payment } from "@modules/checkout/components/payment"
+export { default as Review } from "@modules/checkout/components/review"
+export { default as PaymentWrapper } from "@modules/checkout/components/payment-wrapper"
+export { default as ErrorMessage } from "@modules/checkout/components/error-message"
+export { SubmitButton } from "@modules/checkout/components/submit-button"
+
+// ============= ORDER COMPONENTS =============
+export { default as TransferImage } from "@modules/order/components/transfer-image"
+export { default as TransferActions } from "@modules/order/components/transfer-actions"
+
+// ============= PRODUCT COMPONENTS =============
+export { default as ProductPreview } from "@modules/products/components/product-preview"
+export { default as Thumbnail } from "@modules/products/components/thumbnail"
+
+// ============= STORE COMPONENTS =============
+export { default as Search } from "@modules/store/components/search"
+export { Pagination } from "@modules/store/components/pagination"
+export { default as RefinementList } from "@modules/store/components/refinement-list"
+
+// ============= HOME COMPONENTS =============
 export { default as FeaturedProducts } from "@modules/home/components/featured-products"
 
-// Product components
-export { default as ProductPreview } from "@modules/products/components/product-preview"
+// ============= SHIPPING COMPONENTS =============
+export { default as FreeShippingPriceNudge } from "@modules/shipping/components/free-shipping-price-nudge"
 
-// ============= MEDUSA UI (Legacy support) =============
-// Re-export commonly used Medusa UI components (aliased to avoid conflicts)
-export { 
-  Button as MedusaButton, 
-  Container,
-  Text,
-  Heading,
-  Table,
-  Badge,
-  IconBadge,
-  clx
-} from "@medusajs/ui"
+// ============= SEARCH COMPONENTS =============
+export { default as SearchProductCard } from "@modules/search/components/search-product-card"
+export { default as SearchFilters } from "@modules/search/components/search-filters"
 
-// Additional Medusa UI components (aliased)
-export { 
-  Label as MedusaLabel,
-  Select as MedusaSelect,
-  Textarea as MedusaTextarea,
-  Input as MedusaInput,
-  Checkbox as MedusaCheckbox,
-  RadioGroup as MedusaRadioGroup
-} from "@medusajs/ui" 
+// ============= CATEGORY COMPONENTS =============
+export { default as CategoryFilters } from "@modules/categories/components/category-filters"
+export { default as CategorySearchResults } from "@modules/categories/components/category-search-results" 

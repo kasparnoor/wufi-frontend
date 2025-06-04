@@ -1,5 +1,5 @@
 import repeat from "@lib/util/repeat"
-import { SkeletonProductPreview } from "@lib/components"
+import SkeletonProductPreview from "@lib/components/ui/skeleton-product-preview"
 
 const SkeletonProductGrid = ({
   numberOfProducts = 8,

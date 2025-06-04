@@ -1,16 +1,36 @@
----
-description: Explains how Medusa integrates with this frontend
-globs: 
-alwaysApply: false
----
 # Medusa Integration
 
-The Wufi Storefront integrates with Medusa, an open-source headless commerce engine.
+The Wufi Storefront integrates with Medusa, an open-source headless commerce engine, using both Medusa's backend APIs and UI components in a unified component system.
 
-## Key Integration Points
+## Commerce Integration
 - Uses the Medusa JS SDK for all commerce operations
 - Data fetching is primarily done via server components
 - Product, cart, and checkout flows are built on Medusa APIs
+
+## UI Component Integration
+Medusa UI components are integrated into the unified component system:
+
+### Medusa UI Components
+**Available via**: `@lib/components/ui` (unified import) or `@medusajs/ui` (direct)
+- `Container`, `Text`, `Heading`, `Table`, `Badge`, `IconBadge`, `clx`
+- `MedusaButton` (aliased to avoid conflict with shadcn Button)
+
+### Usage in Unified System
+```tsx
+import { 
+  // Medusa UI components for data display
+  Container, Text, Table,
+  // shadcn components for forms  
+  Button, Input, Form,
+  // Custom Wufi components for branding
+  WufiButton, WufiTooltip
+} from "@lib/components/ui"
+```
+
+### Component Selection Strategy
+- **Use Medusa UI** for data display, tables, containers, and e-commerce layouts
+- **Use shadcn components** for forms, interactive elements, and new UI features
+- **Use custom Wufi components** for brand-specific styling and unique functionality
 
 ## Commerce Modules
 These modules handle specific commerce functionality:
@@ -23,3 +43,8 @@ These modules handle specific commerce functionality:
 - Server components fetch data directly from Medusa API
 - Client components use React Server Actions for mutations
 - Cart state is managed with cookies and server-side storage
+
+## Migration Notes
+- Existing Medusa UI components continue to work seamlessly
+- New components should prefer shadcn alternatives for better accessibility and modern patterns
+- Gradual migration approach allows keeping working Medusa components while adopting better alternatives

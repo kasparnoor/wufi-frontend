@@ -7,7 +7,7 @@ import { placeOrder } from '@lib/data/cart'
 import { useState } from 'react'
 import { useSearchParams } from "next/navigation"
 import { WufiButton } from "@lib/components"
-import { Thumbnail } from "@lib/components"
+import Thumbnail from "@modules/products/components/thumbnail"
 import { convertIntervalToText } from '@lib/util/subscription-intervals'
 
 const Review = ({ cart, customer }: { cart: any, customer: any }) => {

@@ -5,350 +5,113 @@ alwaysApply: false
 ---
 # Styling Guidelines
 
-The Wufi Storefront uses Tailwind CSS with a design system built on the **unified component system**. All components follow consistent styling patterns and are available from a single import point.
+The Wufi Storefront uses a consistent styling approach based on Tailwind CSS with custom components and design patterns.
 
-## Component System Architecture
+## Core Styling Principles
+- Uses [Tailwind CSS](mdc:tailwind.config.js) for utility-first styling
+- **Standardized color palette** with WCAG AA compliant contrast ratios
+- Custom [Satoshi font](mdc:src/styles/globals.css) for typography
+- Mobile-first responsive design
+- Modular component architecture
 
-### Single Import Point
-All styled components are available through the unified system:
+## Standardized Color System
 
-```tsx
-import {
-  // Universal UI (shadcn/ui) - Modern, accessible
-  Button, Input, Dialog, ModernInput, ModernSelect,
-  
-  // Wufi brand components - Perfect centering
-  WufiButton, EmailInput, PhoneInput,
-  
-  // Enhanced layout components
-  BentoGrid, BentoCard, FilterRadioGroup, DeleteButton,
-  
-  // E-commerce (Medusa)
-  CartTotals, LineItemPrice, Container, Text
-} from "@lib/components"
+### Primary Yellow Brand Colors (WCAG AA Compliant)
+```css
+/* Primary Actions & CTAs */
+yellow-400: Primary buttons, main CTAs, badges
+yellow-500: Hover states for primary actions
+
+/* Text Colors (High Contrast) */
+yellow-800: Primary text and icons on white/light backgrounds
+yellow-900: Text on yellow backgrounds
+yellow-700: Secondary text, muted content
+
+/* Background Colors */
+yellow-50: Light section backgrounds, page sections
+yellow-100: Card backgrounds, input fields
+yellow-200: Subtle borders, dividers
+
+/* Interactive States */
+yellow-300: Active borders, hover borders
 ```
 
-## Design Tokens
+### Usage Rules
+1. **NEVER use yellow-600 for text** - Poor contrast
+2. **Use yellow-800 for icons** on light backgrounds
+3. **Use yellow-900 for text** on yellow backgrounds
+4. **Use yellow-50/yellow-100** for backgrounds only
+5. **Use yellow-400 for primary** buttons and CTAs
 
-### Colors
-- **Primary Brand**: `yellow-400` - Main brand color for CTAs and highlights
-- **Primary Dark**: `yellow-800` - Text and icons on light backgrounds  
-- **Primary Light**: `yellow-50/100` - Section and card backgrounds
-- **Neutral**: `gray-50` through `gray-900` - Text, borders, backgrounds
-- **Interactive**: `blue-600/700` - Links, secondary actions
-- **Success**: `green-600` - Success states, confirmations
-- **Error**: `red-600` - Error states, validation
-- **Warning**: `orange-500` - Warning states
+### Accessible Color Combinations
+✅ **Good Contrast:**
+- `text-yellow-800` on `bg-white`
+- `text-yellow-900` on `bg-yellow-400`
+- `text-yellow-800` on `bg-yellow-50`
 
-### Typography
-- **Headings**: Inter font family, bold weights (600-700)
-- **Body**: Inter font family, normal weights (400-500)
-- **Scale**: `text-sm` (14px) to `text-4xl` (36px)
-- **Line Height**: Generous spacing for readability
-
-### Spacing
-- **Component Padding**: `p-4` (16px) standard, `p-6` (24px) for cards
-- **Component Margins**: `gap-4` (16px) standard, `gap-6` (24px) for sections
-- **Border Radius**: `rounded-lg` (8px) standard, `rounded-2xl` (16px) for cards
-
-## Component Styling Patterns
-
-### 1. Form Components (Enhanced with Perfect Centering)
-```tsx
-import { ModernInput, ModernSelect, Button, Form } from "@lib/components"
-
-// Perfect text centering with floating labels
-<ModernInput 
-  type="email" 
-  label="Email Address"
-  className="w-full"
-  errors={errors}
-  touched={touched}
-/>
-
-<ModernSelect 
-  label="Country"
-  options={countries}
-  className="w-full"
-/>
-
-<Button variant="default" size="lg" className="w-full bg-yellow-400 hover:bg-yellow-500">
-  Submit
-</Button>
-```
-
-### 2. Wufi Brand Components
-```tsx
-import { WufiButton, EmailInput, PhoneInput } from "@lib/components"
-
-// Consistent brand styling
-<WufiButton variant="primary" size="large">
-  Subscribe Now
-</WufiButton>
-
-// Enhanced inputs with Wufi styling
-<EmailInput 
-  label="Your Email"
-  className="max-w-md"
-/>
-
-<PhoneInput 
-  placeholder="Phone Number"
-  className="max-w-md"
-/>
-```
-
-### 3. Layout Components (Enhanced)
-```tsx
-import { BentoGrid, BentoCard, FilterRadioGroup, DeleteButton } from "@lib/components"
-
-// Modern grid layouts
-<BentoGrid className="gap-6">
-  <BentoCard 
-    name="Products"
-    description="Browse our selection"
-    className="bg-gradient-to-br from-yellow-50 to-yellow-100"
-  />
-</BentoGrid>
-
-// Enhanced filter controls
-<FilterRadioGroup 
-  title="Size"
-  items={sizes}
-  value={selectedSize}
-  handleChange={setSelectedSize}
-/>
-
-// Modern delete buttons
-<DeleteButton 
-  id="item-1"
-  className="text-red-600 hover:text-red-700"
->
-  Remove Item
-</DeleteButton>
-```
-
-### 4. E-commerce Components
-```tsx
-import { CartTotals, LineItemPrice, Container, Text } from "@lib/components"
-
-// Consistent commerce styling
-<Container className="bg-white rounded-xl border border-gray-200 p-6">
-  <Text className="text-lg font-semibold text-gray-900 mb-4">
-    Order Summary
-  </Text>
-  <CartTotals />
-</Container>
-```
+❌ **Poor Contrast (Avoid):**
+- `text-yellow-600` on `bg-white`
+- `text-yellow-200` on any background
+- `text-yellow-300` for important content
 
 ## Key Style Components
-
-### Modern Enhanced Components
-- **ModernInput** - Perfect text centering, floating labels, validation states
-- **ModernSelect** - Enhanced dropdown with validation and consistent styling
-- **ModernTooltip** - Better positioning and accessible tooltips
-- **FilterRadioGroup** - Enhanced radio group with modern styling
-- **DeleteButton** - Enhanced button with loading states and proper hover effects
-
-### Wufi Brand Components  
-- **WufiButton** - Custom button component with brand variants
-- **EmailInput** - Enhanced email input with perfect centering
-- **PhoneInput** - Enhanced phone input with country selection
-- **EstonianAddressInput** - Localized address input with autocomplete
-
-### Layout Components
-- **BentoGrid/BentoCard** - Modern grid layout system
-- **Container** - Consistent page width and padding
-- **Hero** - Homepage hero section with brand styling
+- [WufiButton](mdc:src/modules/common/components/wufi-button/index.tsx) - Custom button component with variants
+- [Layout](mdc:src/modules/layout) - Consistent page structure components
+- [Hero](mdc:src/modules/home/components/hero/index.tsx) - Homepage hero section with brand styling
 
 ## Common UI Patterns
+1. **Containers**:
+   - `.content-container` class for consistent page width and padding
+   - Rounded corners (rounded-2xl) for cards and prominent elements
 
-### 1. Cards and Containers
-```tsx
-// Standard card pattern
-<div className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md hover:border-yellow-300 transition-all duration-200">
-  <h3 className="text-lg font-semibold text-gray-900 mb-2">Card Title</h3>
-  <p className="text-gray-600">Card content</p>
-</div>
+2. **Colors**:
+   - Yellow-400 as primary brand color for CTAs
+   - Yellow-800 for text and icons on light backgrounds
+   - Yellow-50/100 for section and card backgrounds
+   - White/black text for high contrast
+   - Subtle gradient overlays on images
+   - Transparent backgrounds with backdrop-blur for glass effects
 
-// Glass effect containers
-<div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
-  Content
-</div>
-```
+3. **Interactive Elements**:
+   - Hover effects with scale transformations
+   - Subtle shadows for depth
+   - Consistent border treatments using yellow-200/300
+   - Micro-animations for feedback
 
-### 2. Interactive Elements
-```tsx
-// Primary actions
-<Button className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-  Primary Action
-</Button>
+4. **Typography**:
+   - Satoshi font family
+   - Consistent text size utility classes
+   - Bold headings with normal weight body text
 
-// Secondary actions  
-<Button variant="outline" className="border-gray-300 hover:border-yellow-400 hover:bg-yellow-50 text-gray-700 hover:text-yellow-800">
-  Secondary Action
-</Button>
-```
+5. **Component Structure**:
+   - Functional React components
+   - Props for variants and customization
+   - Compositional pattern with children props
 
-### 3. Form Layouts
-```tsx
-import { Form, FormField, ModernInput, Button } from "@lib/components"
+## Spacing & Alignment
+- Use Tailwind's spacing scale consistently (px-6, py-4, m-4, etc.)
+- Common margins:
+  - Sections: `py-16 sm:py-24` (vertical padding)
+  - Content blocks: `mb-8 sm:mb-12` (bottom margin)
+  - Form fields: `mb-4` (bottom margin)
+  - Button groups: `gap-4` (space between)
+- Common alignment:
+  - Content centering: `mx-auto` (horizontal center)
+  - Flex layouts: `flex items-center justify-between`
+  - Grid layouts: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`
+  - Text alignment: `text-center` for headings, `text-left` for content
 
-// Perfect form layout with validation
-<Form {...form}>
-  <div className="space-y-6">
-    <FormField
-      control={form.control}
-      name="email"
-      render={({ field, fieldState }) => (
-        <FormItem>
-          <FormControl>
-            <ModernInput
-              {...field}
-              type="email"
-              label="Email Address"
-              errors={fieldState.error?.message ? [fieldState.error.message] : undefined}
-              touched={fieldState.isTouched}
-            />
-          </FormControl>
-        </FormItem>
-      )}
-    />
-    
-    <Button type="submit" className="w-full">
-      Submit Form
-    </Button>
-  </div>
-</Form>
-```
+## Component Reuse
+- **ALWAYS prefer using existing components** over creating new ones
+- All shared components are in [src/modules/common/components](mdc:src/modules/common/components)
+- Check existing modules before implementing new UI patterns
+- Maintain design consistency by leveraging the component library
 
-### 4. Responsive Design
-```tsx
-// Mobile-first responsive patterns
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-  <BentoCard />
-  <BentoCard />
-  <BentoCard />
-</div>
-
-// Responsive text and spacing
-<h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6">
-  Responsive Heading
-</h1>
-```
-
-## Animation and Transitions
-
-### Standard Transitions
-```tsx
-// Hover effects
-className="transition-all duration-200 hover:shadow-md hover:-translate-y-1"
-
-// Loading states
-className="disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-
-// Interactive feedback
-className="active:scale-95 transition-transform duration-100"
-```
-
-### Micro-interactions
-```tsx
-// Button feedback
-<Button className="transform transition-all duration-200 hover:scale-105 active:scale-95">
-  Interactive Button
-</Button>
-
-// Card hover effects
-<div className="group hover:shadow-lg transition-all duration-300">
-  <div className="group-hover:scale-105 transition-transform duration-300">
-    Card Content
-  </div>
-</div>
-```
-
-## Best Practices
-
-### 1. Use the Unified System
-```tsx
-// ✅ Always import from the unified system
-import { ModernInput, WufiButton, BentoGrid } from "@lib/components"
-
-// ❌ Don't use old import paths
-import Input from "@modules/common/components/input"
-```
-
-### 2. Consistent Spacing
-- Use standard spacing scale: `gap-4`, `p-6`, `mb-4`
-- Maintain consistent margins between sections
-- Use `space-y-*` for vertical stacking
-
-### 3. Accessible Colors
-- Ensure sufficient color contrast (WCAG AA)
-- Use semantic color names for states
-- Test with color blindness simulators
-
-### 4. Performance
-- Use `transition-*` classes for smooth animations
-- Avoid excessive shadows and blur effects
-- Optimize for 60fps animations
-
-### 5. Mobile-First
-- Start with mobile layouts
-- Use responsive prefixes (`md:`, `lg:`)
-- Test on various screen sizes
-
-## Components Usage Examples
-
-### Perfect Form Example
-```tsx
-import { Form, FormField, ModernInput, ModernSelect, WufiButton } from "@lib/components"
-
-export function ContactForm() {
-  return (
-    <Form {...form}>
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-6">
-        <h2 className="text-xl font-semibold text-gray-900">Contact Us</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            name="firstName"
-            render={({ field, fieldState }) => (
-              <ModernInput
-                {...field}
-                label="First Name"
-                errors={fieldState.error?.message ? [fieldState.error.message] : undefined}
-                touched={fieldState.isTouched}
-              />
-            )}
-          />
-          
-          <FormField
-            name="lastName"
-            render={({ field, fieldState }) => (
-              <ModernInput
-                {...field}
-                label="Last Name"
-                errors={fieldState.error?.message ? [fieldState.error.message] : undefined}
-                touched={fieldState.isTouched}
-              />
-            )}
-          />
-        </div>
-        
-        <ModernSelect
-          label="How can we help?"
-          options={helpOptions}
-          value={helpType}
-          onValueChange={setHelpType}
-        />
-        
-        <WufiButton type="submit" variant="primary" size="large" className="w-full">
-          Send Message
-        </WufiButton>
-      </div>
-    </Form>
-  )
-}
-```
-
-This creates a perfect, accessible form with consistent styling and the enhanced components from our unified system.
+## Common Components Library
+- [src/modules/common/components/wufi-button](mdc:src/modules/common/components/wufi-button) - Buttons
+- [src/modules/common/components/input](mdc:src/modules/common/components/input) - Form inputs
+- [src/modules/common/components/radio](mdc:src/modules/common/components/radio) - Radio buttons
+- [src/modules/common/components/checkbox](mdc:src/modules/common/components/checkbox) - Checkboxes
+- [src/modules/common/components/modal](mdc:src/modules/common/components/modal) - Modal dialogs
+- [src/modules/common/components/bento-grid](mdc:src/modules/common/components/bento-grid) - Grid layouts
+- [src/modules/common/components/interactive-link](mdc:src/modules/common/components/interactive-link) - Enhanced links

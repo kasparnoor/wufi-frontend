@@ -6,7 +6,7 @@ import { clx } from "@medusajs/ui";
 import { RadioGroup as MedusaRadio, RadioGroupItem } from "@lib/components";
 import { updateLineItemMetadata } from "@lib/data/cart";
 import { useState, useEffect } from "react";
-import { Thumbnail } from "@lib/components";
+import Thumbnail from "@modules/products/components/thumbnail";
 import { CheckCircle } from "lucide-react";
 import { getAvailableIntervals } from "@lib/util/subscription-intervals";
 
@@ -179,7 +179,7 @@ const AutoshipItemOption: React.FC<AutoshipItemOptionProps> = ({ item, cart }) =
               <div className="flex flex-col h-full">
                 <div className="flex items-start gap-x-3">
                   <div className="mt-0.5">
-                    <MedusaRadio checked={checked} />
+                    <RadioGroupItem value="subscription" />
                   </div>
                   <div className="flex-1">
                     <RadioGroup.Label as="span" className="text-base font-semibold text-gray-800 block">
@@ -250,7 +250,7 @@ const AutoshipItemOption: React.FC<AutoshipItemOptionProps> = ({ item, cart }) =
             {({ checked }) => (
               <div className="flex items-start gap-x-3">
                 <div className="mt-0.5">
-                  <MedusaRadio checked={checked} />
+                  <RadioGroupItem value="one_time" />
                 </div>
                 <div>
                   <RadioGroup.Label as="span" className="text-base font-semibold text-gray-800 block">

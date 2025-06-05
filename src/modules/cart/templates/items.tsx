@@ -2,6 +2,7 @@ import repeat from "@lib/util/repeat"
 import { HttpTypes } from "@medusajs/types"
 import Item from "@modules/cart/components/item"
 import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
+import { updateCartItemAction, deleteCartItemAction } from "@modules/cart/actions"
 
 type ItemsTemplateProps = {
   cart?: HttpTypes.StoreCart
@@ -22,7 +23,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
       </div>
       
       {items && items.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-0 divide-y divide-gray-100">
           {items
             .sort((a, b) => {
               return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
@@ -34,6 +35,8 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
                   item={item}
                   currencyCode={cart?.currency_code}
                   type="card"
+                  updateItemAction={updateCartItemAction}
+                  deleteItemAction={deleteCartItemAction}
                 />
               )
             })

@@ -15,7 +15,7 @@ import { WufiButton } from "@lib/components"
 import { RadioGroup, Radio } from "@headlessui/react"
 import { RadioGroup as MedusaRadio, RadioGroupItem } from "@lib/components"
 import { getProductPrice } from "@lib/util/get-product-price"
-import { useToast } from "@lib/components"
+import { useToast } from "@modules/common/components/toast"
 import { useCartState } from "@lib/components"
 import { getAvailableIntervals } from "@lib/util/subscription-intervals"
 

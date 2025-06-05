@@ -34,21 +34,22 @@ const DeleteButton = ({
   }
 
   return (
-    <div
+    <button
       className={clx(
-        "flex items-center justify-between text-small-regular",
+        "flex items-center gap-x-1.5 text-sm font-medium transition-colors duration-200",
+        "text-gray-500 hover:text-red-500 disabled:opacity-50 disabled:cursor-not-allowed",
         className
       )}
+      onClick={handleDelete}
+      disabled={isDeleting}
     >
-      <button
-        className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer"
-        onClick={handleDelete}
-        disabled={isDeleting}
-      >
-        {isDeleting ? <LoaderCircle className="animate-spin" /> : <Trash />}
-        <span>{children}</span>
-      </button>
-    </div>
+      {isDeleting ? (
+        <LoaderCircle size={16} className="animate-spin" />
+      ) : (
+        <Trash size={16} />
+      )}
+      <span>{children}</span>
+    </button>
   )
 }
 

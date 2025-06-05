@@ -1,6 +1,6 @@
 // ========================================
-// 🎯 UNIFIED COMPONENT SYSTEM
-// Single import point for all components
+// 🎯 FOUNDATION COMPONENT EXPORTS ONLY
+// UI primitives and brand components
 // ========================================
 
 // ============= UI COMPONENTS (Universal) =============
@@ -24,10 +24,11 @@ export { Separator } from "./ui/separator"
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 export { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 export { Checkbox } from "./ui/checkbox"
+export { Toaster } from "./ui/sonner"
 
-// Modern UI enhancements (alias Input as ModernInput for backward compatibility)
-export { Input as ModernInput } from "./ui/input"
-export { Tooltip as ModernTooltip } from "./ui/tooltip"
+// Modern UI enhancements (enhanced components)
+export { ModernInput } from "./ui/modern-input"
+export { ModernTooltip, InfoTooltip } from "./ui/modern-tooltip"
 
 // ============= SKELETON COMPONENTS =============
 export { default as SkeletonProductPreview } from "./ui/skeleton-product-preview"
@@ -44,82 +45,78 @@ export { default as SkeletonOrderInformation } from "./ui/skeleton-order-informa
 
 // ============= WUFI COMPONENTS =============
 export { default as WufiButton } from "./wufi/wufi-button"
+export { default as EmailInput } from "./wufi/email-input"
+export { default as PhoneInput } from "./wufi/phone-input"
+export { default as EstonianAddressInput } from "./wufi/estonian-address-input"
 
-// ============= COMMON COMPONENTS =============
+// ========================================
+// 🚨 TEMPORARY RE-EXPORTS FOR MIGRATION
+// These will be removed once imports are updated
+// ========================================
+
+// Common components (temporary re-exports)
 export { default as LocalizedClientLink } from "@modules/common/components/localized-client-link"
 export { CartStateProvider, useCartState } from "@modules/common/components/cart-state"
-export { default as CartTotals } from "@modules/common/components/cart-totals"
 export { default as InteractiveLink } from "@modules/common/components/interactive-link"
+export { ToastProvider, useToast as UseToastLegacy, ToastStyles } from "@modules/common/components/toast"
 export { default as LineItemOptions } from "@modules/common/components/line-item-options"
 export { default as LineItemPrice } from "@modules/common/components/line-item-price"
 export { default as LineItemUnitPrice } from "@modules/common/components/line-item-unit-price"
-export { default as DeleteButton } from "@modules/common/components/delete-button"
-export { BentoGrid, BentoCard } from "@modules/common/components/bento-grid"
-export { default as FilterRadioGroup } from "@modules/common/components/filter-radio-group"
-export { default as Divider } from "@modules/common/components/divider"
-export { default as Modal } from "@modules/common/components/modal"
-export { default as NativeSelect } from "@modules/common/components/native-select"
-export { default as Radio } from "@modules/common/components/radio"
+export { default as CartTotals } from "@modules/common/components/cart-totals"
 
-// Toast exports
-export { ToastProvider, useToast, ToastStyles } from "@modules/common/components/toast"
-
-// ============= LAYOUT COMPONENTS =============
+// Layout components (temporary re-exports)
 export { default as CartButton } from "@modules/layout/components/cart-button"
 export { default as SearchBar } from "@modules/layout/components/search-bar"
 export { default as CountrySelect } from "@modules/layout/components/country-select"
 export { default as MegaMenu } from "@modules/layout/components/mega-menu"
-export { default as CartDropdown } from "@modules/layout/components/cart-dropdown"
-export { default as SideMenu } from "@modules/layout/components/side-menu"
 export { default as MedusaCTA } from "@modules/layout/components/medusa-cta"
 
-// ============= ACCOUNT COMPONENTS =============
-export { default as Dashboard } from "@modules/account/components/dashboard"
+// Account components (temporary re-exports)
+export { default as Login } from "@modules/account/components/login"
+export { default as Register } from "@modules/account/components/register"
 export { default as AddressManagement } from "@modules/account/components/address-management"
 export { default as BillingManagement } from "@modules/account/components/billing-management"
 export { default as OrdersManagement } from "@modules/account/components/orders-management"
 export { default as PetManagement } from "@modules/account/components/pet-management"
 export { default as ProfileManagement } from "@modules/account/components/profile-management"
 export { default as SubscriptionManagement } from "@modules/account/components/subscription-management"
-export { default as AccountSetup } from "@modules/account/components/account-setup"
-export { default as Login } from "@modules/account/components/login"
-export { default as Register } from "@modules/account/components/register"
+export { default as Dashboard } from "@modules/account/components/dashboard"
 
-// ============= CHECKOUT COMPONENTS =============
-export { default as DiscountCode } from "@modules/checkout/components/discount-code"
-export { default as CheckoutErrorBoundary } from "@modules/checkout/components/checkout-error-boundary"
-export { default as AutoshipOptions } from "@modules/checkout/components/autoship-options"
-export { default as Addresses } from "@modules/checkout/components/addresses"
-export { default as Shipping } from "@modules/checkout/components/shipping"
-export { default as Payment } from "@modules/checkout/components/payment"
-export { default as Review } from "@modules/checkout/components/review"
-export { default as PaymentWrapper } from "@modules/checkout/components/payment-wrapper"
+// Checkout components (temporary re-exports)
 export { default as ErrorMessage } from "@modules/checkout/components/error-message"
+export { default as PaymentWrapper } from "@modules/checkout/components/payment-wrapper"
 export { SubmitButton } from "@modules/checkout/components/submit-button"
 
-// ============= ORDER COMPONENTS =============
-export { default as TransferImage } from "@modules/order/components/transfer-image"
-export { default as TransferActions } from "@modules/order/components/transfer-actions"
+// Account components (additional)
+export { default as AccountSetup } from "@modules/account/components/account-setup"
 
-// ============= PRODUCT COMPONENTS =============
+// Product components (temporary re-exports)
 export { default as ProductPreview } from "@modules/products/components/product-preview"
 export { default as Thumbnail } from "@modules/products/components/thumbnail"
 
-// ============= STORE COMPONENTS =============
-export { default as Search } from "@modules/store/components/search"
-export { Pagination } from "@modules/store/components/pagination"
-export { default as RefinementList } from "@modules/store/components/refinement-list"
+// Order components (temporary re-exports)
+export { default as TransferImage } from "@modules/order/components/transfer-image"
 
-// ============= HOME COMPONENTS =============
-export { default as FeaturedProducts } from "@modules/home/components/featured-products"
+// Common utility components (temporary re-exports)
+export { default as DeleteButton } from "@modules/common/components/delete-button"
 
-// ============= SHIPPING COMPONENTS =============
-export { default as FreeShippingPriceNudge } from "@modules/shipping/components/free-shipping-price-nudge"
+// Modern toast hook (from sonner)
+export { toast as useToast } from "sonner"
 
-// ============= SEARCH COMPONENTS =============
-export { default as SearchProductCard } from "@modules/search/components/search-product-card"
-export { default as SearchFilters } from "@modules/search/components/search-filters"
-
-// ============= CATEGORY COMPONENTS =============
-export { default as CategoryFilters } from "@modules/categories/components/category-filters"
-export { default as CategorySearchResults } from "@modules/categories/components/category-search-results" 
+// ========================================
+// 📝 TODO: UPDATE IMPORTS TO USE MODULES
+// ========================================
+// 
+// These components should be imported directly from modules:
+// 
+// Layout Components:
+// import CartButton from "@/modules/layout/components/cart-button"
+// import SearchBar from "@/modules/layout/components/search-bar"
+// import MegaMenu from "@/modules/layout/components/mega-menu"
+// 
+// Common Components:
+// import LocalizedClientLink from "@/modules/common/components/localized-client-link"
+// import { CartStateProvider, useCartState } from "@/modules/common/components/cart-state"
+// import { ToastProvider, useToast, ToastStyles } from "@/modules/common/components/toast"
+// 
+// ======================================== 

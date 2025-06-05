@@ -5,21 +5,49 @@ alwaysApply: true
 ---
 # Folder Structure
 
-The Wufi Storefront follows a modular approach with the following directory structure:
+The Wufi Storefront follows a **two-layer component architecture** with modular organization:
 
 ## Main Directories
 - [src/app](mdc:src/app) - Next.js App Router pages and layouts
-- [src/modules](mdc:src/modules) - UI and business logic modules organized by feature
-- [src/lib](mdc:src/lib) - Data fetching, utilities, and helper functions
+- [src/modules](mdc:src/modules) - Feature-specific components and business logic
+- [src/lib](mdc:src/lib) - Foundation components, utilities, and helper functions
 - [src/types](mdc:src/types) - TypeScript type definitions
 - [src/styles](mdc:src/styles) - Tailwind and global styles
 - [public](mdc:public) - Static assets
 
-## Modules Structure
-The modules directory is organized by feature:
-- [src/modules/account](mdc:src/modules/account) - User account management
-- [src/modules/cart](mdc:src/modules/cart) - Shopping cart functionality
-- [src/modules/checkout](mdc:src/modules/checkout) - Checkout process
-- [src/modules/products](mdc:src/modules/products) - Product display and management
-- [src/modules/common](mdc:src/modules/common) - Shared UI components
-- [src/modules/layout](mdc:src/modules/layout) - Layout components (header, footer, etc.)
+## Component Organization
+
+### Layer 1: Foundation Components (`src/lib/components/`)
+```
+src/lib/components/
+├── ui/          # shadcn/ui primitives (Button, Input, Dialog, etc.)
+├── wufi/        # Wufi brand-specific components (WufiButton, EmailInput, etc.)
+└── index.ts     # Foundation component exports
+```
+
+### Layer 2: Feature Components (`src/modules/`)
+```
+src/modules/
+├── account/components/     # User management (Login, Register, Dashboard)
+├── cart/components/        # Shopping cart (CartButton, CartDropdown)
+├── checkout/components/    # Checkout flow (Payment, Shipping, Review)
+├── layout/components/      # Navigation (Header, Footer, MegaMenu, SearchBar)
+├── products/components/    # Product display (ProductCard, ProductPreview)
+├── common/components/      # Shared utilities (Modal, LocalizedClientLink)
+├── search/components/      # Search functionality
+├── order/components/       # Order management
+└── ...                     # Other feature modules
+```
+
+## Import Strategy
+
+### Foundation Components
+```tsx
+import { Button, ModernInput, WufiButton } from "@/lib/components"
+```
+
+### Feature Components  
+```tsx
+import CartButton from "@/modules/layout/components/cart-button"
+import ProductCard from "@/modules/products/components/product-card"
+```

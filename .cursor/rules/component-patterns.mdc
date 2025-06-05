@@ -3,107 +3,131 @@
 The Wufi Storefront follows consistent component patterns for maintainability and consistency, using a unified component system that integrates shadcn/ui, Medusa UI, and custom Wufi components.
 
 ## Unified Component System
-The storefront uses a **three-tier component architecture**:
+# Component Organization System
 
-### 1. shadcn/ui Components (Preferred for new UI)
-**Location**: `src/lib/components/ui/`
-**Import**: `@lib/components/ui`
-- Modern, accessible components built on Radix UI primitives
-- Perfect for forms, interactive elements, and new UI features
-- Examples: `Button`, `Input`, `Form`, `Select`, `Textarea`
+The Wufi Storefront uses a **two-layer component architecture** for clear separation and logical organization:
 
-### 2. Medusa UI Components (For e-commerce patterns)
-**Location**: Re-exported from `@medusajs/ui` 
-**Import**: `@lib/components/ui` (unified) or `@medusajs/ui` (direct)
-- Official Medusa design system components
-- Ideal for data display and commerce-specific layouts
-- Examples: `Container`, `Text`, `Table`, `Badge` (aliased as `MedusaButton`)
+## Layer 1: Foundation Components (`@/lib/components`)
 
-### 3. Custom Wufi Components (For brand identity)
-**Location**: `src/modules/common/components/`
-**Import**: `@lib/components/ui` (unified) or direct module paths
-- Brand-specific styling and unique functionality
-- Examples: `WufiButton`, `WufiTooltip`, `Modal`, `ToastProvider`
+### UI Primitives (`src/lib/components/ui/`)
+**Purpose**: Universal, accessible UI components
+**Import**: `@/lib/components`
 
-## Component Structure
-- Components are organized in feature-specific modules in [src/modules](mdc:src/modules)
-- Each component typically has its own directory with an index.tsx file
-- UI components use Tailwind CSS for styling
-- Server vs. client components are clearly separated
+- **shadcn/ui components**: `Button`, `Input`, `Dialog`, `Form`, `Select`, `Checkbox`
+- **Enhanced components**: `ModernInput`, `ModernTooltip`, `InfoTooltip`
+- **Skeleton components**: Loading states for all UI elements
+- **Utilities**: `Toaster`, `Separator`
 
-## Import Patterns
+### Wufi Brand Components (`src/lib/components/wufi/`)
+**Purpose**: Wufi-specific branded components
+**Import**: `@/lib/components`
 
-### Unified Import (Recommended)
+- `WufiButton` - Brand-styled button with Wufi colors
+- `EmailInput` - Enhanced email input with validation
+- `PhoneInput` - Estonian phone number input
+- `EstonianAddressInput` - Estonian address autocomplete
+
+## Layer 2: Feature Components (`@/modules/`)
+
+### Feature-Specific Components
+**Purpose**: Business logic components organized by domain
+**Import**: Direct from module paths
+
+- **Layout**: `@/modules/layout/components/` - Navigation, header, footer
+- **Account**: `@/modules/account/components/` - User management, login, dashboard
+- **Cart**: `@/modules/cart/components/` - Shopping cart functionality
+- **Checkout**: `@/modules/checkout/components/` - Payment, shipping, review
+- **Products**: `@/modules/products/components/` - Product display, cards, previews
+- **Common**: `@/modules/common/components/` - Shared feature components
+
+## Import Strategy
+
+### ✅ Foundation Components (from `@/lib/components`)
 ```tsx
 import { 
-  // shadcn components
-  Button, Input, Form, FormField,
-  // Medusa components  
-  Container, Text, Table,
-  // Custom Wufi components
-  WufiButton, WufiTooltip, Modal
-} from "@lib/components/ui"
+  // UI primitives
+  Button, Input, Dialog, Form, ModernInput,
+  
+  // Brand components
+  WufiButton, EmailInput, PhoneInput,
+  
+  // Utilities
+  Toaster, Separator
+} from "@/lib/components"
 ```
 
-### Component Selection Guide
-- **New forms & interactive UI** → shadcn components (`Button`, `Input`, `Form`)
-- **Data display & layouts** → Medusa components (`Container`, `Text`, `Table`)
-- **Brand elements & custom features** → Wufi components (`WufiButton`, `WufiTooltip`)
+### ✅ Feature Components (direct imports)
+```tsx
+import CartButton from "@/modules/layout/components/cart-button"
+import ProductCard from "@/modules/products/components/product-card"
+import Login from "@/modules/account/components/login"
+import LocalizedClientLink from "@/modules/common/components/localized-client-link"
+```
+
+## Decision Tree: Where Does This Component Go?
+
+### 🤔 Ask Yourself:
+1. **Is it a UI primitive?** (Button, Input, Dialog) → `src/lib/components/ui/`
+2. **Is it Wufi brand-specific?** (WufiButton, EmailInput) → `src/lib/components/wufi/`
+3. **Does it belong to a specific feature?** (Cart, Account, Products) → `src/modules/{feature}/components/`
+4. **Is it shared across features but not a UI primitive?** → `src/modules/common/components/`
+
+## Component Examples
+
+### ✅ Foundation Components
+- `Button` → `src/lib/components/ui/button.tsx`
+- `ModernInput` → `src/lib/components/ui/modern-input.tsx`
+- `WufiButton` → `src/lib/components/wufi/wufi-button/`
+- `EmailInput` → `src/lib/components/wufi/email-input/`
+
+### ✅ Feature Components
+- `CartButton` → `src/modules/layout/components/cart-button/`
+- `ProductCard` → `src/modules/products/components/product-card/`
+- `LoginForm` → `src/modules/account/components/login/`
+- `LocalizedClientLink` → `src/modules/common/components/localized-client-link/`
 
 ## Best Practices
-1. **Server Components**:
-   - Used for data fetching directly from APIs
-   - Pass data down to client components
-   - Handle initial rendering without client interaction
 
-2. **Client Components**:
-   - Used for interactive elements
-   - Defined with "use client" directive
-   - Minimize client-side JavaScript
+### 1. Component Structure
+- Each component has its own directory with `index.tsx`
+- Use TypeScript interfaces for all props
+- Server vs. client components clearly separated with `"use client"`
 
-3. **Props & Typing**:
-   - Use TypeScript interfaces for prop typing
-   - Default props for common configurations
-   - Optional props with sensible defaults
+### 2. Styling
+- Tailwind utility classes for all styling
+- Follow shadcn patterns for consistency
+- Maintain Wufi brand colors (yellow-400 primary)
+- Use `cn()` utility for conditional classes
 
-4. **Styling**:
-   - Use Tailwind utility classes directly
-   - Conditional classes with clsx utility
-   - Follow shadcn patterns for consistency
-   - Maintain Wufi brand colors (yellow-400 primary)
+### 3. Forms
+- Always use `ModernInput` for enhanced UX (perfect centering, floating labels)
+- Use shadcn `Form` components with React Hook Form + Zod validation
+- `WufiButton` for brand consistency in primary actions
 
-5. **Form Handling**:
-   - Use shadcn `Form` components with React Hook Form + Zod
-   - Provides perfect accessibility and validation out of the box
+### 4. State Management
+- Local state with React hooks
+- Cart state via `CartStateProvider` from `@/modules/common/components/cart-state`
+- Form state with controlled components
 
-6. **State Management**:
-   - Local state with React hooks
-   - Form state with controlled components
-   - Cart state via server components and cookies
+## Migration Note
 
-## Example Patterns
-
-### Modern Form (shadcn + React Hook Form)
-```tsx
-import { Button, Form, FormField, FormControl, FormLabel, FormMessage, Input } from "@lib/components/ui"
-
-// Perfect centering, accessibility, validation
-```
-
-### Data Display (Medusa Components)  
-```tsx
-import { Container, Text, Table } from "@lib/components/ui"
-
-// Proven e-commerce patterns
-```
-
-### Brand Element (Custom Wufi)
-```tsx
-import { WufiButton, WufiTooltip } from "@lib/components/ui"
-
-<WufiButton variant="primary">Brand Consistency</WufiButton>
-```
+**Temporary Re-exports**: Some components are temporarily re-exported through `@/lib/components` for backward compatibility. These will be gradually migrated to direct module imports.
 
 ## Adding New Components
-- **shadcn components**: `npx shadcn@latest add <component>`
-- **Custom components**: Create in `src/modules/common/components/` and add to unified exports
+
+### Foundation Component
+```bash
+# UI primitive
+npx shadcn@latest add <component>
+
+# Wufi brand component
+# Create in src/lib/components/wufi/
+# Export from src/lib/components/index.ts
+```
+
+### Feature Component
+```tsx
+// Create in appropriate module
+src/modules/{feature}/components/{component-name}/index.tsx
+// Import directly from module path
+```

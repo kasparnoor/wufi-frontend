@@ -1,197 +1,125 @@
-# 🎯 Unified Component System
+# 🎯 Foundation Component System
 
-**Single source of truth for all components** - Clean, logical, no more confusion!
+**Clean, logical foundation for all UI primitives and brand components**
 
 ## 📁 Structure
 
 ```
 src/lib/components/
-├── ui/          # Universal UI components (shadcn/ui)
+├── ui/          # shadcn/ui primitives (Button, Input, Dialog, etc.)
 ├── wufi/        # Wufi brand-specific components  
-├── medusa/      # Medusa e-commerce components
-├── layout/      # Layout & utility components
-└── index.ts     # Single import point ⭐
+└── index.ts     # Foundation component exports ⭐
 ```
 
-## 🚀 How to Use
+## 🚀 What's Included
 
-### Single Import Point
+### **UI Primitives** (`ui/`)
+Modern, accessible components based on shadcn/ui:
+- `Button`, `Input`, `Label`, `Dialog`
+- `Select`, `Textarea`, `Checkbox`, `RadioGroup`
+- `Form` components with validation
+- `Tooltip`, `Separator`
+- **Enhanced**: `ModernInput`, `ModernTooltip`
+- **Skeletons**: Loading states for all components
+
+### **Wufi Brand Components** (`wufi/`)
+Wufi-specific branded components:
+- `WufiButton` - Brand-styled button
+- `EmailInput` - Enhanced email input with validation
+- `PhoneInput` - Estonian phone number input
+- `EstonianAddressInput` - Estonian address autocomplete
+
+## 💡 Import Strategy
+
+### ✅ **Foundation Components** (from `@/lib/components`)
 ```tsx
-import {
-  // Universal UI (shadcn/ui)
-  Button, Input, Dialog, Checkbox, Form,
+import { 
+  // UI primitives
+  Button, Input, Dialog, Form,
   
-  // Modern enhanced components
-  ModernInput,      // ✅ Perfect centering!
-  ModernTooltip,    // ✅ Better positioning
+  // Enhanced components  
+  ModernInput, ModernTooltip, InfoTooltip,
   
-  // Wufi brand components
-  WufiButton,
-  EmailInput,       // ✅ Uses ModernInput internally
-  PhoneInput,       // ✅ Uses ModernInput internally
+  // Brand components
+  WufiButton, EmailInput, PhoneInput,
   
-  // E-commerce (Medusa)
-  CartTotals,
-  LineItemPrice,
-  
-  // Layout utilities
-  BentoGrid,
-  BentoCard,
-  
-  // Legacy support (if needed)
-  MedusaButton,
-  Container,
-  Text
-} from "@lib/components"
+  // Utilities
+  Toaster, Separator
+} from "@/lib/components"
 ```
 
-## ✅ What's Been Eliminated
-
-### ❌ Deleted Components (replaced by shadcn)
-- ~~`input/`~~ → `ModernInput` ✅ Perfect centering
-- ~~`tooltip/`~~ → `ModernTooltip` ✅ Better positioning  
-- ~~`modal/`~~ → `Dialog` ✅ Better accessibility
-- ~~`checkbox/`~~ → `Checkbox` ✅ Standard component
-- ~~`radio/`~~ → `RadioGroup` ✅ Standard component
-- ~~`divider/`~~ → `Separator` ✅ Standard component
-- ~~`native-select/`~~ → `Select` ✅ Modern dropdown
-
-### 📁 Moved & Enhanced Components
-- `wufi-button/` → `src/lib/components/wufi/` ✅
-- `email-input/` → `src/lib/components/wufi/` ✅ Enhanced with ModernInput
-- `phone-input/` → `src/lib/components/wufi/` ✅ Enhanced with ModernInput
-- `estonian-address-input/` → `src/lib/components/wufi/` ✅ Enhanced with ModernInput
-
-## 🎨 Component Categories
-
-### 🌐 UI Components (Universal)
-**Location**: `src/lib/components/ui/`  
-**Purpose**: Universal, accessible components for any project
-
+### ✅ **Feature Components** (from modules)
 ```tsx
-import { Button, Input, Dialog, ModernInput } from "@lib/components"
-
-// Perfect form with validation
-<ModernInput 
-  type="email" 
-  label="Email" 
-  errors={["Invalid email"]}
-  touched={true}
-/>
+import CartButton from "@/modules/layout/components/cart-button"
+import ProductCard from "@/modules/products/components/product-card"
+import Login from "@/modules/account/components/login"
 ```
 
-### 🎯 Wufi Components (Brand-specific)
-**Location**: `src/lib/components/wufi/`  
-**Purpose**: Wufi brand-specific components
+## 🎨 Usage Examples
 
+### Perfect Form with Enhanced Components
 ```tsx
-import { WufiButton, EmailInput, PhoneInput } from "@lib/components"
+import { Form, ModernInput, WufiButton } from "@/lib/components"
 
-// Wufi-branded button
-<WufiButton variant="primary">Subscribe</WufiButton>
+<Form>
+  <ModernInput 
+    type="email" 
+    label="Email Address" 
+    errors={["Invalid email format"]}
+    touched={true}
+  />
+  <WufiButton variant="primary">Subscribe</WufiButton>
+</Form>
+```
 
-// Enhanced inputs with perfect centering
+### Brand-Specific Components
+```tsx
+import { EmailInput, PhoneInput, EstonianAddressInput } from "@/lib/components"
+
 <EmailInput label="Your Email" />
 <PhoneInput placeholder="Phone Number" />
+<EstonianAddressInput label="Delivery Address" />
 ```
 
-### 🛒 Medusa Components (E-commerce)
-**Location**: `src/lib/components/medusa/`  
-**Purpose**: E-commerce specific functionality
+## 🎯 Decision Tree
 
-```tsx
-import { CartTotals, LineItemPrice, CartStateProvider } from "@lib/components"
-
-// E-commerce components
-<CartStateProvider>
-  <CartTotals />
-  <LineItemPrice />
-</CartStateProvider>
-```
-
-### 📐 Layout Components (Utilities)
-**Location**: `src/lib/components/layout/`  
-**Purpose**: Layout and utility components
-
-```tsx
-import { BentoGrid, BentoCard } from "@lib/components"
-
-// Layout utilities
-<BentoGrid>
-  <BentoCard name="Products" />
-</BentoGrid>
-```
+### **Should it go in `@/lib/components`?**
+1. **Is it a UI primitive?** (Button, Input, Dialog) → `ui/`
+2. **Is it Wufi brand-specific?** (WufiButton, EmailInput) → `wufi/`
+3. **Is it feature-specific?** (CartButton, ProductCard) → `@/modules/{feature}/`
 
 ## 🔄 Migration Benefits
 
-### ✅ Problems Solved
-1. **Perfect Text Centering** - No more alignment issues!
-2. **Single Import Location** - No more confusion about where to import from
-3. **Logical Organization** - Components grouped by purpose
-4. **No Duplication** - Eliminated redundant components
-5. **Better Accessibility** - All components use Radix UI primitives
-6. **Modern Forms** - React Hook Form + Zod validation built-in
-7. **Consistent APIs** - Similar patterns across all components
+### ✅ **Problems Solved**
+- **Clear Separation**: Foundation vs Feature components
+- **No Confusion**: Know exactly where to import from
+- **Better Organization**: Logical grouping by purpose
+- **Enhanced UX**: Modern, accessible components
+- **Brand Consistency**: Wufi-specific styling
 
 ### 📊 Before vs After
 
 #### ❌ Before (Confusing)
 ```tsx
-// Multiple import locations, confusion
-import Input from "@modules/common/components/input"           // Centering issues
-import { Button } from "@lib/components/ui"                    // Different location  
-import WufiButton from "@modules/common/components/wufi-button" // Another location
-import { Container } from "@medusajs/ui"                      // Yet another location
+// Mixed imports from multiple locations
+import Input from "@modules/common/components/input"
+import WufiButton from "@modules/layout/components/wufi-button"  
+import { Button } from "@lib/components/ui"
 ```
 
-#### ✅ After (Clean & Logical)
+#### ✅ After (Clean)
 ```tsx
-// Single import location, perfect centering
-import { 
-  ModernInput,    // ✅ Perfect centering + floating labels
-  Button,         // ✅ Modern accessible button
-  WufiButton,     // ✅ Brand-specific button  
-  Container       // ✅ Legacy Medusa support
-} from "@lib/components"
+// Foundation components from one place
+import { ModernInput, WufiButton, Button } from "@/lib/components"
+
+// Feature components from their modules
+import CartButton from "@/modules/layout/components/cart-button"
 ```
 
-## 🎉 Success Metrics
+## 🎉 Key Takeaway
 
-- **✅ Perfect Centering**: Text alignment issues completely solved
-- **✅ Single Source**: One import location for everything  
-- **✅ Logical Structure**: Easy to understand where components belong
-- **✅ No Duplication**: Eliminated redundant components
-- **✅ Better DX**: Faster development with modern patterns
-- **✅ Better UX**: Improved accessibility and interactions
-- **✅ Less Maintenance**: Fewer custom components to maintain
+**Two-layer system: Foundation + Features**
+- **Foundation** (`@/lib/components`): UI primitives & brand components
+- **Features** (`@/modules/`): Business logic components
 
-## 🚦 Usage Guide
-
-### For New Development
-```tsx
-// Always use these for new features
-import { 
-  ModernInput,      // Instead of custom input
-  Button,           // Instead of MedusaButton (unless brand-specific)
-  Dialog,           // Instead of Modal
-  ModernTooltip,    // Instead of custom tooltip
-  Form              // For validation
-} from "@lib/components"
-```
-
-### For Existing Code
-```tsx
-// Gradual migration - both work during transition
-import { 
-  ModernInput,      // New: perfect centering
-  MedusaButton,     // Legacy: still available
-  Container,        // Legacy: still available  
-  WufiButton        // Enhanced: uses modern patterns internally
-} from "@lib/components"
-```
-
-## 🎯 Key Takeaway
-
-**You now have a single, logical component system with perfect centering and no more confusion about where to import components from!**
-
-Import everything from: **`@lib/components`** ⭐ 
+**No more confusion about where components belong!** 🎯 

@@ -3,6 +3,8 @@ import { Switch } from "@headlessui/react";
 import { useState, useEffect } from "react";
 import { clx } from "@medusajs/ui";
 import { getAvailableIntervals } from "@lib/util/subscription-intervals";
+import { Info, Percent } from "lucide-react";
+import { ModernTooltip } from "@lib/components";
 
 interface SubscribeToggleProps {
   lineId: string;
@@ -86,20 +88,42 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
 
   const isDisabled = parentIsLoading || loading;
 
+  const tooltipContent = (
+    <div className="bg-white text-gray-800 p-4 rounded-lg shadow-lg border max-w-xs">
+      <div className="font-semibold mb-2">💰 Püsitellimuse eelised:</div>
+      <ul className="text-sm space-y-1">
+        <li>• <strong>30% soodustus</strong> esimesel tellimusel</li>
+        <li>• <strong>5% soodustus</strong> kõigil järgnevatel</li>
+        <li>• Automaatsed tarned</li>
+        <li>• Muuda või tühista igal ajal</li>
+      </ul>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col gap-3 py-3">
+    <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
       <div className="flex items-center justify-between">
-        <label htmlFor={`subscribe-switch-${lineId}`} className="text-sm font-medium text-gray-700">
-          Püsitellimus aktiivne
-        </label>
+        <div className="flex items-center gap-2">
+          <Percent className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-medium text-gray-900">
+            Püsitellimus
+          </span>
+          <ModernTooltip 
+            content={tooltipContent} 
+            side="top" 
+            align="start"
+            className="bg-white border border-gray-200 text-gray-900 shadow-lg"
+          >
+            <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-help" />
+          </ModernTooltip>
+        </div>
         <Switch
-          id={`subscribe-switch-${lineId}`}
           checked={enabled}
           onChange={handleToggle}
           disabled={isDisabled}
           className={clx(
-            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-            enabled ? "bg-blue-600" : "bg-gray-300",
+            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
+            enabled ? "bg-green-600" : "bg-gray-300",
             isDisabled && "opacity-50 cursor-not-allowed"
           )}
         >
@@ -112,27 +136,44 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
           />
         </Switch>
       </div>
+
       {enabled && (
-        <div>
-          <label htmlFor={`interval-select-${lineId}`} className="block text-xs font-medium text-gray-500 mb-1">
-            Tarne intervall
-          </label>
-          <select
-            id={`interval-select-${lineId}`}
-            className={clx(
-                "block w-full text-sm border-gray-300 rounded-md p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="mb-3">
+            <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
+              <Percent className="h-3 w-3" />
+              Säästad 30% + 5% regulaarselt
+            </div>
+          </div>
+          
+          <div>
+            <label htmlFor={`interval-select-${lineId}`} className="block text-xs font-medium text-gray-700 mb-2">
+              Tarneintervall
+            </label>
+            <select
+              id={`interval-select-${lineId}`}
+              className={clx(
+                "block w-full text-sm border border-gray-300 rounded-md p-2 focus:border-green-500 focus:ring-green-500 bg-white",
                 isDisabled && "opacity-50 cursor-not-allowed bg-gray-100"
-            )}
-            value={interval}
-            onChange={handleIntervalChange}
-            disabled={isDisabled}
-          >
-            {availableIntervals.map((interval) => (
-              <option key={interval.value} value={interval.value}>
-                {interval.label}
-              </option>
-            ))}
-          </select>
+              )}
+              value={interval}
+              onChange={handleIntervalChange}
+              disabled={isDisabled}
+            >
+              {availableIntervals.map((interval) => (
+                <option key={interval.value} value={interval.value}>
+                  {interval.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="flex items-center gap-2 mt-2 text-xs text-green-600">
+          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-600"></div>
+          Uuendame...
         </div>
       )}
     </div>

@@ -4,11 +4,13 @@ export interface SearchHit {
   description: string
   brand: string
   categories: string[]
+  category_handles: string[]
   price_eur: number
   subscription_enabled: boolean
   handle: string
   thumbnail: string
   sku: string
+  weight_grams?: number
 }
 
 export interface SearchFacets {
@@ -33,6 +35,8 @@ export interface SearchParams {
   subscription_enabled?: boolean
   min_price?: number
   max_price?: number
+  features?: string
+  rating?: string
   page?: number
   limit?: number
   sort?: string

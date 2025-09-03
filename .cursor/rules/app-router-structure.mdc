@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # Next.js App Router Structure
 
-The Wufi Storefront uses Next.js App Router with the following organization:
+The Kraps Storefront uses Next.js App Router with the following organization:
 
 ## Key Components
 - [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout containing global providers

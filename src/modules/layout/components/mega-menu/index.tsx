@@ -43,7 +43,7 @@ const MegaMenu = ({ categories, className }: MegaMenuProps) => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-yellow-800" />
-                      Toote Kategooriad
+                      Toote kategooriad
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
                       Leidke täpselt see, mida otsissse
@@ -225,7 +225,7 @@ const MegaMenu = ({ categories, className }: MegaMenuProps) => {
               {/* Elegant Footer */}
               <div className="border-t border-gray-100 bg-gray-50/30 p-4">
                 <LocalizedClientLink
-                  href="/store"
+                  href="/pood"
                   className="group flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-yellow-300 hover:shadow-sm transition-all duration-200"
                   onClick={() => close()}
                 >

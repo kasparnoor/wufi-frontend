@@ -6,6 +6,7 @@ import { SearchResponse, SearchFilters } from "../../../../types/search"
 import SearchProductCard from "../../components/search-product-card"
 import SearchFiltersComponent from "../../components/search-filters"
 import { ChevronLeft, ChevronRight, Filter, X } from "lucide-react"
+import { trackSearch } from "@lib/util/meta-pixel"
 
 interface SearchResultsProps {
   initialResults: SearchResponse
@@ -69,6 +70,14 @@ export default function SearchResults({
       const response = await fetch(`/api/search?${params}`)
       const data = await response.json()
       setResults(data)
+
+      // Track search event for Meta Pixel
+      if (searchQuery && searchQuery.trim()) {
+        trackSearch({
+          search_string: searchQuery,
+          content_category: searchFilters.categories.length > 0 ? searchFilters.categories[0] : undefined
+        })
+      }
 
       // Update URL
       const newUrl = `/search?${params}`

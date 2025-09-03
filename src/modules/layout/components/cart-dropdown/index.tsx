@@ -14,6 +14,7 @@ import { LineItemOptions } from "@lib/components"
 import { LineItemPrice } from "@lib/components"
 import { LocalizedClientLink } from "@lib/components"
 import { Thumbnail } from "@lib/components"
+import { FreeShippingProgress } from "@lib/components"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
 
@@ -175,6 +176,11 @@ const CartDropdown = ({
                     ))}
                 </div>
                 <div className="p-4 flex flex-col gap-y-4 text-small-regular">
+                  {/* Free Shipping Progress in Dropdown */}
+                  <FreeShippingProgress 
+                    subtotal={subtotal}
+                    currencyCode={cartState.currency_code}
+                  />
                   <div className="flex items-center justify-between">
                     <span className="text-ui-fg-base font-semibold">
                       Vahesumma{" "}
@@ -210,7 +216,7 @@ const CartDropdown = ({
                   </div>
                   <span>Sinu ostukorv on tühi.</span>
                   <div>
-                    <LocalizedClientLink href="/store">
+                    <LocalizedClientLink href="/pood">
                       <>
                         <span className="sr-only">Mine toodete lehele</span>
                         <Button onClick={close}>Vaata tooteid</Button>

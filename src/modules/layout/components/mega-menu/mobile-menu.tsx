@@ -126,7 +126,7 @@ const MobileCategoriesMenu = ({ categories, onClose, className }: MobileCategori
       {/* View All Products Link */}
       <div className="pt-4 border-t border-gray-200">
         <LocalizedClientLink
-          href="/store"
+                          href="/pood"
           className="flex items-center justify-center px-3 py-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors"
           onClick={onClose}
         >

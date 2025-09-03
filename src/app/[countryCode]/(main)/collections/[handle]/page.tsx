@@ -17,37 +17,13 @@ type Props = {
 
 export const PRODUCT_LIMIT = 12
 
+// Disable static generation for now to avoid build issues
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
-  const { collections } = await listCollections({
-    fields: "*products",
-  })
-
-  if (!collections) {
-    return []
-  }
-
-  const countryCodes = await listRegions().then(
-    (regions: StoreRegion[]) =>
-      regions
-        ?.map((r) => r.countries?.map((c) => c.iso_2))
-        .flat()
-        .filter(Boolean) as string[]
-  )
-
-  const collectionHandles = collections.map(
-    (collection: StoreCollection) => collection.handle
-  )
-
-  const staticParams = countryCodes
-    ?.map((countryCode: string) =>
-      collectionHandles.map((handle: string | undefined) => ({
-        countryCode,
-        handle,
-      }))
-    )
-    .flat()
-
-  return staticParams
+  // Return empty array to skip static generation
+  console.log('Skipping static generation for collections')
+  return []
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
@@ -59,8 +35,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   const metadata = {
-    title: `${collection.title} | Medusa Store`,
-    description: `${collection.title} collection`,
+    title: `${collection.title} | Kraps`,
+    description: `${collection.title} kollektsioon - avasta kvaliteetseid lemmikloomade tooteid Kraps e-poest. Kiire kohaletoimetamine üle Eesti.`,
   } as Metadata
 
   return metadata

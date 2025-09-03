@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { checkoutTimeouts } from "@lib/util/timeout-handler"
 import { HttpTypes } from "@medusajs/types"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 
@@ -13,25 +14,31 @@ export const listCartShippingMethods = async (cartId: string) => {
     ...(await getCacheOptions("fulfillment")),
   }
 
-  return sdk.client
-    .fetch<HttpTypes.StoreShippingOptionListResponse>(
-      `/store/shipping-options`,
-      {
-        method: "GET",
-        query: {
-          cart_id: cartId,
-          fields:
-            "+service_zone.fulfllment_set.type,*service_zone.fulfillment_set.location.address",
-        },
-        headers,
-        next,
-        cache: "force-cache",
-      }
+  try {
+    return await checkoutTimeouts.cartOperation(
+      (signal) => sdk.client
+        .fetch<HttpTypes.StoreShippingOptionListResponse>(
+          `/store/shipping-options`,
+          {
+            method: "GET",
+            query: {
+              cart_id: cartId,
+              fields:
+                "+service_zone.fulfllment_set.type,*service_zone.fulfillment_set.location.address",
+            },
+            headers,
+            next,
+            cache: "force-cache",
+            signal,
+          }
+        )
+        .then(({ shipping_options }) => shipping_options),
+      "Loading shipping methods"
     )
-    .then(({ shipping_options }) => shipping_options)
-    .catch(() => {
-      return null
-    })
+  } catch (error) {
+    console.error("Error loading shipping methods:", error)
+    return null
+  }
 }
 
 export const calculatePriceForShippingOption = async (
@@ -53,18 +60,24 @@ export const calculatePriceForShippingOption = async (
     body.data = data
   }
 
-  return sdk.client
-    .fetch<{ shipping_option: HttpTypes.StoreCartShippingOption }>(
-      `/store/shipping-options/${optionId}/calculate`,
-      {
-        method: "POST",
-        body,
-        headers,
-        next,
-      }
+  try {
+    return await checkoutTimeouts.cartOperation(
+      (signal) => sdk.client
+        .fetch<{ shipping_option: HttpTypes.StoreCartShippingOption }>(
+          `/store/shipping-options/${optionId}/calculate`,
+          {
+            method: "POST",
+            body,
+            headers,
+            next,
+            signal,
+          }
+        )
+        .then(({ shipping_option }) => shipping_option),
+      "Calculating shipping price"
     )
-    .then(({ shipping_option }) => shipping_option)
-    .catch((e) => {
-      return null
-    })
+  } catch (error) {
+    console.error("Error calculating shipping price:", error)
+    return null
+  }
 }

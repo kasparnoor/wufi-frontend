@@ -29,6 +29,8 @@ export { Toaster } from "./ui/sonner"
 // Modern UI enhancements (enhanced components)
 export { ModernInput } from "./ui/modern-input"
 export { ModernTooltip, InfoTooltip } from "./ui/modern-tooltip"
+export { ModernSelect, ModernSelectItem } from "./ui/modern-select"
+export { SearchableSelect } from "./ui/searchable-select"
 
 // ============= SKELETON COMPONENTS =============
 export { default as SkeletonProductPreview } from "./ui/skeleton-product-preview"
@@ -43,11 +45,25 @@ export { default as SkeletonOrderConfirmedHeader } from "./ui/skeleton-order-con
 export { default as SkeletonOrderItems } from "./ui/skeleton-order-items"
 export { default as SkeletonOrderInformation } from "./ui/skeleton-order-information"
 
-// ============= WUFI COMPONENTS =============
-export { default as WufiButton } from "./wufi/wufi-button"
-export { default as EmailInput } from "./wufi/email-input"
-export { default as PhoneInput } from "./wufi/phone-input"
-export { default as EstonianAddressInput } from "./wufi/estonian-address-input"
+// ============= PHASE 3 SKELETON COMPONENTS =============
+export { 
+  Skeleton,
+  FormFieldSkeleton,
+  ContactInfoSkeleton,
+  AddressInfoSkeleton,
+  ShippingMethodSkeleton,
+  ShippingSkeleton,
+  StepTransitionSkeleton,
+  ProgressSkeleton,
+  CheckoutSummarySkeleton 
+} from "./ui/skeleton"
+
+// ============= KRAPS COMPONENTS =============
+export { default as KrapsButton } from "./kraps/kraps-button"
+export { default as EmailInput } from "./kraps/email-input"
+export { default as PhoneInput } from "./kraps/phone-input"
+export { default as EstonianAddressInput } from "./kraps/estonian-address-input"
+export { QuickActions } from "./quick-actions"
 
 // ========================================
 // 🚨 TEMPORARY RE-EXPORTS FOR MIGRATION
@@ -63,6 +79,7 @@ export { default as LineItemOptions } from "@modules/common/components/line-item
 export { default as LineItemPrice } from "@modules/common/components/line-item-price"
 export { default as LineItemUnitPrice } from "@modules/common/components/line-item-unit-price"
 export { default as CartTotals } from "@modules/common/components/cart-totals"
+export { default as Item } from "@modules/cart/components/item"
 
 // Layout components (temporary re-exports)
 export { default as CartButton } from "@modules/layout/components/cart-button"
@@ -88,7 +105,7 @@ export { default as PaymentWrapper } from "@modules/checkout/components/payment-
 export { SubmitButton } from "@modules/checkout/components/submit-button"
 
 // Account components (additional)
-export { default as AccountSetup } from "@modules/account/components/account-setup"
+
 
 // Product components (temporary re-exports)
 export { default as ProductPreview } from "@modules/products/components/product-preview"
@@ -96,12 +113,39 @@ export { default as Thumbnail } from "@modules/products/components/thumbnail"
 
 // Order components (temporary re-exports)
 export { default as TransferImage } from "@modules/order/components/transfer-image"
+export { default as TransferActions } from "@modules/order/components/transfer-actions"
 
 // Common utility components (temporary re-exports)
 export { default as DeleteButton } from "@modules/common/components/delete-button"
 
 // Modern toast hook (from sonner)
 export { toast as useToast } from "sonner"
+
+// Newsletter components
+export { NewsletterForm } from "./newsletter/newsletter-form"
+
+// Subscription components
+export { default as SubscriptionPricing } from "./subscription-pricing"
+
+// Free shipping progress
+export { default as FreeShippingProgress } from "./free-shipping-progress"
+
+// Utility components
+export { default as ClientOnly } from "./client-only"
+export { TextShimmer } from "./text-shimmer"
+export { default as SocialShareSuccess } from "@modules/common/components/social-share-success"
+
+// Global error handler
+export { default as GlobalErrorHandler } from "./global-error-handler"
+
+// SEO components
+export { 
+  OrganizationSchema, 
+  WebsiteSchema, 
+  ProductSchema, 
+  ArticleSchema, 
+  BreadcrumbSchema 
+} from "./seo/json-ld"
 
 // ========================================
 // 📝 TODO: UPDATE IMPORTS TO USE MODULES

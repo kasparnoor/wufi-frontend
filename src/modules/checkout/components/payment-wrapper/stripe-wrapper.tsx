@@ -6,10 +6,11 @@ import { HttpTypes } from "@medusajs/types"
 import { createContext } from "react"
 
 type StripeWrapperProps = {
-  paymentSession: HttpTypes.StorePaymentSession
+  paymentSession?: HttpTypes.StorePaymentSession
   stripeKey?: string
   stripePromise: Promise<Stripe | null> | null
   children: React.ReactNode
+  cart?: HttpTypes.StoreCart
 }
 
 export const StripeContext = createContext(false)
@@ -19,10 +20,25 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
   stripeKey,
   stripePromise,
   children,
+  cart,
 }) => {
-  const options: StripeElementsOptions = {
-    clientSecret: paymentSession!.data?.client_secret as string | undefined,
-  }
+  const clientSecret = paymentSession?.data?.client_secret as string | undefined
+
+  // Get cart total in cents for Stripe (minimum 50 cents required)
+  const cartAmount = cart?.total ? Math.max(Math.round(cart.total * 100), 50) : 1000
+
+  // Create options based on whether we have a client secret or not
+  const options: StripeElementsOptions = clientSecret 
+    ? {
+        clientSecret,
+        locale: "et",
+      }
+    : {
+        mode: "payment",
+        currency: cart?.currency_code?.toLowerCase() || "eur",
+        locale: "et",
+        amount: cartAmount, // Use actual cart amount or fallback
+      }
 
   if (!stripeKey) {
     throw new Error(
@@ -36,12 +52,8 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
     )
   }
 
-  if (!paymentSession?.data?.client_secret) {
-    throw new Error(
-      "Stripe client secret is missing. Cannot initialize Stripe."
-    )
-  }
-
+  // Provide Elements context even when client_secret is not available yet
+  // This prevents useStripe/useElements errors during checkout flow
   return (
     <StripeContext.Provider value={true}>
       <Elements options={options} stripe={stripePromise}>

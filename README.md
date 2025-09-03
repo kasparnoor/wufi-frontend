@@ -1,6 +1,6 @@
-# Wufi Storefront
+# Kraps Storefront
 
-Wufi is a modern, subscription-based pet e-commerce platform inspired by Chewy.com, tailored for the Estonian market. This is the customer-facing storefront, built for performance, accessibility, and a seamless shopping experience.
+Kraps is a modern, subscription-based pet e-commerce platform inspired by Chewy.com, tailored for the Estonian market. This is the customer-facing storefront, built for performance, accessibility, and a seamless shopping experience.
 
 ## Project Overview
 
@@ -53,7 +53,7 @@ wufi-pood-storefront/
 ### 1. Prerequisites
 - Node.js 20+
 - Yarn (recommended)
-- A running [Wufi Medusa backend](../wufi-pood/README.md) (default: http://localhost:9000)
+- A running [Kraps Medusa backend](../wufi-pood/README.md) (default: http://localhost:9000)
 
 ### 2. Setup
 
@@ -88,7 +88,7 @@ NEXT_PUBLIC_STRIPE_KEY=<your-stripe-public-key>
 You must also configure Stripe in your Medusa backend. See the [Medusa docs](https://docs.medusajs.com/resources/commerce-modules/payment/payment-provider/stripe#main) for details.
 
 ## Resources
-- [Wufi Backend (Medusa)](../wufi-pood/README.md)
+- [Kraps Backend (Medusa)](../wufi-pood/README.md)
 - [Medusa Documentation](https://docs.medusajs.com/)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Stripe Documentation](https://stripe.com/docs)

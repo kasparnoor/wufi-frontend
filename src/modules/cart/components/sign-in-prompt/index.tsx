@@ -1,7 +1,7 @@
 import { Button, Heading, Text } from "@medusajs/ui"
 import { LocalizedClientLink } from "@lib/components"
 import { User, ArrowRight } from "lucide-react"
-import { WufiButton } from "@lib/components"
+import { KrapsButton } from "@lib/components"
 
 const SignInPrompt = () => {
   return (
@@ -18,8 +18,8 @@ const SignInPrompt = () => {
         </Text>
       </div>
       <div className="flex-shrink-0">
-        <LocalizedClientLink href="/account">
-          <WufiButton 
+        <LocalizedClientLink href="/konto">
+          <KrapsButton 
             variant="secondary" 
             size="medium"
             className="w-full sm:w-auto justify-center group"
@@ -27,7 +27,7 @@ const SignInPrompt = () => {
           >
             Logi sisse
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </WufiButton>
+          </KrapsButton>
         </LocalizedClientLink>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { ModernInput as Input } from "@lib/components"
 import { applyPromotions, submitPromotionForm } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import ErrorMessage from "../error-message"
-import { WufiButton } from "@lib/components"
+import { KrapsButton } from "@lib/components"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
@@ -51,7 +51,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     <div className="w-full">
       <form action={(a) => addPromotionCode(a)} className="w-full mb-4">
         {!isOpen ? (
-          <WufiButton
+          <KrapsButton
             variant="secondary"
             onClick={() => setIsOpen(true)}
             type="button"
@@ -61,7 +61,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
           >
             <Tag className="h-5 w-5 text-yellow-800" />
             Lisa sooduskood(id)
-          </WufiButton>
+          </KrapsButton>
         ) : (
           <>
             <div className="flex flex-col w-full gap-2">
@@ -76,7 +76,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                 data-testid="discount-input"
               />
               <div className="flex gap-2">
-                <WufiButton
+                <KrapsButton
                   variant="secondary"
                   onClick={() => {
                     setIsOpen(false)
@@ -87,8 +87,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   size="small"
                 >
                   Tühista
-                </WufiButton>
-                <WufiButton
+                </KrapsButton>
+                <KrapsButton
                   type="submit"
                   variant="primary"
                   className="flex-1"
@@ -96,7 +96,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   data-testid="discount-apply-button"
                 >
                   Lisa
-                </WufiButton>
+                </KrapsButton>
               </div>
             </div>
 

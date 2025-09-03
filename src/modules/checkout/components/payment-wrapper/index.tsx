@@ -19,16 +19,20 @@ const PaymentWrapper: React.FC<PaymentWrapperProps> = ({ cart, children }) => {
     (s) => s.status === "pending"
   )
 
-  if (
-    isStripe(paymentSession?.provider_id) &&
-    paymentSession &&
-    stripePromise
-  ) {
+  // Check if we have any Stripe-related payment methods available
+  const hasStripePaymentMethods = cart.payment_collection?.payment_sessions?.some(
+    (s) => isStripe(s.provider_id)
+  )
+
+  // Always provide Stripe context if we have a valid Stripe key
+  // This prevents useStripe/useElements errors during checkout flow transitions
+  if (stripePromise && stripeKey) {
     return (
       <StripeWrapper
         paymentSession={paymentSession}
         stripeKey={stripeKey}
         stripePromise={stripePromise}
+        cart={cart}
       >
         {children}
       </StripeWrapper>

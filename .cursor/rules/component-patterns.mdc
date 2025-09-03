@@ -3,9 +3,14 @@
 The Wufi Storefront follows consistent component patterns for maintainability and consistency, using a unified component system that integrates shadcn/ui, Medusa UI, and custom Wufi components.
 
 ## Unified Component System
+# Component Patterns
+
+The Kraps Storefront follows consistent component patterns for maintainability and consistency, using a unified component system that integrates shadcn/ui, Medusa UI, and custom Kraps components.
+
+## Unified Component System
 # Component Organization System
 
-The Wufi Storefront uses a **two-layer component architecture** for clear separation and logical organization:
+The Kraps Storefront uses a **two-layer component architecture** for clear separation and logical organization:
 
 ## Layer 1: Foundation Components (`@/lib/components`)
 
@@ -18,11 +23,11 @@ The Wufi Storefront uses a **two-layer component architecture** for clear separa
 - **Skeleton components**: Loading states for all UI elements
 - **Utilities**: `Toaster`, `Separator`
 
-### Wufi Brand Components (`src/lib/components/wufi/`)
-**Purpose**: Wufi-specific branded components
+### Kraps Brand Components (`src/lib/components/kraps/`)
+**Purpose**: Kraps-specific branded components
 **Import**: `@/lib/components`
 
-- `WufiButton` - Brand-styled button with Wufi colors
+- `KrapsButton` - Brand-styled button with Kraps colors
 - `EmailInput` - Enhanced email input with validation
 - `PhoneInput` - Estonian phone number input
 - `EstonianAddressInput` - Estonian address autocomplete
@@ -49,7 +54,7 @@ import {
   Button, Input, Dialog, Form, ModernInput,
   
   // Brand components
-  WufiButton, EmailInput, PhoneInput,
+  KrapsButton, EmailInput, PhoneInput,
   
   // Utilities
   Toaster, Separator
@@ -68,7 +73,7 @@ import LocalizedClientLink from "@/modules/common/components/localized-client-li
 
 ### 🤔 Ask Yourself:
 1. **Is it a UI primitive?** (Button, Input, Dialog) → `src/lib/components/ui/`
-2. **Is it Wufi brand-specific?** (WufiButton, EmailInput) → `src/lib/components/wufi/`
+2. **Is it Kraps brand-specific?** (KrapsButton, EmailInput) → `src/lib/components/kraps/`
 3. **Does it belong to a specific feature?** (Cart, Account, Products) → `src/modules/{feature}/components/`
 4. **Is it shared across features but not a UI primitive?** → `src/modules/common/components/`
 
@@ -77,8 +82,8 @@ import LocalizedClientLink from "@/modules/common/components/localized-client-li
 ### ✅ Foundation Components
 - `Button` → `src/lib/components/ui/button.tsx`
 - `ModernInput` → `src/lib/components/ui/modern-input.tsx`
-- `WufiButton` → `src/lib/components/wufi/wufi-button/`
-- `EmailInput` → `src/lib/components/wufi/email-input/`
+- `KrapsButton` → `src/lib/components/kraps/kraps-button/`
+- `EmailInput` → `src/lib/components/kraps/email-input/`
 
 ### ✅ Feature Components
 - `CartButton` → `src/modules/layout/components/cart-button/`
@@ -96,13 +101,13 @@ import LocalizedClientLink from "@/modules/common/components/localized-client-li
 ### 2. Styling
 - Tailwind utility classes for all styling
 - Follow shadcn patterns for consistency
-- Maintain Wufi brand colors (yellow-400 primary)
+- Maintain Kraps brand colors (yellow-400 primary)
 - Use `cn()` utility for conditional classes
 
 ### 3. Forms
 - Always use `ModernInput` for enhanced UX (perfect centering, floating labels)
 - Use shadcn `Form` components with React Hook Form + Zod validation
-- `WufiButton` for brand consistency in primary actions
+- `KrapsButton` for brand consistency in primary actions
 
 ### 4. State Management
 - Local state with React hooks
@@ -120,8 +125,8 @@ import LocalizedClientLink from "@/modules/common/components/localized-client-li
 # UI primitive
 npx shadcn@latest add <component>
 
-# Wufi brand component
-# Create in src/lib/components/wufi/
+# Kraps brand component
+# Create in src/lib/components/kraps/
 # Export from src/lib/components/index.ts
 ```
 

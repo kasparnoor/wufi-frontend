@@ -22,7 +22,7 @@ export async function generateMetadata({
   const query = searchParams.q || ""
   
   return {
-    title: query ? `"${query}" otsingutulemused | Wufi Pood` : "Otsi tooteid | Wufi Pood",
+    title: query ? `"${query}" otsingutulemused | Kraps Pood` : "Otsi tooteid | Kraps Pood",
     description: query 
       ? `Leia parimad lemmikloomade tooted "${query}" kohta. Kvaliteetsed toidud ja aksessuaarid koertele ja kassidele.`
       : "Otsi lemmikloomade tooteid meie laiast valikust. Kvaliteetsed toidud, maiused ja aksessuaarid koertele ja kassidele.",

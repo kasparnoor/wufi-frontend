@@ -23,7 +23,7 @@ export { Separator } from "./separator"
 
 // Modern component replacements
 export { ModernInput } from "./modern-input"
-export { ModernTooltip, InfoTooltip, WufiTooltip } from "./modern-tooltip"
+export { ModernTooltip, InfoTooltip, KrapsTooltip } from "./modern-tooltip"
 
 // Re-export commonly used Medusa UI components for cohesive imports
 export { 
@@ -47,6 +47,5 @@ export {
   RadioGroup as MedusaRadioGroup
 } from "@medusajs/ui"
 
-// Custom Wufi components for easy access
-export { default as WufiButton } from "@modules/common/components/wufi-button"
+
 export { ToastProvider, useToast, ToastStyles } from "@modules/common/components/toast" 

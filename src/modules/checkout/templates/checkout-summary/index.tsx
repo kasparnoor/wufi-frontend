@@ -1,35 +1,32 @@
-import { ShoppingBag, Shield, Truck, Clock } from "lucide-react"
-
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
-import { DiscountCode } from "@lib/components"
-import { CartTotals } from "@lib/components"
+import DiscountCode from "@modules/checkout/components/discount-code"
+import CartTotals from "@modules/common/components/cart-totals"
+import { HttpTypes } from "@medusajs/types"
+import { ShoppingBag, Clock, Truck, Shield } from "lucide-react"
+import { LocalizedClientLink } from "@lib/components"
+import { FreeShippingProgress } from "@lib/components"
 
-const CheckoutSummary = ({ cart }: { cart: any }) => {
-  // Compute total subscription discount
-  const subscriptionDiscountSum = (cart.items ?? []).reduce((sum: number, item: any) => {
-    if (
-      item.metadata?.purchase_type === "subscription" &&
-      item.metadata?.is_first_order === "true"
-    ) {
-      const pct = parseFloat(String(item.metadata.subscription_discount ?? 0))
-      const lineTotal = (item.unit_price ?? 0) * (item.quantity ?? 0)
-      return sum + lineTotal * (pct / 100)
-    }
-    return sum
-  }, 0)
+const CheckoutSummary = ({
+  cart,
+}: {
+  cart: HttpTypes.StoreCart | null
+}) => {
+  if (!cart?.id) {
+    return null
+  }
 
-  // Build adjusted totals object
+  const itemCount = cart.items?.length || 0
+
+  // Calculate adjusted totals to apply subscription discounts
   const adjustedTotals = {
     currency_code: cart.currency_code,
-    subtotal: (cart.subtotal ?? 0) - subscriptionDiscountSum,
-    discount_total: (cart.discount_total ?? 0) + subscriptionDiscountSum,
+    subtotal: cart.subtotal,
+    discount_total: cart.discount_total,
     shipping_subtotal: cart.shipping_subtotal,
     tax_total: cart.tax_total,
     gift_card_total: cart.gift_card_total,
-    total: (cart.total ?? 0) - subscriptionDiscountSum,
+    total: cart.total,
   }
-
-  const itemCount = cart.items?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0
 
   return (
     <div className="space-y-6">
@@ -50,6 +47,14 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         </div>
       </div>
 
+      {/* Free Shipping Progress */}
+      <div>
+        <FreeShippingProgress 
+          subtotal={cart.subtotal || 0}
+          currencyCode={cart.currency_code}
+        />
+      </div>
+
       {/* Order Items - Collapsible */}
       <div className="space-y-4">
         <ItemsPreviewTemplate cart={cart} />
@@ -65,46 +70,20 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <CartTotals 
           totals={adjustedTotals} 
           hasShippingMethod={!!(cart.shipping_methods && cart.shipping_methods.length > 0)}
+          cart={cart}
         />
-      </div>
-
-      {/* Trust Signals */}
-      <div className="border-t border-gray-200 pt-4 space-y-3">
-        <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-          <Shield className="h-5 w-5 text-green-600 flex-shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium text-green-800">SSL turvaline</p>
-            <p className="text-green-600">Andmed on krüpteeritud</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <Truck className="h-5 w-5 text-blue-600 flex-shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium text-blue-800">Tasuta tarne</p>
-            <p className="text-blue-600">Üle 50€ tellimusele</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
-          <Clock className="h-5 w-5 text-orange-600 flex-shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium text-orange-800">Kiire tarne</p>
-            <p className="text-orange-600">1-3 tööpäeva</p>
-          </div>
-        </div>
       </div>
 
       {/* Customer Support */}
       <div className="border-t border-gray-200 pt-4">
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-2">Vajate abi?</p>
-          <a 
-            href="mailto:help@wufi.ee" 
+          <LocalizedClientLink
+            href="/klienditugi"
             className="text-sm font-medium text-yellow-700 hover:text-yellow-800 transition-colors"
           >
             Võtke meiega ühendust →
-          </a>
+          </LocalizedClientLink>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { updateLineItemMetadata } from "@lib/data/cart";
 import { Switch } from "@headlessui/react";
 import { useState, useEffect } from "react";
 import { clx } from "@medusajs/ui";
-import { getAvailableIntervals } from "@lib/util/subscription-intervals";
+import { getAvailableIntervals, getDefaultInterval, isRecommendedInterval } from "@lib/util/subscription-intervals";
 import { Info, Percent } from "lucide-react";
 import { ModernTooltip } from "@lib/components";
 
@@ -30,9 +30,37 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
     productMetadata?.available_intervals as string[] | undefined
   );
   
-  const [enabled, setEnabled] = useState(forceEnable ?? (initialMetadata?.subscribe === true || String(initialMetadata?.subscribe) === "true"));
-  const [interval, setInterval] = useState(initialMetadata?.interval || availableIntervals[0]?.value || "2w");
+  // Initialize based on purchase_type (preferred) or fallback to subscribe field
+  const getInitialSubscriptionState = () => {
+    if (forceEnable !== undefined) return forceEnable;
+    
+    // Check purchase_type first (main way products are added to cart)
+    if (initialMetadata?.purchase_type === "subscription") return true;
+    if (initialMetadata?.purchase_type === "one_time") return false;
+    
+    // Fallback to subscribe field
+    return initialMetadata?.subscribe === true || String(initialMetadata?.subscribe) === "true";
+  };
+  
+  const [enabled, setEnabled] = useState(getInitialSubscriptionState());
+  
+  // Get the default interval for this product
+  const defaultInterval = getDefaultInterval(productMetadata || undefined);
+  
+  console.log('🔍 SubscribeToggle initialization:', {
+    lineId,
+    productMetadata,
+    defaultInterval,
+    initialMetadata,
+    initialSubscriptionState: enabled,
+    initialMetadataInterval: initialMetadata?.interval,
+    finalInitialInterval: initialMetadata?.interval || defaultInterval,
+    purchaseType: initialMetadata?.purchase_type
+  });
+  
+  const [interval, setInterval] = useState(initialMetadata?.interval || defaultInterval);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (forceEnable !== undefined) {
@@ -44,55 +72,104 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
   }, [forceEnable, initialMetadata?.interval, interval]);
 
   const handleToggle = async (newEnabledState: boolean) => {
+    console.log('🔄 SubscribeToggle: handleToggle called', {
+      lineId,
+      newEnabledState,
+      currentInterval: interval,
+      initialMetadata,
+      productMetadata
+    });
+    
     setEnabled(newEnabledState);
     setLoading(true);
+    setError(null); // Clear any previous errors
     const currentInterval = newEnabledState ? interval : undefined;
 
-    if (onStateChange) {
-      await onStateChange(newEnabledState, currentInterval);
-    } else {
-      await updateLineItemMetadata({ 
-        lineId, 
-        metadata: { 
+    try {
+      if (onStateChange) {
+        console.log('🔄 SubscribeToggle: Using onStateChange callback');
+        await onStateChange(newEnabledState, currentInterval);
+      } else {
+        console.log('🔄 SubscribeToggle: Using updateLineItemMetadata directly');
+        const newMetadata = { 
           ...(initialMetadata || {}),
           subscribe: newEnabledState, 
-          interval: currentInterval 
-        },
-        quantity
-      });
+          interval: currentInterval,
+          purchase_type: newEnabledState ? "subscription" : "one_time"
+        };
+        console.log('🔄 SubscribeToggle: Updating metadata', newMetadata);
+        
+        await updateLineItemMetadata({ 
+          lineId, 
+          metadata: newMetadata,
+          quantity
+        });
+        
+        console.log('✅ SubscribeToggle: Metadata updated successfully');
+      }
+    } catch (error: any) {
+      console.error('❌ SubscribeToggle: Error updating metadata', error);
+      setError(error.message || 'Viga tellimuse uuendamisel');
+      // Revert the state if the update failed
+      setEnabled(!newEnabledState);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleIntervalChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newInterval = e.target.value;
+    console.log('🔄 SubscribeToggle: handleIntervalChange called', {
+      lineId,
+      newInterval,
+      enabled,
+      initialMetadata
+    });
+    
     setInterval(newInterval);
     if (enabled) {
       setLoading(true);
-      if (onStateChange) {
-        await onStateChange(true, newInterval);
-      } else {
-        await updateLineItemMetadata({ 
+      setError(null); // Clear any previous errors
+      try {
+        if (onStateChange) {
+          console.log('🔄 SubscribeToggle: Using onStateChange callback for interval change');
+          await onStateChange(true, newInterval);
+        } else {
+          console.log('🔄 SubscribeToggle: Using updateLineItemMetadata directly for interval change');
+          const newMetadata = { 
+            ...(initialMetadata || {}), 
+            subscribe: true, 
+            interval: newInterval,
+            purchase_type: "subscription"
+          };
+          console.log('🔄 SubscribeToggle: Updating interval metadata', newMetadata);
+          
+          await updateLineItemMetadata({ 
             lineId, 
-            metadata: { 
-              ...(initialMetadata || {}), 
-              subscribe: true, 
-              interval: newInterval 
-            },
+            metadata: newMetadata,
             quantity
-        });
+          });
+          
+          console.log('✅ SubscribeToggle: Interval metadata updated successfully');
+        }
+      } catch (error: any) {
+        console.error('❌ SubscribeToggle: Error updating interval metadata', error);
+        setError(error.message || 'Viga intervalli uuendamisel');
+        // Revert the interval if the update failed
+        setInterval(initialMetadata?.interval || availableIntervals[0]?.value || "2w");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
   };
 
   const isDisabled = parentIsLoading || loading;
 
   const tooltipContent = (
-    <div className="bg-white text-gray-800 p-4 rounded-lg shadow-lg border max-w-xs">
+    <div className="max-w-xs">
       <div className="font-semibold mb-2">💰 Püsitellimuse eelised:</div>
       <ul className="text-sm space-y-1">
-        <li>• <strong>30% soodustus</strong> esimesel tellimusel</li>
+        <li>• <strong>30% soodustus (kuni 20€)</strong> esimesel tellimusel</li>
         <li>• <strong>5% soodustus</strong> kõigil järgnevatel</li>
         <li>• Automaatsed tarned</li>
         <li>• Muuda või tühista igal ajal</li>
@@ -142,7 +219,7 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
           <div className="mb-3">
             <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
               <Percent className="h-3 w-3" />
-              Säästad 30% + 5% regulaarselt
+              Säästad 30% (kuni 20€) + 5% regulaarselt
             </div>
           </div>
           
@@ -160,9 +237,10 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
               onChange={handleIntervalChange}
               disabled={isDisabled}
             >
-              {availableIntervals.map((interval) => (
-                <option key={interval.value} value={interval.value}>
-                  {interval.label}
+              {availableIntervals.map((intervalOption) => (
+                <option key={intervalOption.value} value={intervalOption.value}>
+                  {intervalOption.label}
+                  {isRecommendedInterval(intervalOption.value, productMetadata || undefined) && " (Soovitatav ajavahemik)"}
                 </option>
               ))}
             </select>
@@ -174,6 +252,12 @@ const SubscribeToggle: React.FC<SubscribeToggleProps> = ({
         <div className="flex items-center gap-2 mt-2 text-xs text-green-600">
           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-600"></div>
           Uuendame...
+        </div>
+      )}
+
+      {error && (
+        <div className="mt-2 text-xs text-red-600">
+          {error}
         </div>
       )}
     </div>

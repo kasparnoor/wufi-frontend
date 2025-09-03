@@ -270,7 +270,7 @@ function FreeShippingPopup({
             </div>
             <div>
               <LocalizedClientLink
-                href="/store"
+                href="/pood"
                 className="text-white bg-white/20 w-full p-2 text-sm text-center inline-block hover:bg-white/30 transition-colors rounded-lg"
               >
                 Jätka ostlemist

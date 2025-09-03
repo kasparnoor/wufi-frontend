@@ -13,6 +13,8 @@ export async function GET(request: NextRequest) {
                            searchParams.get("subscription_enabled") === "false" ? false : undefined,
       min_price: searchParams.get("min_price") ? Number(searchParams.get("min_price")) : undefined,
       max_price: searchParams.get("max_price") ? Number(searchParams.get("max_price")) : undefined,
+      features: searchParams.get("features") || undefined,
+      rating: searchParams.get("rating") || undefined,
       page: searchParams.get("page") ? Number(searchParams.get("page")) : undefined,
       limit: searchParams.get("limit") ? Number(searchParams.get("limit")) : undefined,
       sort: searchParams.get("sort") || undefined,

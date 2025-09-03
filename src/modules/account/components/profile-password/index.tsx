@@ -5,6 +5,7 @@ import { ModernInput as Input } from "@lib/components"
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
 import { toast } from "@medusajs/ui"
+import { changeMyPassword } from "@lib/data/customer"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
@@ -13,9 +14,14 @@ type MyInformationProps = {
 const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
   const [successState, setSuccessState] = React.useState(false)
 
-  // TODO: Add support for password updates
-  const updatePassword = async () => {
-    toast.info("Parooli uuendamine ei ole veel toetatud")
+  const updatePassword = async (formData: FormData) => {
+    const result = await changeMyPassword(formData)
+    if (typeof result === "string") {
+      toast.error(result)
+      return
+    }
+    setSuccessState(true)
+    toast.success("Parool uuendatud")
   }
 
   const clearState = () => {

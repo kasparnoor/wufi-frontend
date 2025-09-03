@@ -5,7 +5,7 @@ alwaysApply: true
 ---
 # Folder Structure
 
-The Wufi Storefront follows a **two-layer component architecture** with modular organization:
+The Kraps Storefront follows a **two-layer component architecture** with modular organization:
 
 ## Main Directories
 - [src/app](mdc:src/app) - Next.js App Router pages and layouts
@@ -21,7 +21,7 @@ The Wufi Storefront follows a **two-layer component architecture** with modular 
 ```
 src/lib/components/
 ├── ui/          # shadcn/ui primitives (Button, Input, Dialog, etc.)
-├── wufi/        # Wufi brand-specific components (WufiButton, EmailInput, etc.)
+├── kraps/       # Kraps brand-specific components (KrapsButton, EmailInput, etc.)
 └── index.ts     # Foundation component exports
 ```
 
@@ -43,7 +43,7 @@ src/modules/
 
 ### Foundation Components
 ```tsx
-import { Button, ModernInput, WufiButton } from "@/lib/components"
+import { Button, ModernInput, KrapsButton } from "@/lib/components"
 ```
 
 ### Feature Components  

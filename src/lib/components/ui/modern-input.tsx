@@ -13,10 +13,14 @@ export interface ModernInputProps
   touched?: boolean
   variant?: "default" | "phone" | "select" | "estonian-address"
   containerClassName?: string
+  // Phone-specific props that should not be passed to DOM
+  onPhoneChange?: (phone: string) => void
+  defaultCountry?: string
+  region?: any
 }
 
 const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
-  ({ className, type, label, errors, touched, variant = "default", containerClassName, ...props }, ref) => {
+  ({ className, type, label, errors, touched, variant = "default", containerClassName, onPhoneChange, defaultCountry, region, ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false)
     const [isFocused, setIsFocused] = React.useState(false)
     const [hasValue, setHasValue] = React.useState(!!props.value || !!props.defaultValue)

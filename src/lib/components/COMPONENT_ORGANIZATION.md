@@ -8,7 +8,7 @@
 ```
 src/lib/components/
 ├── ui/          # shadcn/ui primitives (Button, Input, Dialog, etc.)
-├── wufi/        # Wufi brand-specific components (WufiButton, EmailInput, etc.)
+├── kraps/       # Kraps brand-specific components (KrapsButton, EmailInput, etc.)
 └── index.ts     # Re-exports foundation components only
 ```
 
@@ -31,7 +31,7 @@ src/modules/
 ### ✅ **For Foundation Components**
 ```tsx
 // Import UI primitives and brand components
-import { Button, Input, Dialog, WufiButton, EmailInput } from "@/lib/components"
+import { Button, Input, Dialog, KrapsButton, EmailInput } from "@/lib/components"
 ```
 
 ### ✅ **For Feature Components**
@@ -49,8 +49,8 @@ import Login from "@/modules/account/components/login"
 1. **Is it a UI primitive?** (Button, Input, Dialog, etc.)
    → `src/lib/components/ui/`
 
-2. **Is it Wufi brand-specific?** (WufiButton, EmailInput, etc.)
-   → `src/lib/components/wufi/`
+2. **Is it Kraps brand-specific?** (KrapsButton, EmailInput, etc.)
+   → `src/lib/components/kraps/`
 
 3. **Does it belong to a specific feature?** (Cart, Checkout, Account, etc.)
    → `src/modules/{feature}/components/`

@@ -5,7 +5,7 @@ import { ProductPreview } from "@lib/components"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 export const metadata: Metadata = {
-  title: "Products | Wufi",
+  title: "Products | Kraps",
   description: "Explore all of our products.",
 }
 

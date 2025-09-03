@@ -23,7 +23,7 @@ export interface AccountStats {
 
 export interface SubscriptionSummary {
   id: string
-  status: 'active' | 'paused' | 'cancelled'
+  status: 'active' | 'paused' | 'canceled'
   interval: string
   next_delivery: string  // Keep for internal use but represents order placement date
   days_until_next: number
@@ -32,6 +32,8 @@ export interface SubscriptionSummary {
   total_items: number
   estimated_total: number
   can_modify: boolean
+  pet_id?: string  // Link to specific pet
+  pet_name?: string  // Pet name for display
 }
 
 export interface SubscriptionItem {
@@ -96,7 +98,7 @@ export interface DashboardData {
 
 export interface SubscriptionDetail {
   id: string
-  status: 'active' | 'paused' | 'cancelled'
+  status: 'active' | 'paused' | 'canceled'
   interval: string
   next_delivery: string  // Keep for internal use but represents order placement date
   items: SubscriptionDetailItem[]
@@ -126,11 +128,4 @@ export interface ModificationHistory {
   reason: string
 }
 
-export interface AccountSetupData {
-  token: string
-  email: string
-  password: string
-  first_name?: string
-  last_name?: string
-  pets?: Pet[]
-} 
+ 

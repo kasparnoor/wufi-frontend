@@ -7,6 +7,11 @@ export const getAuthHeaders = async (): Promise<
   const cookies = await nextCookies()
   const token = cookies.get("_medusa_jwt")?.value
 
+  // Reduce noisy auth logs in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log("[AUTH] getAuthHeaders - token found:", !!token, token?.substring(0, 20) + "...")
+  }
+
   if (!token) {
     return {}
   }
@@ -48,10 +53,12 @@ export const getCacheOptions = async (
 export const setAuthToken = async (token: string) => {
   const cookies = await nextCookies()
   cookies.set("_medusa_jwt", token, {
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 7, // 7 days
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax", // Changed from "strict" to "lax" for better localhost compatibility
     secure: process.env.NODE_ENV === "production",
+    path: "/",
+    priority: "high"
   })
 }
 
@@ -59,6 +66,10 @@ export const removeAuthToken = async () => {
   const cookies = await nextCookies()
   cookies.set("_medusa_jwt", "", {
     maxAge: -1,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
   })
 }
 
@@ -70,10 +81,12 @@ export const getCartId = async () => {
 export const setCartId = async (cartId: string) => {
   const cookies = await nextCookies()
   cookies.set("_medusa_cart_id", cartId, {
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 30, // 30 days
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
+    path: "/",
+    priority: "high"
   })
 }
 
@@ -81,5 +94,9 @@ export const removeCartId = async () => {
   const cookies = await nextCookies()
   cookies.set("_medusa_cart_id", "", {
     maxAge: -1,
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
   })
 }

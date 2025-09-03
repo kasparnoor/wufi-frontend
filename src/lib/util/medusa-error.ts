@@ -15,8 +15,21 @@ export default function medusaError(error: any): never {
   } else if (error.request) {
     // The request was made but no response was received
     throw new Error("No response received: " + error.request)
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    throw new Error("Error setting up the request: " + error.message)
   }
+
+  // Handle errors from fetch-based clients (Medusa SDK) which may not expose axios-like shapes
+  if (typeof error === "object") {
+    const status = (error as any).status || (error as any).statusCode
+    const data = (error as any).data || (error as any).body
+    const msg = (error as any).message || (typeof data === "string" ? data : undefined)
+
+    if (status) {
+      const text = typeof msg === "string" ? msg : JSON.stringify(data || {})
+      throw new Error(`HTTP ${status}: ${text}`)
+    }
+  }
+
+  // Fallback
+  const generic = (error && error.message) ? error.message : "Unknown error"
+  throw new Error("Error setting up the request: " + generic)
 }

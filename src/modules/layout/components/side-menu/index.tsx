@@ -13,7 +13,7 @@ import CountrySelect from "../country-select"
 
 const SideMenuItems = {
   Avaleht: "/",
-  Pood: "/store",
+  Pood: "/pood",
   Konto: "/account",
   Ostukorv: "/cart",
 }
@@ -53,8 +53,8 @@ const SideMenu = ({
         }
       )
 
-      // Close the menu and redirect to store with search query
-      router.push(`/${countryCode}/store?q=${encodeURIComponent(searchQuery)}`)
+      // Close the menu and redirect to pood with search query
+      router.push(`/${countryCode}/pood?q=${encodeURIComponent(searchQuery)}`)
     } catch (error) {
       console.error("Search failed:", error)
     } finally {
@@ -179,7 +179,7 @@ const SideMenu = ({
                       <Text className={`flex justify-between text-sm
                         ${isScrolled ? "text-gray-600" : "text-white/80"}`}
                       >
-                        © {new Date().getFullYear()} WUFI Pood. Kõik õigused kaitstud.
+                        © {new Date().getFullYear()} Kraps Pood. Kõik õigused kaitstud.
                       </Text>
                     </div>
                   </div>

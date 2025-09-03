@@ -3,6 +3,11 @@
 The Wufi Storefront integrates with Medusa, an open-source headless commerce engine, using both Medusa's backend APIs and UI components in a unified component system.
 
 ## Commerce Integration
+# Medusa Integration
+
+The Kraps Storefront integrates with Medusa, an open-source headless commerce engine, using both Medusa's backend APIs and UI components in a unified component system.
+
+## Commerce Integration
 - Uses the Medusa JS SDK for all commerce operations
 - Data fetching is primarily done via server components
 - Product, cart, and checkout flows are built on Medusa APIs
@@ -22,15 +27,15 @@ import {
   Container, Text, Table,
   // shadcn components for forms  
   Button, Input, Form,
-  // Custom Wufi components for branding
-  WufiButton, WufiTooltip
+  // Custom Kraps components for branding
+  KrapsButton, KrapsTooltip
 } from "@lib/components/ui"
 ```
 
 ### Component Selection Strategy
 - **Use Medusa UI** for data display, tables, containers, and e-commerce layouts
 - **Use shadcn components** for forms, interactive elements, and new UI features
-- **Use custom Wufi components** for brand-specific styling and unique functionality
+- **Use custom Kraps components** for brand-specific styling and unique functionality
 
 ## Commerce Modules
 These modules handle specific commerce functionality:

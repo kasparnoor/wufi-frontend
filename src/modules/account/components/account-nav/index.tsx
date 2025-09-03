@@ -1,9 +1,9 @@
 "use client"
 
 import { clx } from "@medusajs/ui"
-import { LogOut, ChevronDown, User, MapPin, CreditCard } from "lucide-react"
+import { LogOut, ChevronDown, User, MapPin, CreditCard, Package, Heart } from "lucide-react"
 import { useParams, usePathname } from "next/navigation"
-import { LocalizedClientLink } from "@lib/components"
+import { LocalizedClientLink, KrapsButton } from "@lib/components"
 import { HttpTypes } from "@medusajs/types"
 import { signout } from "@lib/data/customer"
 
@@ -28,9 +28,9 @@ const AccountNav = ({
   return (
     <div>
       <div className="small:hidden" data-testid="mobile-account-nav">
-        {route !== `/${countryCode}/account` ? (
+        {route !== `/${countryCode}/konto` ? (
           <LocalizedClientLink
-            href="/account"
+            href="/konto"
             className="flex items-center gap-x-2 text-small-regular py-2"
             data-testid="account-main-link"
           >
@@ -48,11 +48,11 @@ const AccountNav = ({
               <ul>
                 <li>
                   <LocalizedClientLink
-                    href="/account/profile"
+                    href="/konto/profiil"
                     className={clx(
                       "flex items-center justify-between py-4 border-b border-gray-200 px-8",
                       {
-                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/profile"),
+                        "bg-yellow-50 text-yellow-800 font-semibold border-l-4 border-l-yellow-400": isActiveRoute("/konto/profile"),
                       }
                     )}
                     data-testid="profile-link"
@@ -68,75 +68,35 @@ const AccountNav = ({
                 </li>
                 <li>
                   <LocalizedClientLink
-                    href="/account/addresses"
+                    href="/konto/lemmikloomad"
                     className={clx(
                       "flex items-center justify-between py-4 border-b border-gray-200 px-8",
                       {
-                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/addresses"),
+                        "bg-yellow-50 text-yellow-800 font-semibold border-l-4 border-l-yellow-400": isActiveRoute("/konto/pets"),
                       }
                     )}
-                    data-testid="addresses-link"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <MapPin />
-                        <span>Aadressid</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/billing"
-                    className={clx(
-                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
-                      {
-                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/billing"),
-                      }
-                    )}
-                    data-testid="billing-link"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <CreditCard className="h-5 w-5" />
-                        <span>Arveldus</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/orders"
-                    className={clx(
-                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
-                      {
-                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/orders"),
-                      }
-                    )}
-                    data-testid="orders-link"
+                    data-testid="pets-link"
                   >
                     <div className="flex items-center gap-x-2">
-                      <User />
-                      <span>Tellimused</span>
+                      <Heart />
+                      <span>Lemmikloomad</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
                   </LocalizedClientLink>
                 </li>
                 <li>
                   <LocalizedClientLink
-                    href="/account/subscriptions"
+                    href="/konto/pusitellimused"
                     className={clx(
                       "flex items-center justify-between py-4 border-b border-gray-200 px-8",
                       {
-                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/subscriptions"),
+                        "bg-yellow-50 text-yellow-800 font-semibold border-l-4 border-l-yellow-400": isActiveRoute("/konto/subscriptions"),
                       }
                     )}
                     data-testid="subscriptions-link"
                   >
                     <div className="flex items-center gap-x-2">
-                      <User />
+                      <Package />
                       <span>Püsitellimused</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
@@ -144,121 +104,117 @@ const AccountNav = ({
                 </li>
                 <li>
                   <LocalizedClientLink
-                    href="/account/pets"
+                    href="/konto/tellimused"
                     className={clx(
                       "flex items-center justify-between py-4 border-b border-gray-200 px-8",
                       {
-                        "bg-blue-50 text-blue-700 font-semibold": isActiveRoute("/account/pets"),
+                        "bg-yellow-50 text-yellow-800 font-semibold border-l-4 border-l-yellow-400": isActiveRoute("/konto/orders"),
                       }
                     )}
-                    data-testid="pets-link"
+                    data-testid="orders-link"
                   >
                     <div className="flex items-center gap-x-2">
-                      <User />
-                      <span>Lemmikloomad</span>
+                      <Package />
+                      <span>Tellimused</span>
                     </div>
                     <ChevronDown className="transform -rotate-90" />
                   </LocalizedClientLink>
                 </li>
                 <li>
-                  <button
-                    type="button"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
-                    onClick={handleLogout}
-                    data-testid="logout-button"
+                  <LocalizedClientLink
+                    href="/konto/makseviis"
+                    className={clx(
+                      "flex items-center justify-between py-4 border-b border-gray-200 px-8",
+                      {
+                        "bg-yellow-50 text-yellow-800 font-semibold border-l-4 border-l-yellow-400": isActiveRoute("/konto/payment"),
+                      }
+                    )}
+                    data-testid="payment-link"
                   >
-                    <div className="flex items-center gap-x-2">
-                      <LogOut />
-                      <span>Logi välja</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </button>
+                    <>
+                      <div className="flex items-center gap-x-2">
+                        <CreditCard className="h-5 w-5" />
+                        <span>Makseviis</span>
+                      </div>
+                      <ChevronDown className="transform -rotate-90" />
+                    </>
+                  </LocalizedClientLink>
                 </li>
               </ul>
             </div>
           </>
         )}
       </div>
+
+      {/* Desktop Navigation */}
       <div className="hidden small:block" data-testid="account-nav">
-        <div>
-          <div className="pb-4">
-            <h3 className="text-base-semi">Konto</h3>
+        <div className="bg-yellow-50/50 rounded-lg p-4 border border-yellow-200/50">
+          <div className="pb-4 border-b border-yellow-200">
+            <h3 className="text-base-semi text-yellow-900">Konto</h3>
+            <p className="text-sm text-yellow-700 mt-1">Tere, {customer?.first_name}</p>
           </div>
-          <div className="text-base-regular">
-            <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-              <li>
+          <div className="text-base-regular pt-4">
+            <ul className="flex mb-0 justify-start items-start flex-col gap-y-2">
+              <li className="w-full">
                 <AccountNavLink
-                  href="/account"
+                  href="/konto"
                   route={route!}
                   data-testid="overview-link"
                 >
                   Ülevaade
                 </AccountNavLink>
               </li>
-              <li>
+              <li className="w-full">
                 <AccountNavLink
-                  href="/account/profile"
+                  href="/konto/profiil"
                   route={route!}
                   data-testid="profile-link"
                 >
                   Profiil
                 </AccountNavLink>
               </li>
-              <li>
+              <li className="w-full">
                 <AccountNavLink
-                  href="/account/addresses"
-                  route={route!}
-                  data-testid="addresses-link"
-                >
-                  Aadressid
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/billing"
-                  route={route!}
-                  data-testid="billing-link"
-                >
-                  Arveldus
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/orders"
-                  route={route!}
-                  data-testid="orders-link"
-                >
-                  Tellimused
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/subscriptions"
-                  route={route!}
-                  data-testid="subscriptions-link"
-                >
-                  Püsitellimused
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/pets"
+                  href="/konto/lemmikloomad"
                   route={route!}
                   data-testid="pets-link"
                 >
                   Lemmikloomad
                 </AccountNavLink>
               </li>
-              <li className="text-grey-700">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  data-testid="logout-button"
+              <li className="w-full">
+                <AccountNavLink
+                  href="/konto/pusitellimused"
+                  route={route!}
+                  data-testid="subscriptions-link"
                 >
-                  Logi välja
-                </button>
+                  Püsitellimused
+                </AccountNavLink>
               </li>
+              <li className="w-full">
+                <AccountNavLink
+                  href="/konto/tellimused"
+                  route={route!}
+                  data-testid="orders-link"
+                >
+                  Tellimused
+                </AccountNavLink>
+              </li>
+              {/* Removed Makseviis tab per request */}
             </ul>
+          </div>
+          
+          {/* Logout Button with Kraps Styling */}
+          <div className="pt-4 mt-4 border-t border-yellow-200">
+            <KrapsButton
+              variant="secondary"
+              size="small"
+              className="w-full justify-center bg-white hover:bg-yellow-50 border-yellow-300 hover:border-yellow-400 text-yellow-800 hover:text-yellow-900"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logi välja
+            </KrapsButton>
           </div>
         </div>
       </div>
@@ -270,27 +226,36 @@ type AccountNavLinkProps = {
   href: string
   route: string
   children: React.ReactNode
-  "data-testid"?: string
+  'data-testid'?: string
 }
 
 const AccountNavLink = ({
   href,
   route,
   children,
-  "data-testid": dataTestId,
+  'data-testid': dataTestId,
 }: AccountNavLinkProps) => {
-  const { countryCode }: { countryCode: string } = useParams()
+  const { countryCode } = useParams() as { countryCode: string }
 
   const active = route.split(countryCode)[1] === href
   return (
     <LocalizedClientLink
       href={href}
-      className={clx("text-ui-fg-subtle hover:text-ui-fg-base", {
-        "text-blue-600 font-semibold": active,
-      })}
+      className={clx(
+        "flex items-center justify-between py-2 px-3 rounded-lg transition-all duration-200 w-full",
+        {
+          "bg-yellow-400 text-yellow-900 font-semibold shadow-sm": active,
+          "text-gray-700 hover:bg-yellow-100 hover:text-yellow-800": !active,
+        }
+      )}
       data-testid={dataTestId}
     >
-      {children}
+      <div className="flex items-center">
+        <span>{children}</span>
+      </div>
+      {active && (
+        <div className="w-2 h-2 rounded-full bg-yellow-900"></div>
+      )}
     </LocalizedClientLink>
   )
 }

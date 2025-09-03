@@ -15,47 +15,39 @@ type Props = {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
+// Disable static generation for now to avoid build issues
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
-  const product_categories = await listCategories()
-
-  if (!product_categories) {
-    return []
-  }
-
-  const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
-    regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
-  )
-
-  const categoryHandles = product_categories.map(
-    (category: any) => category.handle
-  )
-
-  const staticParams = countryCodes
-    ?.map((countryCode: string | undefined) =>
-      categoryHandles.map((handle: any) => ({
-        countryCode,
-        category: [handle],
-      }))
-    )
-    .flat()
-
-  return staticParams
+  // Return empty array to skip static generation
+  console.log('Skipping static generation for categories')
+  return []
 }
 
 export const metadata: Metadata = {
-  title: "Categories | Wufi",
+  title: "Categories | Kraps",
   description: "Explore our product categories.",
 }
 
-export default async function CategoryPage(props: Props) {
-  const searchParams = await props.searchParams
-  const params = await props.params
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { sortBy, page } = searchParams
 
   const productCategory = await getCategoryByHandle(params.category)
 
   if (!productCategory) {
     notFound()
+  }
+
+  // Fetch all categories for filtering
+  let categories: any[] = []
+  try {
+    categories = await listCategories({
+      fields: "*category_children, *parent_category",
+      limit: 100
+    })
+  } catch (error) {
+    console.error("Error fetching categories:", error)
+    categories = []
   }
 
   return (
@@ -65,6 +57,7 @@ export default async function CategoryPage(props: Props) {
       page={page as string}
       countryCode={params.countryCode}
       searchParams={searchParams}
+      categories={categories}
     />
   )
 }

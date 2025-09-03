@@ -8,25 +8,27 @@ import { HttpTypes } from "@medusajs/types"
 export const retrieveOrder = async (id: string) => {
   const headers = {
     ...(await getAuthHeaders()),
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
   }
 
   const next = {
     ...(await getCacheOptions("orders")),
   }
 
-  return sdk.client
-    .fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
+  const url = `${process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"}/store/orders/${id}?fields=*payment_collections.payments,*items,+items.metadata,*items.variant,*items.product,*shipping_address,*billing_address`
+  try {
+    const res = await fetch(url, {
       method: "GET",
-      query: {
-        fields:
-          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product",
-      },
       headers,
+      cache: "no-store",
       next,
-      cache: "force-cache",
     })
-    .then(({ order }) => order)
-    .catch((err) => medusaError(err))
+    if (!res.ok) throw new Error(res.statusText)
+    const data = (await res.json()) as HttpTypes.StoreOrderResponse
+    return data.order
+  } catch (err) {
+    return medusaError(err)
+  }
 }
 
 export const listOrders = async (
@@ -36,28 +38,34 @@ export const listOrders = async (
 ) => {
   const headers = {
     ...(await getAuthHeaders()),
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
   }
 
   const next = {
     ...(await getCacheOptions("orders")),
   }
 
-  return sdk.client
-    .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
+  const qs = new URLSearchParams({
+    limit: String(limit),
+    offset: String(offset),
+    order: "-created_at",
+    fields: "*items,+items.metadata,*items.variant,*items.product",
+    ...Object.fromEntries(Object.entries(filters || {}).map(([k, v]) => [k, String(v)])),
+  }).toString()
+  const base = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
+  try {
+    const res = await fetch(`${base}/store/orders?${qs}`, {
       method: "GET",
-      query: {
-        limit,
-        offset,
-        order: "-created_at",
-        fields: "*items,+items.metadata,*items.variant,*items.product",
-        ...filters,
-      },
       headers,
+      cache: "no-store",
       next,
-      cache: "force-cache",
     })
-    .then(({ orders }) => orders)
-    .catch((err) => medusaError(err))
+    if (!res.ok) throw new Error(res.statusText)
+    const data = (await res.json()) as HttpTypes.StoreOrderListResponse
+    return data.orders
+  } catch (err) {
+    return medusaError(err)
+  }
 }
 
 export const createTransferRequest = async (

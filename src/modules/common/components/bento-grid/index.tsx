@@ -1,7 +1,9 @@
+"use client"
+
 import { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import clsx from "clsx";
-import { WufiButton } from "@lib/components";
+import { KrapsButton, LocalizedClientLink } from "@lib/components";
 
 export interface BentoGridProps {
   children: ReactNode;
@@ -60,12 +62,12 @@ export const BentoCard = ({
       <p className="text-white/90">{description}</p>
     </div>
     <div className="absolute bottom-0 flex w-full md:translate-y-10 transform-gpu flex-row items-center p-4 md:opacity-0 transition-all duration-300 md:group-hover:translate-y-0 md:group-hover:opacity-100 z-20 mt-8">
-      <WufiButton variant="primary" size="small" className="pointer-events-auto">
-        <a href={href} className="flex items-center">
+      <LocalizedClientLink href={href} className="pointer-events-auto">
+        <KrapsButton variant="primary" size="small" className="flex items-center">
           {cta}
           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-        </a>
-      </WufiButton>
+        </KrapsButton>
+      </LocalizedClientLink>
     </div>
     <div className="absolute inset-0 pointer-events-none transform-gpu transition-all duration-300 group-hover:bg-black/40" />
   </div>

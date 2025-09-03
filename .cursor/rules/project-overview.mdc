@@ -5,7 +5,7 @@ alwaysApply: true
 ---
 # Project Overview
 
-This is the Wufi Storefront - a modern, subscription-based pet e-commerce platform tailored for the Estonian market. The storefront is built with Next.js 15 using App Router and Server Components.
+This is the Kraps Storefront - a modern, subscription-based pet e-commerce platform tailored for the Estonian market. The storefront is built with Next.js 15 using App Router and Server Components.
 
 ## Key Files
 - [package.json](mdc:package.json) - Project configuration and dependencies

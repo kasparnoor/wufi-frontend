@@ -3,7 +3,7 @@
 import { Button, Heading, Text } from "@medusajs/ui"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
-import { WufiButton } from "@lib/components"
+import { KrapsButton } from "@lib/components"
 import { ArrowRight, ShoppingBag, Shield } from "lucide-react"
 import { useMemo } from "react"
 import { useSearchParams } from "next/navigation"
@@ -11,6 +11,7 @@ import DiscountCode from "@modules/checkout/components/discount-code"
 import { LocalizedClientLink } from "@lib/components"
 import { CartTotals } from "@lib/components"
 import { Separator as Divider } from "@lib/components"
+import { FreeShippingProgress } from "@lib/components"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart & {
@@ -19,17 +20,8 @@ type SummaryProps = {
 }
 
 function getCheckoutStep(cart: HttpTypes.StoreCart) {
-  // If the cart has any subscription items, start at the autoship step
-  if ((cart.items ?? []).some(item => item.metadata?.purchase_type === "subscription")) {
-    return "autoship"
-  }
-  if (!cart?.shipping_address?.address_1 || !cart.email) {
-    return "address"
-  } else if (cart?.shipping_methods?.length === 0) {
-    return "delivery"
-  } else {
-    return "payment"
-  }
+  // Always start at the customer step for our simplified checkout
+  return "customer"
 }
 
 const Summary = ({ cart }: SummaryProps) => {
@@ -62,6 +54,14 @@ const Summary = ({ cart }: SummaryProps) => {
       </div>
       
       <div className="space-y-6">
+        {/* Free Shipping Progress */}
+        <div>
+          <FreeShippingProgress 
+            subtotal={cart.subtotal || 0}
+            currencyCode={cart.currency_code}
+          />
+        </div>
+        
         {/* Discount Code Section */}
         <div>
           <DiscountCode cart={cart} />
@@ -69,10 +69,11 @@ const Summary = ({ cart }: SummaryProps) => {
         
         {/* Totals Section */}
         <div>
-          <CartTotals 
-            totals={adjustedTotals} 
-            hasShippingMethod={!!(cart.shipping_methods && cart.shipping_methods.length > 0)}
-          />
+                <CartTotals 
+        totals={adjustedTotals}
+        hasShippingMethod={!!(cart.shipping_methods && cart.shipping_methods.length > 0)}
+        cart={cart}
+      />
         </div>
         
         {/* Checkout Button */}
@@ -82,14 +83,14 @@ const Summary = ({ cart }: SummaryProps) => {
             data-testid="checkout-button"
             className="block w-full"
           >
-            <WufiButton 
+            <KrapsButton 
               variant="primary"
               size="large"
               className="w-full shadow-lg justify-center group hover:shadow-xl transition-all duration-200"
             >
               Mine kassasse
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-            </WufiButton>
+            </KrapsButton>
           </LocalizedClientLink>
           
           <p className="text-xs text-gray-500 text-center">

@@ -13,6 +13,7 @@ import {
 import Thumbnail from "@modules/products/components/thumbnail"
 import { useState, useTransition } from "react"
 import { Minus, Plus } from "lucide-react"
+import { rateLimitedAction, RATE_LIMITS } from "@lib/util/client-rate-limit"
 
 // Simple ErrorMessage component since it's not exported
 const ErrorMessage = ({ error, ...props }: { error: string | null, [key: string]: any }) => {
@@ -57,19 +58,30 @@ export default function Item({
     if (!updateItemAction || newQuantity === item.quantity || newQuantity < 1) return
     
     startTransition(() => {
-      const formData = new FormData()
-      formData.append("lineId", item.id)
-      formData.append("quantity", newQuantity.toString())
-      
-      updateItemAction(null, formData).then((result) => {
+      rateLimitedAction(
+        `cart-update-${item.id}`,
+        async () => {
+          const formData = new FormData()
+          formData.append("lineId", item.id)
+          formData.append("quantity", newQuantity.toString())
+          
+          return updateItemAction(null, formData)
+        },
+        {
+          ...RATE_LIMITS.CART_UPDATE,
+          errorMessage: 'Liiga palju muudatusi. Palun oodake hetk.',
+        }
+      ).then((result) => {
         if (result) {
           setError(result)
         } else {
           setError(null)
         }
       }).catch((error) => {
-        console.error("Error updating quantity:", error)
-        setError("Failed to update quantity")
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error updating quantity:", error)
+        }
+        setError(error.message || "Failed to update quantity")
       })
     })
   }
@@ -86,97 +98,148 @@ export default function Item({
     }
   }
 
-  // Check if product supports subscriptions - check for subscription_enabled metadata
+  // Get product metadata from cart item
   const productMetadata = (item.variant?.product as any)?.metadata
+  const variantMetadata = (item.variant as any)?.metadata
+  const itemMetadata = item.metadata
+  
+  // Check if product supports subscriptions - strict check for subscription_enabled = true
   const supportsSubscription = productMetadata?.subscription_enabled === true
+  
+  // Debug logging only in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 Debug cart item metadata:', {
+      productTitle: item.title,
+      supportsSubscription,
+      productId: item.product_id,
+      variantId: item.variant_id,
+    })
+  }
 
+  // Render as table row when used in preview/table context
+  if (type === "preview") {
+    return (
+      <tr 
+        className="border-b border-gray-100 last:border-b-0"
+        data-testid={dataTestId}
+      >
+        <td className="py-4 pr-4">
+          <div className="w-16 h-16 flex-shrink-0">
+            <Thumbnail thumbnail={item.thumbnail} images={item.variant?.product?.images} size="square" />
+          </div>
+        </td>
+        <td className="py-4">
+          <div className="flex flex-col gap-y-2">
+            {/* Product Info */}
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0">
+                <LocalizedClientLink
+                  href={`/products/${item.variant?.product?.handle}`}
+                  className="text-sm font-medium text-gray-900 hover:text-gray-700 transition-colors line-clamp-2"
+                  data-testid="product-link"
+                >
+                  {item.title}
+                </LocalizedClientLink>
+                <LineItemOptions variant={item.variant} data-testid="cart-item-variant" />
+              </div>
+              <div className="text-right ml-4">
+                <LineItemPrice item={item} style="tight" currencyCode={currencyCode} />
+              </div>
+            </div>
+            
+            {/* Subscription info for preview */}
+            {supportsSubscription && item.metadata?.purchase_type === "subscription" && (
+              <div className="text-xs text-blue-600 bg-blue-50 rounded px-2 py-1 w-fit">
+                Püsitellimus
+              </div>
+            )}
+            
+            <div className="text-sm text-gray-600">
+              Kogus: {item.quantity}
+            </div>
+            
+            {error && <ErrorMessage error={error} />}
+          </div>
+        </td>
+      </tr>
+    )
+  }
+
+  // Default div rendering for full/card types
   return (
     <div
       className="py-4 border-b border-gray-100 last:border-b-0"
       data-testid={dataTestId}
     >
-      <div className="grid grid-cols-[100px_1fr] gap-x-4">
-        <div className="w-24 h-24 flex-shrink-0">
+      {/* Top section: Product info and price */}
+      <div className="flex gap-3 sm:gap-4 mb-3 sm:mb-4">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
           <Thumbnail thumbnail={item.thumbnail} images={item.variant?.product?.images} size="square" />
         </div>
-        <div className="flex flex-col gap-y-3">
-          {/* Product Info */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              <LocalizedClientLink
-                href={`/products/${item.variant?.product?.handle}`}
-                className="text-base font-medium text-gray-900 hover:text-gray-700 transition-colors line-clamp-2"
-                data-testid="product-link"
-              >
-                {item.title}
-              </LocalizedClientLink>
-              <LineItemOptions variant={item.variant} data-testid="cart-item-variant" />
-            </div>
-            <div className="text-right ml-4">
-              <LineItemPrice item={item} style="tight" currencyCode={currencyCode} />
-            </div>
-          </div>
-          
-          {/* Subscription Toggle */}
-          {supportsSubscription && (
-            <div className="border-t border-gray-100 pt-3">
-              <SubscribeToggle 
-                lineId={item.id}
-                initialMetadata={item.metadata}
-                productMetadata={productMetadata}
-                quantity={item.quantity}
-                isLoading={isPending}
-              />
-            </div>
-          )}
-          
-          {/* Quantity and Actions */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-x-3">
-              <ModernTooltip content="Eemalda toode">
-                <DeleteButton 
-                  id={item.id} 
-                  onDelete={handleDelete}
-                  data-testid="cart-item-remove-button"
-                  className="!text-gray-400 hover:!text-red-500 transition-colors"
-                >
-                  Eemalda
-                </DeleteButton>
-              </ModernTooltip>
-              
-              <Separator orientation="vertical" className="h-5" />
-              
-              <div className="flex items-center gap-x-2">
-                <span className="text-sm text-gray-600 font-medium">Kogus:</span>
-                <div className="flex items-center border border-gray-200 rounded-lg">
-                  <button
-                    onClick={decrementQuantity}
-                    disabled={item.quantity <= 1 || isPending}
-                    className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <span className="px-3 py-2 text-sm font-medium text-gray-900 min-w-[40px] text-center">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={incrementQuantity}
-                    disabled={item.quantity >= 10 || isPending}
-                    className="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-                {isPending && (
-                  <div className="text-xs text-gray-500">Uuendamine...</div>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 min-w-0">
+          <LocalizedClientLink
+            href={`/products/${item.variant?.product?.handle}`}
+            className="text-sm sm:text-base font-medium text-gray-900 hover:text-gray-700 transition-colors line-clamp-2 block mb-1"
+            data-testid="product-link"
+          >
+            {item.title}
+          </LocalizedClientLink>
+          <LineItemOptions variant={item.variant} data-testid="cart-item-variant" />
+        </div>
+        <div className="text-right">
+          <LineItemPrice item={item} style="tight" currencyCode={currencyCode} />
         </div>
       </div>
       
-      <ErrorMessage error={error} data-testid="cart-item-error-message" />
+      {/* Subscription Toggle */}
+      {supportsSubscription && (
+        <div className="mb-3 sm:mb-4">
+          <SubscribeToggle 
+            lineId={item.id}
+            initialMetadata={item.metadata}
+            productMetadata={productMetadata}
+            quantity={item.quantity}
+            isLoading={isPending}
+          />
+        </div>
+      )}
+      
+      {/* Bottom section: Quantity and Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="text-xs sm:text-sm text-gray-600 font-medium">Kogus:</span>
+          <div className="flex items-center border border-gray-200 rounded-md">
+            <button
+              onClick={decrementQuantity}
+              disabled={item.quantity <= 1 || isPending}
+              className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Vähenda kogust"
+            >
+              <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+            </button>
+            <span className="px-2 sm:px-3 py-1 min-w-[32px] sm:min-w-[40px] text-center text-xs sm:text-sm font-medium">
+              {item.quantity}
+            </span>
+            <button
+              onClick={incrementQuantity}
+              disabled={item.quantity >= 10 || isPending}
+              className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Suurenda kogust"
+            >
+              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+            </button>
+          </div>
+        </div>
+        
+        <DeleteButton
+          id={item.id}
+          onDelete={handleDelete}
+          className="text-gray-400 hover:text-red-500 text-xs sm:text-sm"
+          data-testid="cart-item-remove-button"
+        />
+      </div>
+      
+      {error && <ErrorMessage error={error} />}
     </div>
   )
 }

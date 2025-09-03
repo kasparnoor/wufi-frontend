@@ -10,6 +10,7 @@ export const paymentInfoMap: Record<
   string,
   { title: string; icon: React.JSX.Element }
 > = {
+  // Stripe provider IDs (for backend)
   pp_stripe_stripe: {
     title: "Credit card",
     icon: <CreditCard />,
@@ -22,6 +23,42 @@ export const paymentInfoMap: Record<
     title: "Bancontact",
     icon: <Bancontact />,
   },
+  
+  // Stripe PaymentElement method types (for frontend display)
+  card: {
+    title: "Credit card",
+    icon: <CreditCard />,
+  },
+  ideal: {
+    title: "iDeal",
+    icon: <Ideal />,
+  },
+  bancontact: {
+    title: "Bancontact",
+    icon: <Bancontact />,
+  },
+  paypal: {
+    title: "PayPal",
+    icon: <PayPal />,
+  },
+  blik: {
+    title: "BLIK",
+    icon: <CreditCard />,
+  },
+  giropay: {
+    title: "giropay",
+    icon: <CreditCard />,
+  },
+  przelewy24: {
+    title: "Przelewy24",
+    icon: <CreditCard />,
+  },
+  promptpay: {
+    title: "PromptPay",
+    icon: <CreditCard />,
+  },
+  
+  // Other providers
   pp_paypal_paypal: {
     title: "PayPal",
     icon: <PayPal />,

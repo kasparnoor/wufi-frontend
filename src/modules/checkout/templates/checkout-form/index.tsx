@@ -12,7 +12,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { useEffect, useState, useMemo, useCallback } from "react"
-import { WufiButton } from "@lib/components"
+import { KrapsButton } from "@lib/components"
 import { clx } from "@medusajs/ui"
 import React from "react"
 
@@ -29,6 +29,8 @@ export default function CheckoutForm({
   
   // Add hydration state to prevent SSR/hydration mismatches
   const [isHydrated, setIsHydrated] = useState(false)
+  // Add navigation lock to prevent race conditions
+  const [isNavigating, setIsNavigating] = useState(false)
 
   useEffect(() => {
     setIsHydrated(true)
@@ -52,17 +54,42 @@ export default function CheckoutForm({
     { id: "review", name: "Kinnitus", icon: <ShoppingBag className="h-5 w-5" /> }
   ], [hasAutoshipEligibleItemsInCart]);
 
-  const initialStep = searchParams?.get("step");
-  let determinedCurrentStep = initialStep || (hasAutoshipEligibleItemsInCart ? "autoship" : "address");
-  if (!hasAutoshipEligibleItemsInCart && determinedCurrentStep === "autoship") {
-    determinedCurrentStep = "address";
-  } else if (!steps.find(s => s.id === determinedCurrentStep)) {
-    determinedCurrentStep = hasAutoshipEligibleItemsInCart ? "autoship" : "address";
-  }
-  const [currentStep, setCurrentStep] = useState(determinedCurrentStep);
+  // Stable step determination function
+  const getValidStep = useCallback((stepParam: string | null): string => {
+    if (!isHydrated) {
+      // During SSR/hydration, use safe defaults
+      return hasAutoshipEligibleItemsInCart ? "autoship" : "address";
+    }
+    
+    // Validate the step parameter
+    const validSteps = steps.map(s => s.id);
+    
+    if (stepParam && validSteps.includes(stepParam)) {
+      // Handle autoship special case
+      if (stepParam === "autoship" && !hasAutoshipEligibleItemsInCart) {
+        return "address";
+      }
+      return stepParam;
+    }
+    
+    // Default to first step
+    return hasAutoshipEligibleItemsInCart ? "autoship" : "address";
+  }, [hasAutoshipEligibleItemsInCart, steps, isHydrated]);
+
+  // Use stable current step - only update when URL actually changes
+  const urlStep = searchParams?.get("step");
+  const [currentStep, setCurrentStep] = useState(() => getValidStep(urlStep));
+  
+  // Only update state when URL changes AND we're not currently navigating
   useEffect(() => {
-    setCurrentStep(determinedCurrentStep);
-  }, [determinedCurrentStep]);
+    if (!isNavigating && isHydrated) {
+      const validStep = getValidStep(urlStep);
+      if (validStep !== currentStep) {
+        console.log(`Checkout: Updating step from ${currentStep} to ${validStep}`);
+        setCurrentStep(validStep);
+      }
+    }
+  }, [urlStep, isNavigating, isHydrated, getValidStep, currentStep]);
 
   const currentStepIndex = useMemo(() => steps.findIndex(s => s.id === currentStep), [steps, currentStep]);
 
@@ -115,20 +142,43 @@ export default function CheckoutForm({
     }
   }, [currentStep, isHydrated]);
 
+  // Robust navigation function that prevents race conditions
+  const navigateToStep = useCallback((stepId: string) => {
+    if (isNavigating) {
+      console.log('Navigation already in progress, skipping...');
+      return;
+    }
+    
+    setIsNavigating(true);
+    
+    // Ensure the step is valid
+    const validStep = getValidStep(stepId);
+    
+    console.log(`Checkout: Navigating to step ${validStep}`);
+    
+    // Update URL - this will trigger the useEffect above
+    router.push(`${pathname}?step=${validStep}`);
+    
+    // Release navigation lock after a brief delay
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 100);
+  }, [isNavigating, getValidStep, router, pathname]);
+
   const handleStepClick = useCallback((stepId: string, stepIndex: number) => {
     if (stepIndex < currentStepIndex) {
-      router.push(`${pathname}?step=${stepId}`);
+      navigateToStep(stepId);
     }
-  }, [currentStepIndex, router, pathname, steps]);
+  }, [currentStepIndex, navigateToStep]);
 
   const handleStepKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>, stepId: string, stepIndex: number) => {
     if (event.key === 'Enter' || event.key === ' ') {
       if (stepIndex < currentStepIndex) {
         event.preventDefault();
-        router.push(`${pathname}?step=${stepId}`);
+        navigateToStep(stepId);
       }
     }
-  }, [currentStepIndex, router, pathname, steps]);
+  }, [currentStepIndex, navigateToStep]);
   
   useEffect(() => {
     if (cart?.id) {
@@ -144,14 +194,14 @@ export default function CheckoutForm({
   const goToNextStep = () => {
     if (currentStepIndex < steps.length - 1) {
       const nextStepId = steps[currentStepIndex + 1].id;
-      router.push(`${pathname}?step=${nextStepId}`);
+      navigateToStep(nextStepId);
     }
   };
 
   const goToPreviousStep = () => {
     if (currentStepIndex > 0) {
       const prevStepId = steps[currentStepIndex - 1].id;
-      router.push(`${pathname}?step=${prevStepId}`);
+      navigateToStep(prevStepId);
     }
   };
 
@@ -179,6 +229,22 @@ export default function CheckoutForm({
   } else if (currentStep === "payment") {
     const activePaymentSession = cart?.payment_collection?.payment_sessions?.find(ps => ps.status === 'pending');
     isNextButtonDisabled = !activePaymentSession;
+  }
+
+  // Show loading state during hydration to prevent flash
+  if (!isHydrated) {
+    return (
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="animate-pulse">
+          <div className="bg-gray-200 h-32"></div>
+          <div className="p-8 space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -280,7 +346,7 @@ export default function CheckoutForm({
                 <div></div>
               )}
 
-              <WufiButton
+              <KrapsButton
                 variant="primary"
                 size="large"
                 onClick={goToNextStep}
@@ -288,7 +354,21 @@ export default function CheckoutForm({
                 className="px-8 py-3 min-w-[200px] font-semibold"
               >
                 {getNextButtonText()}
-              </WufiButton>
+              </KrapsButton>
+            </div>
+          )}
+
+          {/* Back Button for Review Step */}
+          {currentStep === "review" && (
+            <div className="flex items-center justify-start pt-8 border-t border-gray-200 mt-8">
+              <button
+                onClick={goToPreviousStep}
+                className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+                type="button"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tagasi makseviiside juurde
+              </button>
             </div>
           )}
         </div>

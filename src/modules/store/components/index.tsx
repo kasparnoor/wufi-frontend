@@ -42,8 +42,8 @@ export default function SearchBar() {
         }
       )
 
-      // Always redirect to store with search query, even if no results
-      router.push(`/${countryCode}/store?q=${encodeURIComponent(searchQuery)}`)
+      // Always redirect to pood with search query, even if no results
+      router.push(`/${countryCode}/pood?q=${encodeURIComponent(searchQuery)}`)
     } catch (error) {
       console.error("Search failed:", error)
     } finally {

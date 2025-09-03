@@ -8,7 +8,7 @@ export async function GET() {
       product_categories: HttpTypes.StoreProductCategory[] 
     }>("/store/product-categories", {
       query: {
-        fields: "*category_children, *products, *parent_category, *parent_category.parent_category",
+        fields: "*category_children, *parent_category, *parent_category.parent_category",
         limit: 100
       },
       cache: "force-cache"

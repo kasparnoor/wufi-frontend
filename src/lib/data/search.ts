@@ -3,6 +3,7 @@
 import { sdk } from "@lib/config"
 import { SearchParams, SearchResponse } from "../../types/search"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { HttpTypes } from "@medusajs/types"
 
 export const searchProducts = async (
   searchParams: SearchParams
@@ -13,34 +14,88 @@ export const searchProducts = async (
 
   const cacheOptions = await getCacheOptions("search")
 
-  // Build query parameters
-  const query: Record<string, any> = {}
-  
-  if (searchParams.q) query.q = searchParams.q
-  if (searchParams.brand) query.brand = searchParams.brand
-  if (searchParams.categories) query.categories = searchParams.categories
-  if (searchParams.subscription_enabled !== undefined) {
-    query.subscription_enabled = searchParams.subscription_enabled
+  // Build query parameters for Medusa /store/products endpoint
+  const query: Record<string, any> = {
+    limit: searchParams.limit || 20,
+    offset: ((searchParams.page || 0) * (searchParams.limit || 20)),
+    fields: "*variants.calculated_price,*images,*categories"
   }
-  if (searchParams.min_price !== undefined) query.min_price = searchParams.min_price
-  if (searchParams.max_price !== undefined) query.max_price = searchParams.max_price
-  if (searchParams.page !== undefined) query.page = searchParams.page
-  if (searchParams.limit !== undefined) query.limit = searchParams.limit
-  if (searchParams.sort) query.sort = searchParams.sort
+  
+  // Add search query
+  if (searchParams.q) {
+    query.q = searchParams.q
+  }
+
+  // Add category filter
+  if (searchParams.categories) {
+    query.category_id = [searchParams.categories]
+  }
+
+  // Add sorting
+  if (searchParams.sort) {
+    switch (searchParams.sort) {
+      case 'price_asc':
+        query.order = 'variants.calculated_price.calculated_amount'
+        break
+      case 'price_desc':
+        query.order = '-variants.calculated_price.calculated_amount'
+        break
+      case 'popularity':
+        query.order = '-sales_count'
+        break
+      default:
+        query.order = '-created_at'
+    }
+  } else {
+    query.order = '-created_at'
+  }
 
   try {
-    const response = await sdk.client.fetch<SearchResponse>(
-      "/store/search",
-      {
-        method: "GET",
-        query,
-        headers,
-        next: cacheOptions,
-        cache: "no-store", // Don't cache search results by default
-      }
-    )
+    const startTime = Date.now()
+    const response = await sdk.client.fetch<{ 
+      products: HttpTypes.StoreProduct[]
+      count: number 
+    }>("/store/products", {
+      method: "GET",
+      query,
+      headers,
+      next: cacheOptions,
+      cache: "no-store", // Don't cache search results by default
+    })
 
-    return response
+    const processingTime = Date.now() - startTime
+
+    // Transform Medusa products to search format
+    const hits = response.products.map(product => ({
+      objectID: product.id,
+      title: product.title || '',
+      description: product.description || '',
+      brand: (product.metadata?.brand as string) || 'Unknown',
+      categories: product.categories?.map(cat => cat.name) || [],
+      price_eur: product.variants?.[0]?.calculated_price?.calculated_amount 
+        ? product.variants[0].calculated_price.calculated_amount 
+        : 0,
+      subscription_enabled: product.metadata?.subscription_enabled === true,
+      handle: product.handle || '',
+      thumbnail: product.thumbnail || '',
+      sku: product.variants?.[0]?.sku || ''
+    }))
+
+    const limit = searchParams.limit || 20
+    const totalPages = Math.ceil(response.count / limit)
+
+    return {
+      query: searchParams.q || "",
+      hits,
+      total: response.count,
+      page: searchParams.page || 0,
+      pages: totalPages,
+      facets: {
+        brand: {},
+        categories: {}
+      },
+      processingTimeMS: processingTime
+    }
   } catch (error) {
     console.error("Search API error:", error)
     

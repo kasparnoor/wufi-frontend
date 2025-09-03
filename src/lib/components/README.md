@@ -7,7 +7,7 @@
 ```
 src/lib/components/
 ├── ui/          # shadcn/ui primitives (Button, Input, Dialog, etc.)
-├── wufi/        # Wufi brand-specific components  
+├── kraps/       # Kraps brand-specific components  
 └── index.ts     # Foundation component exports ⭐
 ```
 
@@ -22,9 +22,9 @@ Modern, accessible components based on shadcn/ui:
 - **Enhanced**: `ModernInput`, `ModernTooltip`
 - **Skeletons**: Loading states for all components
 
-### **Wufi Brand Components** (`wufi/`)
-Wufi-specific branded components:
-- `WufiButton` - Brand-styled button
+### **Kraps Brand Components** (`kraps/`)
+Kraps-specific branded components:
+- `KrapsButton` - Brand-styled button
 - `EmailInput` - Enhanced email input with validation
 - `PhoneInput` - Estonian phone number input
 - `EstonianAddressInput` - Estonian address autocomplete
@@ -41,7 +41,7 @@ import {
   ModernInput, ModernTooltip, InfoTooltip,
   
   // Brand components
-  WufiButton, EmailInput, PhoneInput,
+  KrapsButton, EmailInput, PhoneInput,
   
   // Utilities
   Toaster, Separator
@@ -68,7 +68,7 @@ import { Form, ModernInput, WufiButton } from "@/lib/components"
     errors={["Invalid email format"]}
     touched={true}
   />
-  <WufiButton variant="primary">Subscribe</WufiButton>
+  <KrapsButton variant="primary">Subscribe</KrapsButton>
 </Form>
 ```
 
@@ -85,7 +85,7 @@ import { EmailInput, PhoneInput, EstonianAddressInput } from "@/lib/components"
 
 ### **Should it go in `@/lib/components`?**
 1. **Is it a UI primitive?** (Button, Input, Dialog) → `ui/`
-2. **Is it Wufi brand-specific?** (WufiButton, EmailInput) → `wufi/`
+2. **Is it Kraps brand-specific?** (KrapsButton, EmailInput) → `kraps/`
 3. **Is it feature-specific?** (CartButton, ProductCard) → `@/modules/{feature}/`
 
 ## 🔄 Migration Benefits
@@ -95,7 +95,7 @@ import { EmailInput, PhoneInput, EstonianAddressInput } from "@/lib/components"
 - **No Confusion**: Know exactly where to import from
 - **Better Organization**: Logical grouping by purpose
 - **Enhanced UX**: Modern, accessible components
-- **Brand Consistency**: Wufi-specific styling
+- **Brand Consistency**: Kraps-specific styling
 
 ### 📊 Before vs After
 
@@ -103,14 +103,14 @@ import { EmailInput, PhoneInput, EstonianAddressInput } from "@/lib/components"
 ```tsx
 // Mixed imports from multiple locations
 import Input from "@modules/common/components/input"
-import WufiButton from "@modules/layout/components/wufi-button"  
+import KrapsButton from "@modules/layout/components/kraps-button"  
 import { Button } from "@lib/components/ui"
 ```
 
 #### ✅ After (Clean)
 ```tsx
 // Foundation components from one place
-import { ModernInput, WufiButton, Button } from "@/lib/components"
+import { ModernInput, KrapsButton, Button } from "@/lib/components"
 
 // Feature components from their modules
 import CartButton from "@/modules/layout/components/cart-button"

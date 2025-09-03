@@ -6,7 +6,7 @@ import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
 import { ShoppingBag, LoaderCircle } from "lucide-react"
-import { WufiButton } from "@lib/components"
+import { KrapsButton } from "@lib/components"
 
 import { getProductPrice } from "@lib/util/get-product-price"
 import OptionSelect from "./option-select"
@@ -23,6 +23,18 @@ type MobileActionsProps = {
   isAdding?: boolean
   show: boolean
   optionsDisabled: boolean
+  // New props to sync state with main actions
+  purchaseType?: "one_time" | "subscription"
+  onPurchaseTypeChange?: (type: "one_time" | "subscription") => void
+  prices?: {
+    regular: number
+    firstOrder: number
+    recurring: number
+    actualDiscount: number
+  }
+  availableIntervals?: { value: string; label: string }[]
+  selectedInterval?: string
+  onIntervalChange?: (val: string) => void
 }
 
 const MobileActions: React.FC<MobileActionsProps> = ({
@@ -35,6 +47,12 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   isAdding,
   show,
   optionsDisabled,
+  purchaseType,
+  onPurchaseTypeChange,
+  prices,
+  availableIntervals,
+  selectedInterval,
+  onIntervalChange,
 }) => {
   const { state, open, close } = useToggleState()
 
@@ -57,7 +75,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   return (
     <>
       <div
-        className={clx("lg:hidden inset-x-0 bottom-0 fixed", {
+        className={clx("lg:hidden inset-x-0 bottom-0 fixed z-40", {
           "pointer-events-none": !show,
         })}
       >
@@ -72,73 +90,116 @@ const MobileActions: React.FC<MobileActionsProps> = ({
           leaveTo="opacity-0"
         >
           <div
-            className="bg-white flex flex-col gap-y-3 md:gap-y-4 justify-center items-center p-4 md:p-6 h-full w-full border-t border-gray-200 shadow-lg"
+            className="bg-white flex flex-col gap-y-3 md:gap-y-4 justify-center items-center p-3 md:p-4 w-full border-t border-gray-200 shadow-lg rounded-t-2xl"
             data-testid="mobile-actions"
           >
-            <div className="w-full flex flex-col gap-y-2">
-              {selectedPrice && (
-                <div className="flex items-center gap-x-2">
-                  {selectedPrice.price_type === "sale" && (
-                    <p>
-                      <span className="line-through text-sm text-gray-500">
-                        {selectedPrice.original_price}
-                      </span>
-                    </p>
-                  )}
-                  <span
-                    className={clx("text-lg md:text-xl font-semibold", {
-                      "text-ui-fg-interactive":
-                        selectedPrice.price_type === "sale",
-                    })}
+            <div className="w-full flex items-center justify-between gap-3">
+              {/* Left: Variant chooser (if not simple) and purchase type toggle */}
+              <div className="flex items-start gap-2 flex-1 min-w-0">
+                {!isSimple && (
+                  <KrapsButton
+                    onClick={open}
+                    variant="secondary"
+                    className="text-gray-700 min-h-[40px] text-sm"
+                    data-testid="mobile-actions-button"
                   >
-                    {selectedPrice.calculated_price}
-                  </span>
-                </div>
-              )}
-              {!inStock && variant && (
-                <p className="text-sm text-red-500">
-                  Vabandame, see variant on hetkel saadaval
-                </p>
-              )}
-            </div>
-
-            <div className={clx("grid grid-cols-2 w-full gap-x-3 md:gap-x-4", {
-              "!grid-cols-1": isSimple
-            })}>
-              {!isSimple && <WufiButton
-                onClick={open}
-                variant="secondary"
-                className="w-full text-gray-700 min-h-[44px] md:min-h-[48px] text-sm md:text-base"
-                data-testid="mobile-actions-button"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-medium">
-                    {variant
-                      ? Object.values(options).join(" / ")
-                      : "Vali variant"}
-                  </span>
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              </WufiButton>}
-              <WufiButton
-                onClick={handleAddToCart}
-                disabled={!inStock || !variant}
-                className="w-full min-h-[44px] md:min-h-[48px] text-sm md:text-base"
-                data-testid="mobile-cart-button"
-              >
-                {isAdding ? (
-                  <LoaderCircle className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
-                ) : (
-                  <ShoppingBag className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium truncate max-w-[120px]">
+                        {variant ? Object.values(options).join(" / ") : "Vali variant"}
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </div>
+                  </KrapsButton>
                 )}
-                {!variant
-                  ? "Vali variant"
-                  : !inStock
-                  ? "Läbi müüdud"
-                  : isAdding
-                  ? "Lisatakse..."
-                  : "Lisa ostukorvi"}
-              </WufiButton>
+
+                {/* Purchase type toggle with interval label below */}
+                {onPurchaseTypeChange && (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                      <button
+                        type="button"
+                        onClick={() => onPurchaseTypeChange("one_time")}
+                        className={clx(
+                          "px-2 py-1 text-xs rounded-md",
+                          purchaseType === "one_time" ? "bg-white shadow font-semibold" : "text-gray-600"
+                        )}
+                        aria-pressed={purchaseType === "one_time"}
+                      >
+                        Ühekordne
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onPurchaseTypeChange("subscription")
+                          // Open interval picker immediately when choosing subscription
+                          if (availableIntervals && availableIntervals.length > 0 && onIntervalChange) {
+                            open()
+                          }
+                        }}
+                        className={clx(
+                          "px-2 py-1 text-xs rounded-md",
+                          purchaseType === "subscription" ? "bg-white shadow font-semibold" : "text-gray-600"
+                        )}
+                        aria-pressed={purchaseType === "subscription"}
+                      >
+                        Püsitellimus
+                      </button>
+                    </div>
+
+                    {purchaseType === "subscription" && availableIntervals && onIntervalChange && (
+                      <button
+                        type="button"
+                        onClick={open}
+                        className="text-[11px] text-gray-600 underline underline-offset-2 text-left"
+                      >
+                        {availableIntervals.find(i => i.value === (selectedInterval || ""))?.label || "Vali sagedus"}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Right: Price and Add to cart */}
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  {purchaseType === "subscription" && prices ? (
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-sm font-bold text-blue-600">
+                        {selectedPrice?.currency_code ? new Intl.NumberFormat("et-EE", { style: "currency", currency: selectedPrice.currency_code }).format(prices.firstOrder) : selectedPrice?.calculated_price}
+                      </span>
+                      <div className="text-[11px] text-gray-500">
+                        <span className="line-through mr-1">
+                          {selectedPrice?.currency_code ? new Intl.NumberFormat("et-EE", { style: "currency", currency: selectedPrice.currency_code }).format(prices.regular) : undefined}
+                        </span>
+                        <span>→ {selectedPrice?.currency_code ? new Intl.NumberFormat("et-EE", { style: "currency", currency: selectedPrice.currency_code }).format(prices.recurring) : undefined}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    selectedPrice && (
+                      <span className="text-sm font-semibold">{selectedPrice.calculated_price}</span>
+                    )
+                  )}
+                </div>
+                <KrapsButton
+                  onClick={handleAddToCart}
+                  disabled={!inStock || !variant}
+                  className="min-h-[40px] text-sm"
+                  data-testid="mobile-cart-button"
+                >
+                  {isAdding ? (
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ShoppingBag className="h-4 w-4 mr-2" />
+                  )}
+                  {!variant
+                    ? "Vali variant"
+                    : !inStock
+                    ? "Läbi müüdud"
+                    : isAdding
+                    ? "Lisatakse..."
+                    : "Lisa"}
+                </KrapsButton>
+              </div>
             </div>
           </div>
         </Transition>
@@ -197,6 +258,30 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                             </div>
                           )
                         })}
+                      </div>
+                    )}
+                    {/* Interval selection for subscription */}
+                    {purchaseType === "subscription" && availableIntervals && onIntervalChange && (
+                      <div className="mt-8">
+                        <h3 className="text-base font-semibold text-gray-900 mb-3">Vali tarne sagedus</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {availableIntervals.map((intv) => (
+                            <button
+                              key={intv.value}
+                              type="button"
+                              onClick={() => { onIntervalChange(intv.value); close(); }}
+                              className={clx(
+                                "w-full text-left px-3 py-2 rounded-lg border",
+                                selectedInterval === intv.value
+                                  ? "border-blue-600 bg-blue-50 text-blue-700 font-semibold"
+                                  : "border-gray-200 bg-white text-gray-800 hover:bg-gray-50"
+                              )}
+                              aria-pressed={selectedInterval === intv.value}
+                            >
+                              {intv.label}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

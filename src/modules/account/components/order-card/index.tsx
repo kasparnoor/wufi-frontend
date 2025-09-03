@@ -74,9 +74,9 @@ const OrderCard = ({ order }: OrderCardProps) => {
         )}
       </div>
       <div className="flex justify-end">
-        <LocalizedClientLink href={`/account/orders/details/${order.id}`}>
+        <LocalizedClientLink href={`/konto/orders/details/${order.id}`}>
           <Button data-testid="order-details-link" variant="secondary">
-            See details
+            Vaata detaile
           </Button>
         </LocalizedClientLink>
       </div>

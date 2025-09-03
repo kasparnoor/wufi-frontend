@@ -15,9 +15,10 @@ type CartTotalsProps = {
     shipping_subtotal?: number | null
   }
   hasShippingMethod?: boolean
+  cart?: any // Add cart to calculate individual subscription discounts (flexible type for different cart shapes)
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals, hasShippingMethod = false }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, hasShippingMethod = false, cart }) => {
   const {
     currency_code,
     total,
@@ -27,6 +28,26 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, hasShippingMethod = fal
     gift_card_total,
     shipping_subtotal,
   } = totals
+
+  // Calculate subscription discounts from line item metadata
+  const calculateSubscriptionDiscounts = () => {
+    if (!cart?.items) return 0
+    
+    return cart.items.reduce((totalDiscount: number, item: any) => {
+      if (item.metadata?.purchase_type === "subscription" && item.metadata?.subscription_discount) {
+        const discountPercent = parseInt(item.metadata.subscription_discount) / 100
+        const maxSavings = 20 // 20€ cap on first order discount
+        const itemTotal = (item.unit_price || 0) * (item.quantity || 0)
+        const discountAmount = Math.min(itemTotal * discountPercent, maxSavings * (item.quantity || 0))
+        return totalDiscount + discountAmount
+      }
+      return totalDiscount
+    }, 0)
+  }
+
+  // Use subscription calculation if available, otherwise fall back to cart discount
+  const calculatedSubscriptionDiscount = calculateSubscriptionDiscounts()
+  const displayDiscount = calculatedSubscriptionDiscount > 0 ? calculatedSubscriptionDiscount : (discount_total || 0)
 
   const getShippingDisplay = () => {
     if (!hasShippingMethod) {
@@ -51,17 +72,17 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, hasShippingMethod = fal
           </span>
         </div>
         
-        {!!discount_total && (
+        {displayDiscount > 0 && (
           <div className="flex items-center justify-between py-2 bg-green-50 -mx-3 px-3 rounded-lg">
             <span className="flex items-center gap-x-2 text-green-700 font-medium text-sm">
-              🏷️ Allahindlus
+              🏷️ {calculatedSubscriptionDiscount > 0 ? 'Püsitellimuse allahindlus' : 'Allahindlus'}
             </span>
             <span
               className="text-green-700 font-bold"
               data-testid="cart-discount"
-              data-value={discount_total || 0}
+              data-value={displayDiscount}
             >
-              - {convertToLocale({ amount: discount_total ?? 0, currency_code })}
+              - {convertToLocale({ amount: displayDiscount, currency_code })}
             </span>
           </div>
         )}
@@ -104,11 +125,16 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals, hasShippingMethod = fal
       <div className="border-t border-gray-200"></div>
 
       {/* Savings Display */}
-      {(discount_total ?? 0) > 0 && (
+      {displayDiscount > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
           <p className="text-green-700 font-bold text-sm">
-            🎉 Säästsite: {convertToLocale({ amount: discount_total ?? 0, currency_code })}
+            🎉 Säästsite: {convertToLocale({ amount: displayDiscount, currency_code })}
           </p>
+          {calculatedSubscriptionDiscount > 0 && (
+            <p className="text-green-600 text-xs mt-1">
+              Püsitellimuse esimese tellimuse soodustus
+            </p>
+          )}
         </div>
       )}
 

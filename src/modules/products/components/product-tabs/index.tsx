@@ -3,11 +3,8 @@
 import Back from "@modules/common/icons/back"
 import FastDelivery from "@modules/common/icons/fast-delivery"
 import Refresh from "@modules/common/icons/refresh"
-import { Text } from "@medusajs/ui"
 import { HttpTypes } from "@medusajs/types"
-import { useMemo, useState } from "react"
-import { Disclosure } from "@headlessui/react"
-import { Info, Shield } from "lucide-react"
+import { Shield, Truck, RotateCcw, Package } from "lucide-react"
 
 import Accordion from "./accordion"
 
@@ -18,19 +15,19 @@ type ProductTabsProps = {
 const ProductTabs = ({ product }: ProductTabsProps) => {
   const tabs = [
     {
-      label: "Toote tehniline info",
-      icon: <Info className="h-5 w-5 text-yellow-800" />,
+      label: "Tehnilised andmed",
+      icon: <Package className="h-5 w-5 text-gray-600" />,
       component: <ProductInfoTab product={product} />,
     },
     {
-      label: "Garantii ja tagastamine",
-      icon: <Shield className="h-5 w-5 text-yellow-800" />,
+      label: "Kohaletoimetamine ja tagastamine",
+      icon: <Truck className="h-5 w-5 text-gray-600" />,
       component: <ShippingInfoTab />,
     },
   ]
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 overflow-hidden">
+    <div className="w-full">
       <Accordion type="multiple">
         {tabs.map((tab, i) => (
           <Accordion.Item
@@ -39,7 +36,7 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
             icon={tab.icon}
             headingSize="medium"
             value={tab.label}
-            className="hover:bg-yellow-50/30 transition-colors duration-200"
+            className="border-b border-gray-200 last:border-b-0"
           >
             {tab.component}
           </Accordion.Item>
@@ -50,79 +47,74 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
 }
 
 const ProductInfoTab = ({ product }: ProductTabsProps) => {
+  const specs = [
+    { label: "Materjal", value: product.material },
+    { label: "Päritolumaa", value: product.origin_country },
+    { label: "Tüüp", value: product.type?.value },
+    { label: "Kaal", value: product.weight ? `${product.weight} g` : null },
+    { 
+      label: "Mõõtmed", 
+      value: product.length && product.width && product.height
+        ? `${product.length} × ${product.width} × ${product.height} cm`
+        : null
+    },
+  ].filter(spec => spec.value && spec.value !== 'Unknown')
+
   return (
-    <div className="text-small-regular py-8 px-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-        <div className="flex flex-col gap-y-4">
-          <div className="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100">
-            <span className="font-semibold text-yellow-800">Materjal</span>
-            <p className="text-gray-600 mt-1">{product.material ? product.material : "-"}</p>
-          </div>
-          <div className="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100">
-            <span className="font-semibold text-yellow-800">Päritolumaa</span>
-            <p className="text-gray-600 mt-1">{product.origin_country ? product.origin_country : "-"}</p>
-          </div>
-          <div className="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100">
-            <span className="font-semibold text-yellow-800">Tüüp</span>
-            <p className="text-gray-600 mt-1">{product.type ? product.type.value : "-"}</p>
-          </div>
+    <div className="py-6">
+      {specs.length > 0 ? (
+        <div className="space-y-4">
+          {specs.map((spec, index) => (
+            <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+              <span className="text-gray-600 font-medium">{spec.label}</span>
+              <span className="text-gray-900">{spec.value}</span>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-y-4">
-          <div className="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100">
-            <span className="font-semibold text-yellow-800">Kaal</span>
-            <p className="text-gray-600 mt-1">{product.weight ? `${product.weight} g` : "-"}</p>
-          </div>
-          <div className="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100">
-            <span className="font-semibold text-yellow-800">Mõõtmed</span>
-            <p className="text-gray-600 mt-1">
-              {product.length && product.width && product.height
-                ? `${product.length}L x ${product.width}W x ${product.height}H`
-                : "-"}
-            </p>
-          </div>
-        </div>
-      </div>
+      ) : (
+        <p className="text-gray-500 italic">Tehnilised andmed pole saadaval</p>
+      )}
     </div>
   )
 }
 
 const ShippingInfoTab = () => {
+  const policies = [
+    {
+      icon: <Truck className="h-5 w-5 text-blue-600" />,
+      title: "Tasuta kohaletoimetamine",
+      description: "Tellimused üle 50€ - tasuta transport kogu Eestis"
+    },
+    {
+      icon: <RotateCcw className="h-5 w-5 text-green-600" />,
+      title: "14-päevane tagastamine",
+      description: "Tagastage toode 14 päeva jooksul, kui see ei sobi"
+    },
+    {
+      icon: <Shield className="h-5 w-5 text-purple-600" />,
+      title: "Maitsegarantii",
+      description: "Kui pakk on 80% täis ja lemmikule ei maitsenud, võtame tagasi 14 päeva jooksul - isegi kui pakk on avatud!"
+    }
+  ]
+
   return (
-    <div className="text-small-regular py-8 px-6">
-      <div className="grid grid-cols-1 gap-y-6">
-        <div className="bg-yellow-50/50 p-6 rounded-xl border border-yellow-100">
-          <div className="flex items-start gap-x-4">
-            <FastDelivery className="h-6 w-6 text-yellow-800 mt-1" />
+    <div className="py-6">
+      <div className="space-y-6">
+        {policies.map((policy, index) => (
+          <div key={index} className="flex items-start gap-4">
+            <div className="flex-shrink-0 p-2 bg-gray-50 rounded-lg">
+              {policy.icon}
+            </div>
             <div>
-              <span className="font-semibold text-yellow-800">Kiire ja turvaline tarne</span>
-              <p className="text-gray-600 mt-2 max-w-sm">
-                Teie tellimus jõuab teieni 3-5 tööpäeva jooksul. Kogu teekonna võite jälgida meie veebilehel.
+              <h4 className="font-semibold text-gray-900 mb-1">
+                {policy.title}
+              </h4>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {policy.description}
               </p>
             </div>
           </div>
-        </div>
-        <div className="bg-yellow-50/50 p-6 rounded-xl border border-yellow-100">
-          <div className="flex items-start gap-x-4">
-            <Refresh className="h-6 w-6 text-yellow-800 mt-1" />
-            <div>
-              <span className="font-semibold text-yellow-800">14-päevane tagastamine</span>
-              <p className="text-gray-600 mt-2 max-w-sm">
-                Kui toode ei sobi või ei vasta teie ootustele, tagastage see 14 päeva jooksul. Tagastamine on tasuta.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-yellow-50/50 p-6 rounded-xl border border-yellow-100">
-          <div className="flex items-start gap-x-4">
-            <Shield className="h-6 w-6 text-yellow-800 mt-1" />
-            <div>
-              <span className="font-semibold text-yellow-800">2-aastane garantii</span>
-              <p className="text-gray-600 mt-2 max-w-sm">
-                Kõik meie tooted on kaetud 2-aastase garantiiaga. Kui toode peaks rikki minema, asendame selle uue vastu.
-              </p>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   )

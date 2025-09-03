@@ -27,8 +27,27 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
             {order.shipping_address?.last_name}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.address_1}{" "}
-            {order.shipping_address?.address_2}
+            {(() => {
+              const shippingAddress = order.shipping_address
+              const metadata = shippingAddress?.metadata as any
+              
+              // Check if this is a pakiautomaat order
+              const isPakiautomaat = metadata?.is_pakiautomaat === 'true' || 
+                                    metadata?.delivery_type === 'pakiautomaat'
+              
+              // If it's a pakiautomaat order, show the pakiautomaat info
+              if (isPakiautomaat) {
+                const pakiautomaarName = shippingAddress?.address_1 || 
+                                        metadata?.pakiautomaat_name || 
+                                        metadata?.pakiautomaat_location
+                
+                return pakiautomaarName ? `📦 ${pakiautomaarName}` : 'Pakiautomaat valimata'
+              }
+              
+              // For regular addresses
+              return shippingAddress?.address_1 || 'Aadress puudub'
+            })()}
+            {order.shipping_address?.address_2 && ` ${order.shipping_address?.address_2}`}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
             {order.shipping_address?.postal_code},{" "}

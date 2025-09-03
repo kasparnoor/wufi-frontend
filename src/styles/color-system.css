@@ -1,64 +1,64 @@
-/* Wufi Standardized Color System */
+/* Kraps Standardized Color System */
 
 :root {
   /* Primary Yellow Brand Colors */
-  --wufi-yellow-primary: #FBBF24;      /* yellow-400 - Primary buttons, CTAs */
-  --wufi-yellow-primary-hover: #F59E0B; /* yellow-500 - Hover states */
-  --wufi-yellow-dark: #92400E;         /* yellow-800 - Text on light backgrounds */
-  --wufi-yellow-darker: #78350F;       /* yellow-900 - Text on yellow backgrounds */
+  --kraps-yellow-primary: #FBBF24;      /* yellow-400 - Primary buttons, CTAs */
+  --kraps-yellow-primary-hover: #F59E0B; /* yellow-500 - Hover states */
+  --kraps-yellow-dark: #92400E;         /* yellow-800 - Text on light backgrounds */
+  --kraps-yellow-darker: #78350F;       /* yellow-900 - Text on yellow backgrounds */
   
   /* Background Colors */
-  --wufi-yellow-lightest: #FFFBEB;     /* yellow-50 - Light section backgrounds */
-  --wufi-yellow-light: #FEF3C7;        /* yellow-100 - Card backgrounds */
-  --wufi-yellow-subtle: #FDE68A;       /* yellow-200 - Subtle accents */
+  --kraps-yellow-lightest: #FFFBEB;     /* yellow-50 - Light section backgrounds */
+  --kraps-yellow-light: #FEF3C7;        /* yellow-100 - Card backgrounds */
+  --kraps-yellow-subtle: #FDE68A;       /* yellow-200 - Subtle accents */
   
   /* Border & Accent Colors */
-  --wufi-yellow-border: #FDE68A;       /* yellow-200 - Subtle borders */
-  --wufi-yellow-border-active: #FCD34D; /* yellow-300 - Active/hover borders */
+  --kraps-yellow-border: #FDE68A;       /* yellow-200 - Subtle borders */
+  --kraps-yellow-border-active: #FCD34D; /* yellow-300 - Active/hover borders */
   
   /* Text Colors (WCAG AA Compliant) */
-  --wufi-text-on-light: #92400E;       /* yellow-800 - High contrast on white */
-  --wufi-text-on-yellow: #78350F;      /* yellow-900 - High contrast on yellow backgrounds */
-  --wufi-text-muted: #B45309;          /* yellow-700 - Secondary text */
+  --kraps-text-on-light: #92400E;       /* yellow-800 - High contrast on white */
+  --kraps-text-on-yellow: #78350F;      /* yellow-900 - High contrast on yellow backgrounds */
+  --kraps-text-muted: #B45309;          /* yellow-700 - Secondary text */
   
   /* Icon Colors */
-  --wufi-icon-primary: #92400E;        /* yellow-800 - Primary icons */
-  --wufi-icon-secondary: #B45309;      /* yellow-700 - Secondary icons */
+  --kraps-icon-primary: #92400E;        /* yellow-800 - Primary icons */
+  --kraps-icon-secondary: #B45309;      /* yellow-700 - Secondary icons */
   
   /* Interactive States */
-  --wufi-hover-bg: #FEF3C7;           /* yellow-100 - Hover backgrounds */
-  --wufi-active-bg: #FDE68A;          /* yellow-200 - Active/pressed backgrounds */
+  --kraps-hover-bg: #FEF3C7;           /* yellow-100 - Hover backgrounds */
+  --kraps-active-bg: #FDE68A;          /* yellow-200 - Active/pressed backgrounds */
   
   /* Opacity Variants for Backgrounds */
-  --wufi-yellow-10: rgba(251, 191, 36, 0.1);  /* 10% opacity */
-  --wufi-yellow-20: rgba(251, 191, 36, 0.2);  /* 20% opacity */
-  --wufi-yellow-30: rgba(251, 191, 36, 0.3);  /* 30% opacity */
+  --kraps-yellow-10: rgba(251, 191, 36, 0.1);  /* 10% opacity */
+  --kraps-yellow-20: rgba(251, 191, 36, 0.2);  /* 20% opacity */
+  --kraps-yellow-30: rgba(251, 191, 36, 0.3);  /* 30% opacity */
 }
 
 /* Utility Classes for Standardized Colors */
-.wufi-bg-primary { background-color: var(--wufi-yellow-primary); }
-.wufi-bg-primary-hover { background-color: var(--wufi-yellow-primary-hover); }
-.wufi-bg-lightest { background-color: var(--wufi-yellow-lightest); }
-.wufi-bg-light { background-color: var(--wufi-yellow-light); }
-.wufi-bg-hover { background-color: var(--wufi-hover-bg); }
+.kraps-bg-primary { background-color: var(--kraps-yellow-primary); }
+.kraps-bg-primary-hover { background-color: var(--kraps-yellow-primary-hover); }
+.kraps-bg-lightest { background-color: var(--kraps-yellow-lightest); }
+.kraps-bg-light { background-color: var(--kraps-yellow-light); }
+.kraps-bg-hover { background-color: var(--kraps-hover-bg); }
 
-.wufi-text-primary { color: var(--wufi-text-on-light); }
-.wufi-text-on-yellow { color: var(--wufi-text-on-yellow); }
-.wufi-text-muted { color: var(--wufi-text-muted); }
+.kraps-text-primary { color: var(--kraps-text-on-light); }
+.kraps-text-on-yellow { color: var(--kraps-text-on-yellow); }
+.kraps-text-muted { color: var(--kraps-text-muted); }
 
-.wufi-icon-primary { color: var(--wufi-icon-primary); }
-.wufi-icon-secondary { color: var(--wufi-icon-secondary); }
+.kraps-icon-primary { color: var(--kraps-icon-primary); }
+.kraps-icon-secondary { color: var(--kraps-icon-secondary); }
 
-.wufi-border { border-color: var(--wufi-yellow-border); }
-.wufi-border-active { border-color: var(--wufi-yellow-border-active); }
+.kraps-border { border-color: var(--kraps-yellow-border); }
+.kraps-border-active { border-color: var(--kraps-yellow-border-active); }
 
 /* Hover States */
-.wufi-hover:hover { 
-  background-color: var(--wufi-hover-bg);
-  color: var(--wufi-text-primary);
+.kraps-hover:hover { 
+  background-color: var(--kraps-hover-bg);
+  color: var(--kraps-text-primary);
 }
 
-.wufi-hover-scale:hover {
+.kraps-hover-scale:hover {
   transform: scale(1.02);
   transition: all 0.2s ease;
 } 

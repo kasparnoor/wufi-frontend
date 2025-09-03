@@ -282,6 +282,7 @@ export default function SearchBar({
         <input
           ref={inputRef}
           type="text"
+          aria-label="Otsi tooteid"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyPress}

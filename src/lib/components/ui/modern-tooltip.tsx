@@ -59,4 +59,4 @@ export const InfoTooltip = React.forwardRef<
 
 InfoTooltip.displayName = "InfoTooltip"
 
-export { ModernTooltip as WufiTooltip } 
+export { ModernTooltip as KrapsTooltip } 

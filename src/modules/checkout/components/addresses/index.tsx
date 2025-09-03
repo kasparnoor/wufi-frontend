@@ -49,7 +49,7 @@ const Addresses = ({
           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isOpen ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
             <MapPin className="h-4 w-4" />
           </div>
-          <h3 className="font-medium text-lg text-gray-900">Tarneinfo</h3>
+          <h3 className="font-medium text-lg text-gray-900">Kontakt & Tarneinfo</h3>
         </div>
         
         {!isOpen && cart?.shipping_address && (
@@ -98,8 +98,27 @@ const Addresses = ({
                     {cart.shipping_address.last_name}
                   </p>
                   <p className="text-sm text-gray-900">
-                    {cart.shipping_address.address_1}{" "}
-                    {cart.shipping_address.address_2}
+                    {(() => {
+                      const shippingAddress = cart.shipping_address
+                      const metadata = shippingAddress?.metadata as any
+                      
+                      // Check if this is a pakiautomaat order
+                      const isPakiautomaat = metadata?.is_pakiautomaat === 'true' || 
+                                            metadata?.delivery_type === 'pakiautomaat'
+                      
+                      // If it's a pakiautomaat order, show the pakiautomaat info
+                      if (isPakiautomaat) {
+                        const pakiautomaarName = shippingAddress?.address_1 || 
+                                                metadata?.pakiautomaat_name || 
+                                                metadata?.pakiautomaat_location
+                        
+                        return pakiautomaarName ? `📦 ${pakiautomaarName}` : 'Pakiautomaat valimata'
+                      }
+                      
+                      // For regular addresses
+                      return shippingAddress?.address_1 || 'Aadress puudub'
+                    })()}
+                    {cart.shipping_address.address_2 && ` ${cart.shipping_address.address_2}`}
                   </p>
                   <p className="text-sm text-gray-900">
                     {cart.shipping_address.postal_code},{" "}

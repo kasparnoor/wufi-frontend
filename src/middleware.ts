@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 // Set a fallback region that actually exists in your Medusa database
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "gb"
+const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "ee"
 
 // For debugging region issues
 console.log("Default region:", DEFAULT_REGION)
@@ -27,43 +27,70 @@ async function getRegionMap(cacheId: string) {
     !regionMap.keys().next().value ||
     regionMapUpdated < Date.now() - 3600 * 1000
   ) {
-    // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
-    const { regions } = await fetch(`${BACKEND_URL}/store/regions`, {
-      headers: {
-        "x-publishable-api-key": PUBLISHABLE_API_KEY!,
-      },
-      next: {
-        revalidate: 3600,
-        tags: [`regions-${cacheId}`],
-      },
-      cache: "force-cache",
-    }).then(async (response) => {
-      const json = await response.json()
+    try {
+      // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
+      const response = await fetch(`${BACKEND_URL}/store/regions`, {
+        headers: {
+          "x-publishable-api-key": PUBLISHABLE_API_KEY!,
+        },
+        next: {
+          revalidate: 3600,
+          tags: [`regions-${cacheId}`],
+        },
+        cache: "force-cache",
+      })
 
+      // Check if response is ok before attempting to parse JSON
       if (!response.ok) {
-        throw new Error(json.message)
+        console.error(`Failed to fetch regions: ${response.status} ${response.statusText}`)
+        throw new Error(`Failed to fetch regions: ${response.status}`)
       }
 
-      return json
-    })
+      // Check content type to ensure we're getting JSON
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error(`Expected JSON but got content-type: ${contentType}`)
+        const text = await response.text()
+        console.error(`Response body: ${text.substring(0, 200)}...`)
+        throw new Error(`Expected JSON response but got ${contentType}`)
+      }
 
-    if (!regions?.length) {
-      throw new Error(
-        "No regions found. Please set up regions in your Medusa Admin."
-      )
-    }
+      const json = await response.json()
 
-    // Create a map of country codes to regions.
-    regions.forEach((region: HttpTypes.StoreRegion) => {
-      region.countries?.forEach((c) => {
-        regionMapCache.regionMap.set(c.iso_2 ?? "", region)
+      if (!json.regions?.length) {
+        throw new Error(
+          "No regions found. Please set up regions in your Medusa Admin."
+        )
+      }
+
+      // Create a map of country codes to regions.
+      json.regions.forEach((region: HttpTypes.StoreRegion) => {
+        region.countries?.forEach((c) => {
+          regionMapCache.regionMap.set(c.iso_2 ?? "", region)
+        })
       })
-    })
 
-    regionMapCache.regionMapUpdated = Date.now()
-    
-    // Log available regions for debugging
-    console.log("Available regions:", Array.from(regionMap.keys()))
+      regionMapCache.regionMapUpdated = Date.now()
+      
+      // Log available regions for debugging
+      console.log("Available regions:", Array.from(regionMap.keys()))
+    } catch (error) {
+      console.error("Error fetching regions in middleware:", error)
+      
+      // If we don't have any cached regions and fetching failed, create a minimal fallback
+      if (regionMap.size === 0) {
+        console.log("Creating fallback region map with default region:", DEFAULT_REGION)
+        // Create a basic region object for fallback
+        const fallbackRegion = {
+          id: "fallback",
+          name: "Fallback Region",
+          currency_code: "EUR",
+          countries: [{ iso_2: DEFAULT_REGION }]
+        } as HttpTypes.StoreRegion
+        
+        regionMapCache.regionMap.set(DEFAULT_REGION, fallbackRegion)
+      }
+    }
   }
 
   return regionMapCache.regionMap
@@ -129,7 +156,7 @@ async function getCountryCode(
     }
     
     // Return a known valid country code on error
-    return "gb"
+    return "ee"
   }
 }
 
@@ -148,7 +175,7 @@ function getValidCountryCode(regionMap: Map<string, HttpTypes.StoreRegion | numb
   }
   
   // Last resort: use the first available region
-  return Array.from(regionMap.keys())[0] || "gb"
+  return Array.from(regionMap.keys())[0] || "ee"
 }
 
 /**
@@ -222,13 +249,29 @@ export async function middleware(request: NextRequest) {
     return response
   } catch (error) {
     console.error("Middleware error:", error)
-    // On error, don't redirect and just proceed
+    
+    // On error, still try to set up a basic redirect to default region if needed
+    const urlPathParts = request.nextUrl.pathname.split("/")
+    const currentUrlCountryCode = urlPathParts[1]?.toLowerCase()
+    
+    if (request.nextUrl.pathname === "/") {
+      redirectUrl = `${request.nextUrl.origin}/${DEFAULT_REGION}`
+      console.log("Error fallback redirect to:", redirectUrl)
+      const redirectResponse = NextResponse.redirect(redirectUrl, 307)
+      redirectResponse.headers.set("x-redirect-count", (redirectCount + 1).toString())
+      redirectResponse.cookies.set("_medusa_cache_id", cacheId, {
+        maxAge: 60 * 60 * 24,
+      })
+      return redirectResponse
+    }
+    
+    // If there's an error but we're not at root, just proceed
     return response
   }
 }
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|images|assets|png|svg|jpg|jpeg|gif|webp).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|images|optimized|assets|png|svg|jpg|jpeg|gif|webp).*)",
   ],
 }

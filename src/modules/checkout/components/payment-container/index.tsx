@@ -5,8 +5,8 @@ import React, { useContext, useMemo, type JSX } from "react"
 import { RadioGroup as Radio, RadioGroupItem, SkeletonCardDetails } from "@lib/components"
 
 import { isManual } from "@lib/constants"
-import { CardElement } from "@stripe/react-stripe-js"
-import { StripeCardElementOptions } from "@stripe/stripe-js"
+import { PaymentElement } from "@stripe/react-stripe-js"
+import { StripePaymentElementOptions } from "@stripe/stripe-js"
 import PaymentTest from "../payment-test"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 
@@ -42,7 +42,11 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
     >
       <div className="flex items-center justify-between ">
         <div className="flex items-center gap-x-4">
-          <Radio checked={selectedPaymentOptionId === paymentProviderId} />
+          <div className="w-4 h-4 border-2 rounded-full flex items-center justify-center border-gray-300 data-[checked]:border-ui-fg-interactive data-[checked]:bg-ui-fg-interactive">
+            {selectedPaymentOptionId === paymentProviderId && (
+              <div className="w-2 h-2 rounded-full bg-white" />
+            )}
+          </div>
           <Text className="text-base-regular">
             {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
           </Text>
@@ -62,39 +66,36 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   )
 }
 
-export default PaymentContainer
-
 export const StripeCardContainer = ({
   paymentProviderId,
   selectedPaymentOptionId,
   paymentInfoMap,
   disabled = false,
-  setCardBrand,
-  setError,
-  setCardComplete,
+  cart,
 }: Omit<PaymentContainerProps, "children"> & {
-  setCardBrand: (brand: string) => void
-  setError: (error: string | null) => void
-  setCardComplete: (complete: boolean) => void
+  cart?: any; // Add cart to detect subscriptions
 }) => {
   const stripeReady = useContext(StripeContext)
 
-  const useOptions: StripeCardElementOptions = useMemo(() => {
+  // Check if cart contains subscription items
+  const hasSubscriptions = cart?.items?.some((item: any) => 
+    item.metadata?.purchase_type === "subscription" && 
+    item.metadata?.autoship === "true"
+  ) || false
+
+  const paymentElementOptions: StripePaymentElementOptions = useMemo(() => {
     return {
-      style: {
-        base: {
-          fontFamily: "Inter, sans-serif",
-          color: "#424270",
-          "::placeholder": {
-            color: "rgb(107 114 128)",
-          },
-        },
+      layout: "tabs",
+      // For subscriptions, we need to save payment method for future use
+      paymentMethodCreation: hasSubscriptions ? "on_session" : "automatic",
+      fields: {
+        billingDetails: "auto", // Let PaymentElement handle billing details
       },
-      classes: {
-        base: "pt-3 pb-1 block w-full h-11 px-4 mt-0 bg-ui-bg-field border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-ui-border-base hover:bg-ui-bg-field-hover transition-all duration-300 ease-in-out",
+      terms: {
+        card: hasSubscriptions ? "auto" : "never", // Show terms for subscriptions
       },
     }
-  }, [])
+  }, [hasSubscriptions])
 
   return (
     <PaymentContainer
@@ -103,26 +104,46 @@ export const StripeCardContainer = ({
       paymentInfoMap={paymentInfoMap}
       disabled={disabled}
     >
-      {selectedPaymentOptionId === paymentProviderId &&
-        (stripeReady ? (
-          <div className="my-4 transition-all duration-150 ease-in-out">
-            <Text className="txt-medium-plus text-ui-fg-base mb-1">
-              Enter your card details:
-            </Text>
-            <CardElement
-              options={useOptions as StripeCardElementOptions}
-              onChange={(e) => {
-                setCardBrand(
-                  e.brand && e.brand.charAt(0).toUpperCase() + e.brand.slice(1)
-                )
-                setError(e.error?.message || null)
-                setCardComplete(e.complete)
-              }}
-            />
-          </div>
-        ) : (
-          <SkeletonCardDetails />
-        ))}
+      {selectedPaymentOptionId === paymentProviderId && (
+        <div className="my-4 transition-all duration-150 ease-in-out">
+          {hasSubscriptions && (
+            <div className="subscription-notice mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="text-sm font-semibold text-blue-800 mb-2">
+                🔄 Subscription Items Detected
+              </h3>
+              <p className="text-xs text-blue-700 mb-2">
+                This order contains subscription items that will be automatically renewed.
+              </p>
+              <ul className="text-xs text-blue-600">
+                {cart?.items
+                  ?.filter((item: any) => item.metadata?.purchase_type === "subscription")
+                  ?.map((item: any) => (
+                    <li key={item.id}>
+                      • {item.product_title} - Every {item.metadata?.interval || "month"}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+          
+          {stripeReady ? (
+            <div>
+              <Text className="txt-medium-plus text-ui-fg-base mb-2">
+                {hasSubscriptions 
+                  ? "Enter your payment details (saved for future subscriptions):" 
+                  : "Enter your payment details:"}
+              </Text>
+              <PaymentElement
+                options={paymentElementOptions}
+              />
+            </div>
+          ) : (
+            <SkeletonCardDetails />
+          )}
+        </div>
+      )}
     </PaymentContainer>
   )
 }
+
+export default PaymentContainer

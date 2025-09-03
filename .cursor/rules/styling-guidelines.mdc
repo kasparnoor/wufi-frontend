@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # Styling Guidelines
 
-The Wufi Storefront uses a consistent styling approach based on Tailwind CSS with custom components and design patterns.
+The Kraps Storefront uses a consistent styling approach based on Tailwind CSS with custom components and design patterns.
 
 ## Core Styling Principles
 - Uses [Tailwind CSS](mdc:tailwind.config.js) for utility-first styling
@@ -55,7 +55,7 @@ yellow-300: Active borders, hover borders
 - `text-yellow-300` for important content
 
 ## Key Style Components
-- [WufiButton](mdc:src/modules/common/components/wufi-button/index.tsx) - Custom button component with variants
+- [KrapsButton](mdc:src/lib/components/kraps/kraps-button/index.tsx) - Custom button component with variants
 - [Layout](mdc:src/modules/layout) - Consistent page structure components
 - [Hero](mdc:src/modules/home/components/hero/index.tsx) - Homepage hero section with brand styling
 
@@ -108,7 +108,7 @@ yellow-300: Active borders, hover borders
 - Maintain design consistency by leveraging the component library
 
 ## Common Components Library
-- [src/modules/common/components/wufi-button](mdc:src/modules/common/components/wufi-button) - Buttons
+- [src/lib/components/kraps/kraps-button](mdc:src/lib/components/kraps/kraps-button) - Buttons
 - [src/modules/common/components/input](mdc:src/modules/common/components/input) - Form inputs
 - [src/modules/common/components/radio](mdc:src/modules/common/components/radio) - Radio buttons
 - [src/modules/common/components/checkbox](mdc:src/modules/common/components/checkbox) - Checkboxes
